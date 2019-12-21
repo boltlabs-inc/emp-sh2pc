@@ -8,19 +8,46 @@ include(${CMAKE_FOLDER}/cmake/source_of_randomness.cmake)
 include(${CMAKE_FOLDER}/cmake/threading.cmake)
 
 find_package(emp-ot REQUIRED)
+   find_library(CRYPTOPP_LIBRARIES NAMES cryptopp libcryptopp )
+   MESSAGE(STATUS "CryptoPP libs: " ${CRYPTOPP_LIBRARIES} )
+   
 include_directories(${EMP-OT_INCLUDE_DIRS})
 
 # Installation
 install(FILES cmake/emp-sh2pc-config.cmake DESTINATION cmake/)
+   
+add_library(token-utils SHARED emp-sh2pc/sha256.cpp emp-sh2pc/hmac.cpp emp-sh2pc/ecdsa.cpp emp-sh2pc/tokens.cpp emp-sh2pc/tokens-misc.cpp)
+target_link_libraries(token-utils ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} ${GMP_LIBRARIES} ${EMP-OT_LIBRARIES})
+   
+install(TARGETS token-utils DESTINATION lib)
+  
+add_executable(token emp-sh2pc/token.cpp)
+target_link_libraries(token
+    ${EMP-OT_LIBRARIES}
+    token-utils)
+  
+install(TARGETS token DESTINATION bin)
+    
+   
 install(DIRECTORY emp-sh2pc DESTINATION include/)
 
-# Test cases
 macro (add_test _name)
-	add_test_with_lib(${_name} ${EMP-OT_LIBRARIES})
+  add_executable(${_name} "test/${_name}.cpp")
+  target_link_libraries(${_name}
+    ${OPENSSL_LIBRARIES}
+    ${Boost_LIBRARIES}
+    ${GMP_LIBRARIES}
+    ${EMP-OT_LIBRARIES}
+    ${CRYPTOPP_LIBRARIES}
+    token-utils)
 endmacro()
-
+   
 add_test (bit)
 add_test (int)
 add_test (float)
 add_test (circuit_file)
 add_test (example)
+add_test (ecdsa)
+add_test (sha256)
+add_test (hmac)
+add_test (bitcoin)
