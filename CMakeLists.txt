@@ -30,6 +30,7 @@ install(TARGETS token DESTINATION bin)
     
    
 install(DIRECTORY emp-sh2pc DESTINATION include/)
+install(FILES tokens/tokens.h DESTINATION include/emp-sh2pc)
 
 macro (add_test _name)
   add_executable(${_name} "test/${_name}.cpp")
