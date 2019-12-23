@@ -21,7 +21,7 @@ target_link_libraries(token-utils ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} ${GMP_
    
 install(TARGETS token-utils DESTINATION lib)
   
-add_executable(token tokens/token-main.cpp)
+add_executable(token tokens/token.cpp)
 target_link_libraries(token
     ${EMP-OT_LIBRARIES}
     token-utils)
