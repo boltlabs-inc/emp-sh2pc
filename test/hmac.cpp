@@ -4,9 +4,9 @@
  */
 #include <typeinfo>
 #include "emp-sh2pc/emp-sh2pc.h"
-#include "emp-sh2pc/tokens-misc.h"
-#include "emp-sh2pc/hmac.h"
-#include "emp-sh2pc/sha256.h"
+#include "tokens/tokens-misc.h"
+#include "tokens/hmac.h"
+#include "tokens/sha256.h"
 using namespace emp;
 using namespace std;
 
