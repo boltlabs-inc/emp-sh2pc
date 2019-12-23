@@ -5,10 +5,6 @@
 
 using namespace std;
 
-// old main functions -- don't use
-int sha256_main(int argc, char** argv);
-int ecdsa_main(int argc, char** argv);
-
 /* 
  * Test main for token generation
  * generates fake data for now.
