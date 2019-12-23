@@ -73,7 +73,7 @@ struct PayToken_l {
  * TYPISSUE - how many bits is an ECDSA public key? Do we actually need this?
  */
 struct PubKey {
-  char pubkey[33];
+  char pubkey[256]; 
 };
 
 /* ECDSA partial signature
@@ -92,7 +92,7 @@ struct EcdsaPartialSig_l {
  * RIGHT NOW THIS THING IS 96 BITS.  WE MAY WANT TO INCREASE ITS LENGTH IN THE FUTURE!!!
  */
 struct Nonce_l {
-  uint32_t nonce[3];
+  uint32_t nonce[4];
 };
 /* Revocation lock - TYPISSUE: not sure what type this is yet.
  * Tentatively sized to use a hash (SHA256-based) commitment scheme.
@@ -102,10 +102,26 @@ struct RevLock_l {
   uint32_t revlock[8];
 };
 
+struct RevLockCommitment_l {
+  uint32_t commitment[8];
+};
+
 /* bitcoin-flavored transaction id
  */
 struct Txid_l {
   uint32_t txid[8];
+};
+
+struct BitcoinPublicKey_l {
+  uint32_t key[9]; // last byte padded with zeros.
+};
+
+struct PublicKeyHash_l {
+  uint32_t hash[5];
+};
+
+struct Balance_l {
+  uint32_t balance[2];
 };
 
 /* state type
@@ -120,10 +136,12 @@ struct Txid_l {
 struct State_l {
   struct Nonce_l nonce;
   struct RevLock_l rl;
-  int32_t balance_cust;
-  int32_t balance_merch;
+  struct Balance_l balance_cust;
+  struct Balance_l balance_merch;
   struct Txid_l txid_merch;
   struct Txid_l txid_escrow;
+  struct Txid_l HashPrevOuts_merch;
+  struct Txid_l HashPrevOuts_escrow;
 };
 
 /* customer's token generation function

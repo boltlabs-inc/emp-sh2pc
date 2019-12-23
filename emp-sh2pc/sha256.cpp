@@ -129,36 +129,6 @@ void computeSHA256_2l(uint message[2][16], Integer result[8]) {
 }
 
 
-/* computes sha256 for a 2-block message
- * output is stored in result
- * composed of 8 32-bit Integers such that
- * sha256(message) = result[0] || result[1] || ... || result[7]
- */
-void computeSHA256_2d(Integer message[2][16], Integer result[8]) {
-  // initialize constants and initial hash digest value
-  const int BLOCKS = 2;
-  Integer k[64];
-  Integer H[8];
-  Integer w[BLOCKS][64];
-  // initialize message schedule
-  for (int i=0; i<BLOCKS; i++) {
-    for(size_t t=0; t<16; t++) {
-      w[i][t] = message[i][t];
-    }
-  }
-
-  initSHA256(k, H);
-
-  for (int i=0; i<BLOCKS; i++) {
-    computeInnerHashBlock(k, H, w[i]);
-  }
-
-  for(int i=0; i<8; i++) {
-    result[i] = H[i];
-  }
-}
-
-
 /* computes sha256 for 1-block message
  * output is stored in result
  * composed of 8 32-bit Integers such that
@@ -177,6 +147,35 @@ void computeSHA256_1d(Integer message[1][16], Integer result[8]) {
 
   initSHA256(k, H);
   computeInnerHashBlock(k, H, w);
+
+  for(int i=0; i<8; i++) {
+    result[i] = H[i];
+  }
+}
+
+
+/* computes sha256 for a 2-block message
+ * output is stored in result
+ * composed of 8 32-bit Integers such that
+ * sha256(message) = result[0] || result[1] || ... || result[7]
+ */
+void computeSHA256_2d(Integer message[2][16], Integer result[8]) {
+  // initialize constants and initial hash digest value
+  Integer k[64];
+  Integer H[8];
+  Integer w[2][64];
+  // initialize message schedule
+  for (int i=0; i<2; i++) {
+    for(size_t t=0; t<16; t++) {
+      w[i][t] = message[i][t];
+    }
+  }
+
+  initSHA256(k, H);
+
+  for (int i=0; i<2; i++) {
+    computeInnerHashBlock(k, H, w[i]);
+  }
 
   for(int i=0; i<8; i++) {
     result[i] = H[i];
@@ -212,3 +211,93 @@ void computeSHA256_3d(Integer message[3][16], Integer result[8]) {
     result[i] = H[i];
   }
 }
+
+void computeSHA256_4d(Integer message[4][16], Integer result[8]) {
+  // initialize constants and initial hash digest value
+  Integer k[64];
+  Integer H[8];
+  Integer w[4][64];
+  // initialize message schedule
+  for (int i=0; i<4; i++) {
+    for(size_t t=0; t<16; t++) {
+      w[i][t] = message[i][t];
+    }
+  }
+
+  initSHA256(k, H);
+
+  for (int i=0; i<4; i++) {
+    computeInnerHashBlock(k, H, w[i]);
+  }
+
+  for(int i=0; i<8; i++) {
+    result[i] = H[i];
+  }
+}
+
+void computeSHA256_5d(Integer message[5][16], Integer result[8]) {
+  // initialize constants and initial hash digest value
+  Integer k[64];
+  Integer H[8];
+  Integer w[5][64];
+  // initialize message schedule
+  for (int i=0; i<5; i++) {
+    for(size_t t=0; t<16; t++) {
+      w[i][t] = message[i][t];
+    }
+  }
+
+  initSHA256(k, H);
+
+  for (int i=0; i<5; i++) {
+    computeInnerHashBlock(k, H, w[i]);
+  }
+
+  for(int i=0; i<8; i++) {
+    result[i] = H[i];
+  }
+}
+
+
+
+void computeDoubleSHA256_3d(Integer message[3][16], Integer result[8]) {
+
+  // initialize constants and initial hash digest value
+  Integer k[64];
+  Integer H[8];
+  Integer w[3][64];
+  // initialize message schedule
+  for (int i=0; i<3; i++) {
+    for(size_t t=0; t<16; t++) {
+      w[i][t] = message[i][t];
+    }
+  }
+
+  initSHA256(k, H);
+
+  for (int i=0; i<3; i++) {
+    computeInnerHashBlock(k, H, w[i]);
+  }
+
+  // for(int i=0; i<8; i++) {
+  //   result[i] = H[i];
+  // }
+
+  // make a new buffer for the itterated hash
+
+  Integer newmessage[1][16];
+
+  for(int i=0; i<8; i++) {
+    newmessage[0][i] = H[i];
+  }
+
+  newmessage[0][8] = Integer(32, 2147483648/*0x80000000*/, PUBLIC);
+  for(int i=9; i<15; i++) {
+    newmessage[0][i] = Integer(32, 0/*0x00000000*/, PUBLIC);
+  }
+  newmessage[0][15] = Integer(32, 256, PUBLIC);
+
+  computeSHA256_1d(newmessage, result);
+}
+
+

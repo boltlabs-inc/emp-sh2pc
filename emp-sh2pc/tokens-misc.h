@@ -26,6 +26,11 @@ struct RevLock_d {
   Integer revlock[8];
 };
 
+typedef struct RevLockCommitment_l RevLockCommitment_l;
+struct RevLockCommitment_d {
+  Integer commitment[8];
+};
+
 /* This is a pay token
  * Is is an HMAC computed on the state 
  * The output of HMAC is the underlying block size.  In this case 256 bits
@@ -56,7 +61,7 @@ struct ClosingTokenEscrow_d {
  */
 typedef struct Nonce_l Nonce_l;
 struct Nonce_d {
-  Integer nonce[3];
+  Integer nonce[4];
 };
 
 struct TxSerialized_l {
@@ -70,6 +75,18 @@ struct TxSerialized_d {
 typedef struct Txid_l Txid_l;
 struct Txid_d {
   Integer txid[8];
+};
+
+struct BitcoinPublicKey_d {
+  Integer key[9]; // last byte padded with zeros.
+};
+
+struct PublicKeyHash_d {
+  Integer hash[5];
+};
+
+struct Balance_d {
+  Integer balance[2];
 };
 
 /* state type
@@ -86,10 +103,12 @@ typedef struct State_l State_l;
 struct State_d {
   Nonce_d nonce;
   RevLock_d rl;
-  Integer balance_cust;
-  Integer balance_merch;
+  Balance_d balance_cust;
+  Balance_d balance_merch;
   Txid_d txid_merch;
   Txid_d txid_escrow;
+  Txid_d HashPrevOuts_merch;
+  Txid_d HashPrevOuts_escrow;
 };
 
 /* Commitment stuff
@@ -132,6 +151,9 @@ HMACKey_l localize_HMACKey(HMACKey_d key);
 RevLock_d distribute_RevLock(RevLock_l revlock, int party);
 RevLock_l localize_RevLock(RevLock_d revlock);
 
+RevLockCommitment_d distribute_RevLockCommitment(RevLockCommitment_l rlc, int party);
+RevLockCommitment_l localize_RevLockCommitment(RevLockCommitment_d rlc);
+
 PayToken_d distribute_PayToken(PayToken_l paytoken, int party);
 PayToken_l localize_PayToken(PayToken_d paytoken);
 
@@ -150,8 +172,22 @@ HMACKeyCommitment_l localize_HMACKeyCommitment(HMACKeyCommitment_d commitment);
 MaskCommitment_d distribute_MaskCommitment(MaskCommitment_l commitment, int party);
 MaskCommitment_l localize_MaskCommitment(MaskCommitment_d commitment);
 
+PublicKeyHash_d distribute_PublicKeyHash(PublicKeyHash_l hash, int party);
+PublicKeyHash_l localize_PublicKeyHash(PublicKeyHash_d hash);
+
 Mask_d distribute_Mask(Mask_l mask, int party);
 Mask_l localize_Mask(Mask_d mask);
+
+Balance_d distribute_Balance(Balance_l balance, int party);
+Balance_l localize_Balance(Balance_d balance);
+
+Balance_d convert_to_little_endian(Balance_d big_endian_balance);
+Balance_d convert_to_big_endian(Balance_d little_endian_balance);
+
+Balance_d sum_balances(Balance_d lhs, Balance_d rhs);
+
+BitcoinPublicKey_d distribute_BitcoinPublicKey(BitcoinPublicKey_l pubKey, int party);
+BitcoinPublicKey_l localize_BitcoinPublicKey(BitcoinPublicKey_d pubKey);
 
 EcdsaPartialSig_d distribute_EcdsaPartialSig(EcdsaPartialSig_l ecdsapartialsig, int party=MERCH);
 EcdsaPartialSig_l localize_EcdsaPartialSig(EcdsaPartialSig_d ecdsapartialsig);
@@ -169,22 +205,32 @@ Integer makeInteger(bool *bits, int len, int intlen, int party);
  * as described in bolt.pdf
  */
 void issue_tokens(
+/* CUSTOMER INPUTS */
   State_l old_state_l,
   State_l new_state_l,
-  int32_t epsilon_l,
-  HMACKeyCommitment_l hmac_key_commitment_l,
-  HMACKey_l hmac_key_l,
   PayToken_l old_paytoken_l,
+  BitcoinPublicKey_l cust_escrow_pub_key_l,
+  BitcoinPublicKey_l cust_payout_pub_key_l,
+/* MERCHANT INPUTS */
+  HMACKey_l hmac_key_l,
   Mask_l paytoken_mask_l,
-  MaskCommitment_l paytoken_mask_commitment_l,
   Mask_l merch_mask_l,
-  MaskCommitment_l merch_mask_commitment_l,
   Mask_l escrow_mask_l,
-  MaskCommitment_l escrow_mask_commitment_l,
+  /* TODO: ECDSA Key info */
+/* PUBLIC INPUTS */
+  Balance_l epsilon_l,
+  HMACKeyCommitment_l hmac_key_commitment_l,
+  MaskCommitment_l paytoken_mask_commitment_l,
+  RevLockCommitment_l rlc_l,
+  Nonce_l nonce_l,
+  BitcoinPublicKey_l merch_escrow_pub_key_l,
+  BitcoinPublicKey_l merch_dispute_key_l, 
+  PublicKeyHash_l merch_publickey_hash_l,
+/* OUTPUTS */
   EcdsaPartialSig_l sig1, 
-  bool close_tx_escrow[1024],
+  char close_tx_escrow[1024],
   EcdsaPartialSig_l sig2, 
-  bool close_tx_merch[1024]
+  char close_tx_merch[1024]
   );
 
 /* SIGNATURE SCHEME
@@ -211,7 +257,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, HMACKey_d opening, State_d 
  *
  * \return b 	: success bit
  */
-Bit compare_wallets(State_d old_state_d, State_d new_state_d, Integer epsilon_d);
+Bit compare_wallets(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, Nonce_d nonce_d, Balance_d epsilon_d);
 
 /* opens and verifies commitment to a wallet
  * e.g. checks that com == commit(w;t)
@@ -225,6 +271,7 @@ Bit compare_wallets(State_d old_state_d, State_d new_state_d, Integer epsilon_d)
  */
 Bit open_commitment();
 
+Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d);
 
 Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment);
 
@@ -243,8 +290,10 @@ Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment);
  *
  * \return b 	: success bit
  */
-Bit validate_transactions(State_d new_state_d, TxSerialized_d close_tx_escrow_d, TxSerialized_d close_tx_merch_d);
-
+void validate_transactions(State_d new_state_d, 
+  BitcoinPublicKey_d cust_escrow_pub_key_d, BitcoinPublicKey_d cust_payout_pub_key_d,
+  BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, PublicKeyHash_d merch_publickey_hash_d,
+  Integer escrow_digest[8]);
 /* applies a mask to a pay token
  * uses a one-time-pad scheme (just xors mask with token bits)
  * Also checks to make sure that the mask matches the commited to randomness
@@ -267,7 +316,7 @@ Bit mask_paytoken(Integer paytoken[8], Mask_d mask, MaskCommitment_d maskcommitm
  * \param[in] token : Sequence of bits representing a token
  *
  */
-Bit mask_closemerchtoken(Integer token[8], Mask_d mask, MaskCommitment_d maskcommitment);
-Bit mask_closeescrowtoken(Integer token[8], Mask_d mask, MaskCommitment_d maskcommitment);
+void mask_closemerchtoken(Integer token[8], Mask_d mask);
+void mask_closeescrowtoken(Integer token[8], Mask_d mask);
 
 
