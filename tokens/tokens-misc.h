@@ -225,6 +225,7 @@ void issue_tokens(
   Nonce_l nonce_l,
   BitcoinPublicKey_l merch_escrow_pub_key_l,
   BitcoinPublicKey_l merch_dispute_key_l, 
+  BitcoinPublicKey_l merch_payout_pub_key_l,
   PublicKeyHash_l merch_publickey_hash_l,
 /* OUTPUTS */
   EcdsaPartialSig_l sig1, 
@@ -292,8 +293,8 @@ Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment);
  */
 void validate_transactions(State_d new_state_d, 
   BitcoinPublicKey_d cust_escrow_pub_key_d, BitcoinPublicKey_d cust_payout_pub_key_d,
-  BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, PublicKeyHash_d merch_publickey_hash_d,
-  Integer escrow_digest[8]);
+  BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, 
+  PublicKeyHash_d merch_publickey_hash_d, Integer escrow_digest[8], Integer merch_digest[8]);
 /* applies a mask to a pay token
  * uses a one-time-pad scheme (just xors mask with token bits)
  * Also checks to make sure that the mask matches the commited to randomness
