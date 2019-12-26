@@ -68,6 +68,13 @@ struct PayToken_l {
   uint32_t paytoken[8];
 };
 
+/* This is the second part of an ecdsa signature
+ * In this case 256 bits
+ */
+struct EcdsaSig_l {
+  uint32_t sig[8];
+};
+
 /* ECDSA public key type 
  * \param pubkey    : a public key. 
  * TYPISSUE - how many bits is an ECDSA public key? Do we actually need this?
@@ -174,22 +181,28 @@ struct State_l {
  */
 void build_masked_tokens_cust(
   struct PubKey pkM,
-  uint64_t amount,
-  struct RevLock_l rl_com, // TYPISSUE: this doesn't match the docs. should be a commitment
+  struct Balance_l epsilon_l,
+  struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   int port,
   char ip_addr[15], // TYPISSUE: do we want to support ipv6?
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
+  struct BitcoinPublicKey_l merch_escrow_pub_key_l,
+  struct BitcoinPublicKey_l merch_dispute_key_l,
+  struct PublicKeyHash_l merch_publickey_hash,
+  struct BitcoinPublicKey_l merch_payout_pub_key_l,
+  struct Nonce_l nonce_l,
 
   struct State_l w_new,
   struct State_l w_old,
   char *t,
   struct PayToken_l pt_old,
-  char close_tx_escrow[1024],
-  char close_tx_merch[1024],
+  struct BitcoinPublicKey_l cust_escrow_pub_key_l,
+  struct BitcoinPublicKey_l cust_payout_pub_key_l,
 
-  char ct_masked[256],
-  char pt_masked[256]
+  struct PayToken_l pt_return,
+  struct EcdsaSig_l ct_escrow,
+  struct EcdsaSig_l ct_merch
 );
 
 
@@ -228,16 +241,22 @@ void build_masked_tokens_cust(
  */
 void build_masked_tokens_merch(
   struct PubKey pkM,
-  uint64_t amount,
-  struct RevLock_l rl_com, // TYPISSUE: this doesn't match the docs. should be a commitment
+  struct Balance_l epsilon_l,
+  struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   int port,
   char ip_addr[15], // TYPISSUE: what IP version?
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
+  struct BitcoinPublicKey_l merch_escrow_pub_key_l,
+  struct BitcoinPublicKey_l merch_dispute_key_l,
+  struct PublicKeyHash_l merch_publickey_hash,
+  struct BitcoinPublicKey_l merch_payout_pub_key_l,
+  struct Nonce_l nonce_l,
 
   struct HMACKey_l hmac_key,
-  struct Mask_l close_mask,
-  struct Mask_l pay_mask,
+  struct Mask_l merch_mask_l,
+  struct Mask_l escrow_mask_l,
+  struct Mask_l paytoken_mask_l,
   struct EcdsaPartialSig_l sig1,
   struct EcdsaPartialSig_l sig2,
   struct EcdsaPartialSig_l sig3

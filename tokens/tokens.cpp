@@ -23,7 +23,9 @@ void issue_tokens(
   Mask_l paytoken_mask_l,
   Mask_l merch_mask_l,
   Mask_l escrow_mask_l,
-  /* TODO: ECDSA Key info */
+  EcdsaPartialSig_l sig1,
+  EcdsaPartialSig_l sig2,
+/* TODO: ECDSA Key info */
 /* PUBLIC INPUTS */
   Balance_l epsilon_l,
   HMACKeyCommitment_l hmac_key_commitment_l,
@@ -35,10 +37,9 @@ void issue_tokens(
   BitcoinPublicKey_l merch_payout_pub_key_l,
   PublicKeyHash_l merch_publickey_hash_l,
 /* OUTPUTS */
-  EcdsaPartialSig_l sig1, 
-  char close_tx_escrow[1024],
-  EcdsaPartialSig_l sig2, 
-  char close_tx_merch[1024]
+  PayToken_l pt_return,
+  EcdsaSig_l ct_escrow,
+  EcdsaSig_l ct_merch
   ) {
 
   cout << "issuing tokens" << endl;
@@ -136,52 +137,40 @@ void issue_tokens(
  */
 void build_masked_tokens_cust(
   struct PubKey pkM,
-  uint64_t amount,
-  struct RevLock_l rl_com, // TYPISSUE: this doesn't match the docs. should be a commitment
+  struct Balance_l epsilon_l,
+  struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   int port,
   char ip_addr[15],
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
+  struct BitcoinPublicKey_l merch_escrow_pub_key_l,
+  struct BitcoinPublicKey_l merch_dispute_key_l,
+  struct PublicKeyHash_l merch_publickey_hash,
+  struct BitcoinPublicKey_l merch_payout_pub_key_l,
+  struct Nonce_l nonce_l,
 
   struct State_l w_new,
   struct State_l w_old,
   char *t,
   struct PayToken_l pt_old,
-  char close_tx_escrow[1024],
-  char close_tx_merch[1024],
+  struct BitcoinPublicKey_l cust_escrow_pub_key_l,
+  struct BitcoinPublicKey_l cust_payout_pub_key_l,
 
-  char ct_masked[256],
-  char pt_masked[256]
+  struct PayToken_l pt_return,
+  struct EcdsaSig_l ct_escrow,
+  struct EcdsaSig_l ct_merch
 ) {
   // todo: replace new/delete with sweet auto
   NetIO * io = new NetIO("127.0.0.1", port);
   setup_semi_honest(io, CUST);
 
-  // hardcoded data for run-throughs 
-  for (int i=0; i<1024; i++) {
-    close_tx_escrow[i] = '1';
-  }
-  for (int i=0; i < 10; i+=2) {
-    close_tx_escrow[1023-i] = '0';
-  }
-
   // placeholders for vars passed by merchant
   // TODO maybe do all the distributing here, before calling issue_tokens
   HMACKey_l hmac_key_l;
   Mask_l paytoken_mask_l;
-  MaskCommitment_l paytoken_mask_commitment_l;
-  RevLockCommitment_l rlc_l;
   Mask_l merch_mask_l;
   Mask_l escrow_mask_l;
   EcdsaPartialSig_l dummy_sig;
-  BitcoinPublicKey_l cust_escrow_pub_key_l;
-  BitcoinPublicKey_l merch_escrow_pub_key_l;
-  Nonce_l nonce_l;
-  BitcoinPublicKey_l merch_dispute_key_l;
-  PublicKeyHash_l merch_publickey_hash;
-  Balance_l epsilon_l;
-  BitcoinPublicKey_l cust_payout_pub_key_l;
-  BitcoinPublicKey_l merch_payout_pub_key_l;
 
 issue_tokens(
 /* CUSTOMER INPUTS */
@@ -195,11 +184,13 @@ issue_tokens(
   paytoken_mask_l,
   merch_mask_l,
   escrow_mask_l,
-  /* TODO: ECDSA Key info */
+  dummy_sig,
+  dummy_sig,
+/* TODO: ECDSA Key info */
 /* PUBLIC INPUTS */
   epsilon_l,
   key_com,
-  paytoken_mask_commitment_l,
+  paymask_com,
   rlc_l,
   nonce_l,
   merch_escrow_pub_key_l,
@@ -207,10 +198,9 @@ issue_tokens(
   merch_payout_pub_key_l,
   merch_publickey_hash,
 /* OUTPUTS */
-  dummy_sig,
-  close_tx_escrow,
-  dummy_sig,
-  close_tx_merch
+  pt_return,
+  ct_escrow,
+  ct_merch
   );
 
   cout << "customer finished!" << endl;
@@ -220,16 +210,22 @@ issue_tokens(
 
 void build_masked_tokens_merch(
   struct PubKey pkM,
-  uint64_t amount,
-  struct RevLock_l rl_com, // TYPISSUE: this doesn't match the docs. should be a commitment
+  struct Balance_l epsilon_l,
+  struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   int port,
   char ip_addr[15],
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
+  struct BitcoinPublicKey_l merch_escrow_pub_key_l,
+  struct BitcoinPublicKey_l merch_dispute_key_l,
+  struct PublicKeyHash_l merch_publickey_hash,
+  struct BitcoinPublicKey_l merch_payout_pub_key_l,
+  struct Nonce_l nonce_l,
 
   struct HMACKey_l hmac_key,
-  struct Mask_l close_mask,
-  struct Mask_l pay_mask,
+  struct Mask_l merch_mask_l,
+  struct Mask_l escrow_mask_l,
+  struct Mask_l paytoken_mask_l,
   struct EcdsaPartialSig_l sig1,
   struct EcdsaPartialSig_l sig2,
   struct EcdsaPartialSig_l sig3
@@ -239,38 +235,15 @@ void build_masked_tokens_merch(
   NetIO * io = new NetIO(nullptr, port);
   setup_semi_honest(io, MERCH);
 
-  // hardcode test values using boost to get char*s.
-
-  string r = "108792476108599305057612221643697785065475034835954270988586688301027220077907";
-  string k_inv = "44657876998057202178264530375095959644163723589174927475562391733096641768603";
-
-  fillEcdsaPartialSig_l(&sig1, r, k_inv);
-  fillEcdsaPartialSig_l(&sig2, r, k_inv);
-
-  // define dummy (customer) inputs
-  char dummy_tx[1024];
-  // fill this in so signature_hash doesn't crash 
-  // TODO find a better way/location to initialize vars
-  for (int i=0; i<1024; i++) {
-    dummy_tx[i] = '0';  
-  }
 
   State_l old_state_l;
   State_l new_state_l;
   PayToken_l old_paytoken_l;
-  Mask_l paytoken_mask_l;
-  MaskCommitment_l paytoken_mask_commitment_l;
-  RevLockCommitment_l rlc_l;
-  Mask_l merch_mask_l;
-  Mask_l escrow_mask_l;
   BitcoinPublicKey_l cust_escrow_pub_key_l;
-  BitcoinPublicKey_l merch_escrow_pub_key_l;
-  Nonce_l nonce_l;
-  BitcoinPublicKey_l merch_dispute_key_l;
-  PublicKeyHash_l merch_publickey_hash;
-  Balance_l epsilon_l;
   BitcoinPublicKey_l cust_payout_pub_key_l;
-  BitcoinPublicKey_l merch_payout_pub_key_l;
+  PayToken_l pt_return;
+  EcdsaSig_l ct_escrow;
+  EcdsaSig_l ct_merch;
 
 issue_tokens(
 /* CUSTOMER INPUTS */
@@ -284,11 +257,13 @@ issue_tokens(
   paytoken_mask_l,
   merch_mask_l,
   escrow_mask_l,
-  /* TODO: ECDSA Key info */
+  sig1,
+  sig2,
+/* TODO: ECDSA Key info */
 /* PUBLIC INPUTS */
   epsilon_l,
   key_com,
-  paytoken_mask_commitment_l,
+  paymask_com,
   rlc_l,
   nonce_l,
   merch_escrow_pub_key_l,
@@ -296,10 +271,9 @@ issue_tokens(
   merch_payout_pub_key_l, 
   merch_publickey_hash,
 /* OUTPUTS */
-  sig1,
-  dummy_tx,
-  sig2,
-  dummy_tx
+  pt_return,
+  ct_escrow,
+  ct_merch
   );
 
   cout << "merchant finished!" << endl;

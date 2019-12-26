@@ -216,7 +216,9 @@ void issue_tokens(
   Mask_l paytoken_mask_l,
   Mask_l merch_mask_l,
   Mask_l escrow_mask_l,
-  /* TODO: ECDSA Key info */
+  EcdsaPartialSig_l sig1,
+  EcdsaPartialSig_l sig2,
+/* TODO: ECDSA Key info */
 /* PUBLIC INPUTS */
   Balance_l epsilon_l,
   HMACKeyCommitment_l hmac_key_commitment_l,
@@ -228,10 +230,9 @@ void issue_tokens(
   BitcoinPublicKey_l merch_payout_pub_key_l,
   PublicKeyHash_l merch_publickey_hash_l,
 /* OUTPUTS */
-  EcdsaPartialSig_l sig1, 
-  char close_tx_escrow[1024],
-  EcdsaPartialSig_l sig2, 
-  char close_tx_merch[1024]
+  PayToken_l pt_return,
+  EcdsaSig_l ct_escrow,
+  EcdsaSig_l ct_merch
   );
 
 /* SIGNATURE SCHEME
