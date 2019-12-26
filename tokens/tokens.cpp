@@ -138,7 +138,7 @@ void issue_tokens(
     signed_escrow_tx_parsed.sig[i] = handle_error_case(signed_escrow_tx_parsed.sig[i], error_signal);
   }
 
-  pt_return = localize_PayToken(new_paytoken_d, CUST)
+  pt_return = localize_PayToken(new_paytoken_d, CUST);
   ct_escrow = localize_EcdsaSig(signed_merch_tx_parsed, CUST);
   ct_merch  = localize_EcdsaSig(signed_escrow_tx_parsed, CUST);
 }
