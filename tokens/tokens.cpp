@@ -654,8 +654,8 @@ void validate_transactions(State_d new_state_d,
 
   Balance_d big_endian_total_amount = sum_balances(new_state_d.balance_cust, new_state_d.balance_merch);
   Balance_d little_endian_total_amount = convert_to_little_endian(big_endian_total_amount);
-  total_preimage[2][12] = little_endian_total_amount.balance[0];
-  total_preimage[2][13] = little_endian_total_amount.balance[1];
+  total_preimage_escrow[2][12] = little_endian_total_amount.balance[0];
+  total_preimage_escrow[2][13] = little_endian_total_amount.balance[1];
 
   total_preimage_escrow[2][14] = Integer(32, 4294967295 /*0xffffffff*/, PUBLIC);
 
