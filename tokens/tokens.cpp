@@ -67,11 +67,11 @@ void issue_tokens(
 
   cout << "distributed everything. verifying token sig" << endl;
   // check old pay token
-  Bit b = verify_token_sig(hmac_key_commitment_d, hmac_key_d, old_state_d, old_paytoken_d);
+  Bit error_signal = verify_token_sig(hmac_key_commitment_d, hmac_key_d, old_state_d, old_paytoken_d);
 
   // make sure wallets are well-formed
   cout << "comparing wallets" << endl;
-  b = (b | compare_wallets(old_state_d, new_state_d, rlc_d, nonce_d, epsilon_d));
+  error_signal = (error_signal | compare_wallets(old_state_d, new_state_d, rlc_d, nonce_d, epsilon_d));
 
   
   // make sure customer committed to this new wallet
@@ -108,23 +108,39 @@ void issue_tokens(
   PayToken_d new_paytoken_d = sign_token(new_state_d, hmac_key_d);
 
   // Transform the signed_merch_tx into the correct format --> array of 8 32bit uints
-  Integer signed_merch_tx_parsed[8];
-  Integer signed_escrow_tx_parsed[8];
+  EcdsaSig_d signed_merch_tx_parsed;
+  EcdsaSig_d signed_escrow_tx_parsed;
+  // Integer signed_merch_tx_parsed[8];
+  // Integer signed_escrow_tx_parsed[8];
 
   // mask pay and close tokens
   cout << "masking pay token" << endl;
-  b = ( b | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d)); // pay token 
-  cout << "b: "<< b.reveal<bool>(PUBLIC) << endl;
+  error_signal = ( error_signal | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d)); // pay token 
+  // cout << "b: "<< b.reveal<bool>(PUBLIC) << endl;
 
   cout << "masking close merch token" << endl;
-  mask_closemerchtoken(signed_merch_tx_parsed, merch_mask_d); // close token - merchant close 
+  mask_closemerchtoken(signed_merch_tx_parsed.sig, merch_mask_d); // close token - merchant close 
 
   cout << "masking close escrow token" << endl;
-  mask_closeescrowtoken(signed_escrow_tx_parsed, escrow_mask_d); // close token - escrow close 
+  mask_closeescrowtoken(signed_escrow_tx_parsed.sig, escrow_mask_d); // close token - escrow close 
 
   // ...return masked tokens
   // If b = 1, we need to return nothing of value.  Otherwise we need to return all 1's or something.
-  //   we can do this by or-ing b into everything!
+  for(int i=0; i<8; i++) {
+    new_paytoken_d.paytoken[i] = handle_error_case(new_paytoken_d.paytoken[i], error_signal);
+  }
+
+  for(int i=0; i<8; i++) {
+    signed_merch_tx_parsed.sig[i] = handle_error_case(signed_merch_tx_parsed.sig[i], error_signal);
+  }
+
+  for(int i=0; i<8; i++) {
+    signed_escrow_tx_parsed.sig[i] = handle_error_case(signed_escrow_tx_parsed.sig[i], error_signal);
+  }
+
+  pt_return = localize_PayToken(new_paytoken_d, CUST)
+  ct_escrow = localize_EcdsaSig(signed_merch_tx_parsed, CUST);
+  ct_merch  = localize_EcdsaSig(signed_escrow_tx_parsed, CUST);
 }
 
 /* customer's token generation function

@@ -25,7 +25,7 @@ HMACKey_d distribute_HMACKey(HMACKey_l key, int party) {
   return to_return;
 }
 
-HMACKey_l localize_HMACKey(HMACKey_d key){
+HMACKey_l localize_HMACKey(HMACKey_d key, int party) {
   HMACKey_l to_return;
   // GABE TODO
   
@@ -47,7 +47,7 @@ RevLockCommitment_d distribute_RevLockCommitment(RevLockCommitment_l rlc, int pa
   return to_return;
 }
 
-RevLockCommitment_l localize_RevLockCommitment(RevLockCommitment_d rlc) {
+RevLockCommitment_l localize_RevLockCommitment(RevLockCommitment_d rlc, int party) {
   RevLockCommitment_l to_return;
   return to_return;
 }
@@ -68,7 +68,7 @@ RevLock_d distribute_RevLock(RevLock_l revlock, int party) {
   return to_return;
 }
 
-RevLock_l localize_RevLock(RevLock_d revlock){
+RevLock_l localize_RevLock(RevLock_d revlock, int party) {
   RevLock_l to_return;
   // GABE TODO
 
@@ -91,9 +91,12 @@ PayToken_d distribute_PayToken(PayToken_l paytoken, int party) {
   return to_return;
 }
 
-PayToken_l localize_PayToken(PayToken_d paytoken){
+PayToken_l localize_PayToken(PayToken_d paytoken, int party) {
   PayToken_l to_return;
-  // GABE TODO
+  
+  for(int i=0; i<8; i++) {
+    to_return.paytoken[i] = paytoken.paytoken[i].reveal<uint32_t>(CUST);
+  }
 
   return to_return;
 }
@@ -110,7 +113,7 @@ Nonce_d distribute_Nonce(Nonce_l nonce, int party)  {
   return to_return;
 }
 
-Nonce_l localize_Nonce(Nonce_d nonce) {
+Nonce_l localize_Nonce(Nonce_d nonce, int party) {
   Nonce_l to_return;
   // GABE TODO
 
@@ -133,7 +136,7 @@ Txid_d distribute_Txid(Txid_l txid, int party) {
   return to_return;  
 }
 
-Txid_l localize_Txid(Txid_d txid) {
+Txid_l localize_Txid(Txid_d txid, int party) {
   Txid_l to_return;
 
   return to_return;
@@ -158,7 +161,7 @@ State_d distribute_State(State_l state, int party) {
   return to_return;
 }
 
-State_l localize_State(State_d state){
+State_l localize_State(State_d state, int party){
   State_l to_return;
   // GABE TODO
 
@@ -182,7 +185,7 @@ HMACKeyCommitment_d distribute_HMACKeyCommitment(HMACKeyCommitment_l commitment,
 
 }
 
-HMACKeyCommitment_l localize_HMACKeyCommitment(HMACKeyCommitment_d commitment) {
+HMACKeyCommitment_l localize_HMACKeyCommitment(HMACKeyCommitment_d commitment, int party) {
   HMACKeyCommitment_l to_return;
   // GABE TODO
 
@@ -206,7 +209,7 @@ MaskCommitment_d distribute_MaskCommitment(MaskCommitment_l commitment, int part
 
 }
 
-MaskCommitment_l localize_MaskCommitment(MaskCommitment_d commitment) {
+MaskCommitment_l localize_MaskCommitment(MaskCommitment_d commitment, int party) {
   MaskCommitment_l to_return;
   // GABE TODO
 
@@ -225,7 +228,7 @@ PublicKeyHash_d distribute_PublicKeyHash(PublicKeyHash_l hash, int party) {
   return to_return;
 }
 
-PublicKeyHash_l localize_PublicKeyHash(PublicKeyHash_d hash) {
+PublicKeyHash_l localize_PublicKeyHash(PublicKeyHash_d hash, int party) {
   PublicKeyHash_l to_return;
 
   return to_return;
@@ -240,7 +243,7 @@ Balance_d distribute_Balance(Balance_l balance, int party) {
   return to_return;
 }
 
-Balance_l localize_Balance(Balance_d balance) {
+Balance_l localize_Balance(Balance_d balance, int party) {
   Balance_l to_return;
 
   return to_return;
@@ -262,7 +265,7 @@ Mask_d distribute_Mask(Mask_l mask, int party) {
   return to_return;  
 }
 
-Mask_l localize_Mask(Mask_d mask) {
+Mask_l localize_Mask(Mask_d mask, int party) {
   Mask_l to_return;
   // GABE TODO
 
@@ -286,7 +289,7 @@ BitcoinPublicKey_d distribute_BitcoinPublicKey(BitcoinPublicKey_l pubKey, int pa
   return to_return;
 }
 
-BitcoinPublicKey_l localize_BitcoinPublicKey(BitcoinPublicKey_d pubKey) {
+BitcoinPublicKey_l localize_BitcoinPublicKey(BitcoinPublicKey_d pubKey, int party) {
   BitcoinPublicKey_l to_return;
 
   return to_return;
@@ -324,15 +327,42 @@ EcdsaPartialSig_d distribute_EcdsaPartialSig(EcdsaPartialSig_l psl, int party){
 
 // honestly, if we ever need to do this (which we shouldn't outside of testing)
 // we definitely should not reveal them publicly.
-EcdsaPartialSig_l localize_EcdsaPartialSig(EcdsaPartialSig_d psd){
+EcdsaPartialSig_l localize_EcdsaPartialSig(EcdsaPartialSig_d psd, int party){
   EcdsaPartialSig_l to_return;
 
-  string r = psd.r.reveal<string>(PUBLIC);
-  string k_inv = psd.k_inv.reveal<string>(PUBLIC);
+  string r = psd.r.reveal<string>(party);
+  string k_inv = psd.k_inv.reveal<string>(party);
   fillEcdsaPartialSig_l(&to_return, r, k_inv);
 
   return to_return;
 }
+
+EcdsaSig_d distribute_EcdsaSig(EcdsaSig_l EcdsaSig, int party) {
+  EcdsaSig_d to_return;
+
+  to_return.sig[0] = Integer(32, EcdsaSig.sig[0], party);
+  to_return.sig[1] = Integer(32, EcdsaSig.sig[1], party);
+  to_return.sig[2] = Integer(32, EcdsaSig.sig[2], party);
+  to_return.sig[3] = Integer(32, EcdsaSig.sig[3], party);
+  to_return.sig[4] = Integer(32, EcdsaSig.sig[4], party);
+  to_return.sig[5] = Integer(32, EcdsaSig.sig[5], party);
+  to_return.sig[6] = Integer(32, EcdsaSig.sig[6], party);
+  to_return.sig[7] = Integer(32, EcdsaSig.sig[7], party);
+  to_return.sig[8] = Integer(32, EcdsaSig.sig[8], party);
+
+  return to_return;
+}
+
+EcdsaSig_l localize_EcdsaSig(EcdsaSig_d EcdsaSig, int party) {
+  EcdsaSig_l to_return;
+
+  for(int i=0; i<8; i++) {
+    to_return.sig[i] = EcdsaSig.sig[i].reveal<uint32_t>(CUST);
+  }
+
+  return to_return;
+}
+
 
 Balance_d convert_to_little_endian(Balance_d big_endian_balance) {
   Balance_d little_endian_balance;
@@ -396,3 +426,14 @@ Balance_d sum_balances(Balance_d lhs, Balance_d rhs) {
 
   return to_return;
 }
+
+Integer handle_error_case(Integer data, Bit mask) {
+  Integer to_return = data;
+
+  for(int i=0; i<data.size(); i++) {
+    to_return[i] = data[i] | mask;
+  }
+
+  return to_return;
+}
+

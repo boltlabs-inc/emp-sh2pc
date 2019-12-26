@@ -89,6 +89,14 @@ struct Balance_d {
   Integer balance[2];
 };
 
+/* This is the second part of an ecdsa signature
+ * In this case 256 bits
+ */
+struct EcdsaSig_d {
+  Integer sig[8];
+};
+
+
 /* state type
  *
  * \param pkC           : customer public key 
@@ -146,40 +154,40 @@ struct EcdsaPartialSig_d {
 /********************* Casting functions  **********************/
 
 HMACKey_d distribute_HMACKey(HMACKey_l key, int party);
-HMACKey_l localize_HMACKey(HMACKey_d key);
+HMACKey_l localize_HMACKey(HMACKey_d key, int party);
 
 RevLock_d distribute_RevLock(RevLock_l revlock, int party);
-RevLock_l localize_RevLock(RevLock_d revlock);
+RevLock_l localize_RevLock(RevLock_d revlock, int party);
 
 RevLockCommitment_d distribute_RevLockCommitment(RevLockCommitment_l rlc, int party);
-RevLockCommitment_l localize_RevLockCommitment(RevLockCommitment_d rlc);
+RevLockCommitment_l localize_RevLockCommitment(RevLockCommitment_d rlc, int party);
 
 PayToken_d distribute_PayToken(PayToken_l paytoken, int party);
-PayToken_l localize_PayToken(PayToken_d paytoken);
+PayToken_l localize_PayToken(PayToken_d paytoken, int party);
 
 Nonce_d distribute_Nonce(Nonce_l nonce, int party);
-Nonce_l localize_Nonce(Nonce_d nonce);
+Nonce_l localize_Nonce(Nonce_d nonce, int party);
 
 Txid_d distribute_Txid(Txid_l txid, int party);
-Txid_l localize_Txid(Txid_d txid);
+Txid_l localize_Txid(Txid_d txid, int party);
 
 State_d distribute_State(State_l state, int party);
-State_l localize_State(State_d state);
+State_l localize_State(State_d state, int party);
 
 HMACKeyCommitment_d distribute_HMACKeyCommitment(HMACKeyCommitment_l commitment, int party);
-HMACKeyCommitment_l localize_HMACKeyCommitment(HMACKeyCommitment_d commitment);
+HMACKeyCommitment_l localize_HMACKeyCommitment(HMACKeyCommitment_d commitment, int party);
 
 MaskCommitment_d distribute_MaskCommitment(MaskCommitment_l commitment, int party);
-MaskCommitment_l localize_MaskCommitment(MaskCommitment_d commitment);
+MaskCommitment_l localize_MaskCommitment(MaskCommitment_d commitment, int party);
 
 PublicKeyHash_d distribute_PublicKeyHash(PublicKeyHash_l hash, int party);
-PublicKeyHash_l localize_PublicKeyHash(PublicKeyHash_d hash);
+PublicKeyHash_l localize_PublicKeyHash(PublicKeyHash_d hash, int party);
 
 Mask_d distribute_Mask(Mask_l mask, int party);
-Mask_l localize_Mask(Mask_d mask);
+Mask_l localize_Mask(Mask_d mask, int party);
 
 Balance_d distribute_Balance(Balance_l balance, int party);
-Balance_l localize_Balance(Balance_d balance);
+Balance_l localize_Balance(Balance_d balance, int party);
 
 Balance_d convert_to_little_endian(Balance_d big_endian_balance);
 Balance_d convert_to_big_endian(Balance_d little_endian_balance);
@@ -187,12 +195,21 @@ Balance_d convert_to_big_endian(Balance_d little_endian_balance);
 Balance_d sum_balances(Balance_d lhs, Balance_d rhs);
 
 BitcoinPublicKey_d distribute_BitcoinPublicKey(BitcoinPublicKey_l pubKey, int party);
-BitcoinPublicKey_l localize_BitcoinPublicKey(BitcoinPublicKey_d pubKey);
+BitcoinPublicKey_l localize_BitcoinPublicKey(BitcoinPublicKey_d pubKey, int party);
 
 EcdsaPartialSig_d distribute_EcdsaPartialSig(EcdsaPartialSig_l ecdsapartialsig, int party=MERCH);
-EcdsaPartialSig_l localize_EcdsaPartialSig(EcdsaPartialSig_d ecdsapartialsig);
+EcdsaPartialSig_l localize_EcdsaPartialSig(EcdsaPartialSig_d ecdsapartialsig, int party);
+
+EcdsaSig_d distribute_EcdsaSig(EcdsaSig_l EcdsaSig, int party=MERCH);
+EcdsaSig_l localize_EcdsaSig(EcdsaSig_d EcdsaSig, int party);
+
 // easy initialization of ecdsapartialsig
 void fillEcdsaPartialSig_l(EcdsaPartialSig_l *eps, string r, string kinv);
+
+
+/*****  Helpful for the final fail case editing *******/
+
+Integer handle_error_case(Integer data, Bit mask);
 
 /***************************** THIS FROM MARCELLA BEFORE THE GREAT RE-TYPING ************************/
 

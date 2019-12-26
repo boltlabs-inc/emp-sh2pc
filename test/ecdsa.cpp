@@ -164,7 +164,7 @@ void test_types() {
   EcdsaPartialSig_l psl;
   fillEcdsaPartialSig_l(&psl, r, k_inv);
   EcdsaPartialSig_d psd = distribute_EcdsaPartialSig(psl);
-  EcdsaPartialSig_l returned = localize_EcdsaPartialSig(psd);
+  EcdsaPartialSig_l returned = localize_EcdsaPartialSig(psd, PUBLIC);
 
   // compare distributed
   Bit eqr = r_d.equal(psd.r);
