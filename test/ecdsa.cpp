@@ -134,7 +134,7 @@ void test_hardcoded_vector() {
   EcdsaPartialSig_d psd = distribute_EcdsaPartialSig(psl);
 
   // compute and parse result
-  string actual = sign_hashed_msg(e, psd).reveal_unsigned(PUBLIC);
+  string actual = ecdsa_sign_hashed(e, psd).reveal_unsigned(PUBLIC);
   string myfull = r + actual;
   actual = change_base(actual, 10, 16);
   while (actual.length() < 64) {

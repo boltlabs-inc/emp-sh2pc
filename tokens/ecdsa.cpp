@@ -2,13 +2,14 @@
 #include "ecdsa.h"
 #include "sha256.h"
 
-// computes SHA256 hash of the input
-// first, converts bit-array to uint blocks as required by sha256
-// (big-endian bit shifts; maybe they're in the wrong order?
-//  TODO make some test vectors, seriously)
+// parses a 1024 char array (of 0/1s) into a 2-block sha256 input 
+// input: char [1024]
+// output: fills in uint [2][16]
+//  TODO make some test vectors, seriously
 //  TODO maybe move the parsing code to sha256 module
+//  TODO maybe move this to a distribute_?? function
 //
-Integer signature_hash(char cmsg[1024]) {
+void parseSHA256_2l(char cmsg[1024], uint message[2][16]) {
   // convert to bools TODO: test this section
   bool msg[1024];
   for (int i=0; i<1024; i++) {
@@ -16,7 +17,7 @@ Integer signature_hash(char cmsg[1024]) {
     msg[i] = (cmsg[i] == 1);
   }
   // convert to Integer
-  uint message[2][16] = {0};
+  //uint message[2][16] = {0};
   uint shft = 0;
   uint block = 0;
   uint byte = 0;
@@ -36,13 +37,6 @@ Integer signature_hash(char cmsg[1024]) {
       byte = 0;
     }
   }
-  
-  Integer result[8];
-  computeSHA256_2l(message, result);
-
-  Integer hash = composeSHA256result(result);
-  
-  return hash;
 }
 
 // hard-coded conversion of secp256k1 point order 
@@ -53,31 +47,47 @@ string get_ECDSA_params() {
   return "115792089237316195423570985008687907852837564279074904382605163141518161494337";
 }
 
+// signs a message using the Ecdsa partial signature 
+Integer ecdsa_sign(Integer message[2][16], EcdsaPartialSig_d partialsig) {
+  Integer result[8];
+
+  computeSHA256_2d(message, result);
+  Integer hash = composeSHA256result(result);
+  return ecdsa_sign_hashed(hash, partialsig);
+}
+
 // ecdsa-signs a message based on the given parameters
 // parameters here are appended -c because they're in the clear
 // mc : message text (in the clear)
 // pubsig : partial ecdsa signature in the clear (see token.h)
 Integer ecdsa_sign(char msg[1024], EcdsaPartialSig_l pubsig) {
-  // merchant inputs
   EcdsaPartialSig_d partialsig = distribute_EcdsaPartialSig(pubsig);
 
-  // customer inputs
-  // m : message (limited to 1024 bits because that's all we can hash)
+  // parse input for hashing
+  uint parsed_msg[2][16];
+  parseSHA256_2l(msg, parsed_msg);
 
-  // hash input
-  Integer e = signature_hash(msg);
-  return sign_hashed_msg(e, partialsig);
+  // hash and sign
+  Integer result[8];
+  computeSHA256_2l(parsed_msg, result);
+  Integer hash = composeSHA256result(result);
+  return ecdsa_sign_hashed(hash, partialsig);
 }
 
-Integer sign_hashed_msg(Integer e, EcdsaPartialSig_d partialsig) {
+Integer ecdsa_sign_hashed(Integer broken_digest[8], EcdsaPartialSig_d partialsig) {
+  Integer digest = composeSHA256result(broken_digest);
+  return ecdsa_sign_hashed(digest, partialsig);
+}
+
+Integer ecdsa_sign_hashed(Integer digest, EcdsaPartialSig_d partialsig) {
   // get shared/fixed q
   Integer q(257, get_ECDSA_params(), PUBLIC);
 
-  e.resize(257, true);
-  e = e % q;
+  digest.resize(257, true);
+  digest = digest % q;
 
   // can we keep q in the clear and use it as the modulus?
-  Integer s = e + partialsig.r;
+  Integer s = digest + partialsig.r;
   s = s % q;
 
   s.resize(513,true);

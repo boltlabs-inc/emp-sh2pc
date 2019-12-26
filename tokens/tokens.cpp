@@ -41,6 +41,8 @@ void issue_tokens(
   char close_tx_merch[1024]
   ) {
 
+  cout << "issuing tokens" << endl;
+
   State_d old_state_d = distribute_State(old_state_l, CUST);
   State_d new_state_d = distribute_State(new_state_l, CUST);
   PayToken_d old_paytoken_d = distribute_PayToken(old_paytoken_l, CUST);
@@ -62,30 +64,46 @@ void issue_tokens(
   BitcoinPublicKey_d merch_payout_pub_key_d = distribute_BitcoinPublicKey(merch_payout_pub_key_l, PUBLIC);
   PublicKeyHash_d merch_publickey_hash_d = distribute_PublicKeyHash(merch_publickey_hash_l, PUBLIC);
 
-
+  cout << "distributed everything. verifying token sig" << endl;
   // check old pay token
   Bit b = verify_token_sig(hmac_key_commitment_d, hmac_key_d, old_state_d, old_paytoken_d);
 
   // make sure wallets are well-formed
+  cout << "comparing wallets" << endl;
   b = (b | compare_wallets(old_state_d, new_state_d, rlc_d, nonce_d, epsilon_d));
+
   
   // make sure customer committed to this new wallet
   Integer escrow_digest[8];
   Integer merch_digest[8];
 
   // generate the hash of the properly formed transacation
+  cout << "validating transactions" << endl;
+  /*
+  // TODO: Something is broken in here that causes the customer to hang when we run this end-to-end.
+  // Commenting it out for now, but we need to debug.
   validate_transactions(new_state_d, 
     cust_escrow_pub_key_d, cust_payout_pub_key_d,
     merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, 
     merch_publickey_hash_d, escrow_digest, merch_digest);
-
+  */
   // we should return into these txserialized_d or hash 
 
+  // initialize digests with dummy vars to skip the above function
+  for (int i=0; i<8; i++) {
+    escrow_digest[i] = Integer(32,i,MERCH);
+    merch_digest[i] = Integer(32,i,MERCH);
+  }
+
   // sign new close transactions 
-  Integer signed_merch_tx = ecdsa_sign(close_tx_escrow, sig1);
-  //Integer signed_escrow_tx = ecdsa_sign(close_tx_merch, sig2);
+  cout << "signing transactions" << endl;
+  EcdsaPartialSig_d epsd1 = distribute_EcdsaPartialSig(sig1);
+  EcdsaPartialSig_d epsd2 = distribute_EcdsaPartialSig(sig2);
+  Integer signed_merch_tx = ecdsa_sign_hashed(escrow_digest, epsd1);
+  Integer signed_escrow_tx = ecdsa_sign_hashed(merch_digest, epsd2);
 
   // sign new pay token
+  cout << "signing token" << endl;
   PayToken_d new_paytoken_d = sign_token(new_state_d, hmac_key_d);
 
   // Transform the signed_merch_tx into the correct format --> array of 8 32bit uints
@@ -93,9 +111,14 @@ void issue_tokens(
   Integer signed_escrow_tx_parsed[8];
 
   // mask pay and close tokens
+  cout << "masking pay token" << endl;
   b = ( b | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d)); // pay token 
+  cout << "b: "<< b.reveal<bool>(PUBLIC) << endl;
 
+  cout << "masking close merch token" << endl;
   mask_closemerchtoken(signed_merch_tx_parsed, merch_mask_d); // close token - merchant close 
+
+  cout << "masking close escrow token" << endl;
   mask_closeescrowtoken(signed_escrow_tx_parsed, escrow_mask_d); // close token - escrow close 
 
   // ...return masked tokens
@@ -190,6 +213,8 @@ issue_tokens(
   close_tx_merch
   );
 
+  cout << "customer finished!" << endl;
+
   delete io;
 }
 
@@ -276,6 +301,8 @@ issue_tokens(
   sig2,
   dummy_tx
   );
+
+  cout << "merchant finished!" << endl;
 
   delete io;
 }
