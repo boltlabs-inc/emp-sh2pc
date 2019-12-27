@@ -37,9 +37,9 @@ void issue_tokens(
   BitcoinPublicKey_l merch_payout_pub_key_l,
   PublicKeyHash_l merch_publickey_hash_l,
 /* OUTPUTS */
-  PayToken_l pt_return,
-  EcdsaSig_l ct_escrow,
-  EcdsaSig_l ct_merch
+  PayToken_l* pt_return,
+  EcdsaSig_l* ct_escrow,
+  EcdsaSig_l* ct_merch
   ) {
 
   cout << "issuing tokens" << endl;
@@ -138,9 +138,9 @@ void issue_tokens(
     signed_escrow_tx_parsed.sig[i] = handle_error_case(signed_escrow_tx_parsed.sig[i], error_signal);
   }
 
-  pt_return = localize_PayToken(new_paytoken_d, CUST);
-  ct_escrow = localize_EcdsaSig(signed_merch_tx_parsed, CUST);
-  ct_merch  = localize_EcdsaSig(signed_escrow_tx_parsed, CUST);
+  localize_PayToken(pt_return, new_paytoken_d, CUST);
+  localize_EcdsaSig(ct_escrow, signed_merch_tx_parsed, CUST);
+  localize_EcdsaSig(ct_merch, signed_escrow_tx_parsed, CUST);
 }
 
 /* customer's token generation function
@@ -171,9 +171,9 @@ void build_masked_tokens_cust(
   struct BitcoinPublicKey_l cust_escrow_pub_key_l,
   struct BitcoinPublicKey_l cust_payout_pub_key_l,
 
-  struct PayToken_l pt_return,
-  struct EcdsaSig_l ct_escrow,
-  struct EcdsaSig_l ct_merch
+  struct PayToken_l* pt_return,
+  struct EcdsaSig_l* ct_escrow,
+  struct EcdsaSig_l* ct_merch
 ) {
   // todo: replace new/delete with sweet auto
   NetIO * io = new NetIO("127.0.0.1", port);
@@ -285,9 +285,9 @@ issue_tokens(
   merch_payout_pub_key_l, 
   merch_publickey_hash,
 /* OUTPUTS */
-  pt_return,
-  ct_escrow,
-  ct_merch
+  &pt_return,
+  &ct_escrow,
+  &ct_merch
   );
 
   cout << "merchant finished!" << endl;

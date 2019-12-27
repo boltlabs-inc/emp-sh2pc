@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
       merch_dispute_key_l, merch_publickey_hash,
       merch_payout_pub_key_l, nonce_l,
 	  w, w, nullptr, pt_old, cust_escrow_pub_key_l, cust_payout_pub_key_l,
-	  pt_return, ct_escrow, ct_merch);
+	  &pt_return, &ct_escrow, &ct_merch);
   }
 
   return 0;

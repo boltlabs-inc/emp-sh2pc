@@ -91,14 +91,10 @@ PayToken_d distribute_PayToken(PayToken_l paytoken, int party) {
   return to_return;
 }
 
-PayToken_l localize_PayToken(PayToken_d paytoken, int party) {
-  PayToken_l to_return;
-  
+void localize_PayToken(PayToken_l* target, PayToken_d paytoken, int party) {  
   for(int i=0; i<8; i++) {
-    to_return.paytoken[i] = paytoken.paytoken[i].reveal<uint32_t>(CUST);
+    target->paytoken[i] = paytoken.paytoken[i].reveal<uint32_t>(CUST);
   }
-
-  return to_return;
 }
 
 Nonce_d distribute_Nonce(Nonce_l nonce, int party)  {
@@ -352,14 +348,10 @@ EcdsaSig_d distribute_EcdsaSig(EcdsaSig_l EcdsaSig, int party) {
   return to_return;
 }
 
-EcdsaSig_l localize_EcdsaSig(EcdsaSig_d EcdsaSig, int party) {
-  EcdsaSig_l to_return;
-
+void localize_EcdsaSig(EcdsaSig_l* target, EcdsaSig_d EcdsaSig, int party) {
   for(int i=0; i<8; i++) {
-    to_return.sig[i] = EcdsaSig.sig[i].reveal<uint32_t>(CUST);
+    target->sig[i] = EcdsaSig.sig[i].reveal<uint32_t>(CUST);
   }
-
-  return to_return;
 }
 
 

@@ -163,7 +163,7 @@ RevLockCommitment_d distribute_RevLockCommitment(RevLockCommitment_l rlc, int pa
 RevLockCommitment_l localize_RevLockCommitment(RevLockCommitment_d rlc, int party);
 
 PayToken_d distribute_PayToken(PayToken_l paytoken, int party);
-PayToken_l localize_PayToken(PayToken_d paytoken, int party);
+void localize_PayToken(PayToken_l *target, PayToken_d paytoken, int party);
 
 Nonce_d distribute_Nonce(Nonce_l nonce, int party);
 Nonce_l localize_Nonce(Nonce_d nonce, int party);
@@ -201,7 +201,7 @@ EcdsaPartialSig_d distribute_EcdsaPartialSig(EcdsaPartialSig_l ecdsapartialsig, 
 EcdsaPartialSig_l localize_EcdsaPartialSig(EcdsaPartialSig_d ecdsapartialsig, int party);
 
 EcdsaSig_d distribute_EcdsaSig(EcdsaSig_l EcdsaSig, int party=MERCH);
-EcdsaSig_l localize_EcdsaSig(EcdsaSig_d EcdsaSig, int party);
+void localize_EcdsaSig(EcdsaSig_l *target, EcdsaSig_d EcdsaSig, int party);
 
 // easy initialization of ecdsapartialsig
 void fillEcdsaPartialSig_l(EcdsaPartialSig_l *eps, string r, string kinv);
@@ -255,9 +255,9 @@ void issue_tokens(
   BitcoinPublicKey_l merch_payout_pub_key_l,
   PublicKeyHash_l merch_publickey_hash_l,
 /* OUTPUTS */
-  PayToken_l pt_return,
-  EcdsaSig_l ct_escrow,
-  EcdsaSig_l ct_merch
+  PayToken_l* pt_return,
+  EcdsaSig_l* ct_escrow,
+  EcdsaSig_l* ct_merch
   );
 
 /* SIGNATURE SCHEME
