@@ -451,10 +451,10 @@ void dump_buffer(string label, Integer buffer[16]) {
   Integer temp = compose_buffer(buffer);
 
   string temp_string = temp.reveal_unsigned(PUBLIC,16);
-  cout << label << temp_string  << endl;
+  std::cout << label << temp_string  << std::endl;
 }
 
 void dump_bit(string label, Bit b) {
-  string temp_string = b.reveal<string>(PUBLIC,16);
-  cout << label << temp_string  << endl;
+  string temp_string = b.reveal<string>(PUBLIC);
+  std::cout << label << temp_string  << std::endl;
 }
