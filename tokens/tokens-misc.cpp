@@ -348,7 +348,6 @@ EcdsaSig_d distribute_EcdsaSig(EcdsaSig_l EcdsaSig, int party) {
   to_return.sig[5] = Integer(32, EcdsaSig.sig[5], party);
   to_return.sig[6] = Integer(32, EcdsaSig.sig[6], party);
   to_return.sig[7] = Integer(32, EcdsaSig.sig[7], party);
-  to_return.sig[8] = Integer(32, EcdsaSig.sig[8], party);
 
   return to_return;
 }
