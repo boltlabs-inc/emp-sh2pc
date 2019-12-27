@@ -27,7 +27,6 @@ int main(int argc, char** argv) {
   Nonce_l nonce_l;
 
   if (party == MERCH) {
-	PubKey pkM;
 	EcdsaPartialSig_l sig;
 	string r = "108792476108599305057612221643697785065475034835954270988586688301027220077907";
     string k_inv = "44657876998057202178264530375095959644163723589174927475562391733096641768603";
@@ -36,14 +35,13 @@ int main(int argc, char** argv) {
     struct HMACKey_l hmac_key;
     struct Mask_l mask;
 	build_masked_tokens_merch(
-	  pkM, amt, rl, port, ip,
+	  amt, rl, port, ip,
       paymask_com, key_com, merch_escrow_pub_key_l,
       merch_dispute_key_l, merch_publickey_hash,
       merch_payout_pub_key_l, nonce_l,
       hmac_key,
 	  mask, mask, mask, sig, sig, sig);
   } else {
-	PubKey pkM;
 	State_l w;
     PayToken_l pt_old;
 	BitcoinPublicKey_l cust_escrow_pub_key_l;
@@ -53,7 +51,7 @@ int main(int argc, char** argv) {
     EcdsaSig_l ct_merch;
 
 	build_masked_tokens_cust(
-	  pkM, amt, rl, port, ip,
+	  amt, rl, port, ip,
       paymask_com, key_com, merch_escrow_pub_key_l,
       merch_dispute_key_l, merch_publickey_hash,
       merch_payout_pub_key_l, nonce_l,

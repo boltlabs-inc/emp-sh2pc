@@ -75,14 +75,6 @@ struct EcdsaSig_l {
   uint32_t sig[8];
 };
 
-/* ECDSA public key type 
- * \param pubkey    : a public key. 
- * TYPISSUE - how many bits is an ECDSA public key? Do we actually need this?
- */
-struct PubKey {
-  char pubkey[33]; 
-};
-
 /* ECDSA partial signature
 * This is a partial signature. It is based on a raondomly chosen k, message x, public key G, and public modulus q. Let (rx, ry) = kG.
 * \param r     : r = rx*x mod q. Represented as a decimal string. (256 bits)
@@ -180,7 +172,6 @@ struct State_l {
  *
  */
 void build_masked_tokens_cust(
-  struct PubKey pkM,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   int port,
@@ -240,7 +231,6 @@ void build_masked_tokens_cust(
  *
  */
 void build_masked_tokens_merch(
-  struct PubKey pkM,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   int port,

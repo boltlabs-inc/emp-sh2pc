@@ -152,7 +152,6 @@ void issue_tokens(
  * exactly 1024 bits according to the SHA256 spec.
  */
 void build_masked_tokens_cust(
-  struct PubKey pkM,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   int port,
@@ -225,7 +224,6 @@ issue_tokens(
 }
 
 void build_masked_tokens_merch(
-  struct PubKey pkM,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   int port,
