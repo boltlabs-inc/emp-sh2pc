@@ -552,6 +552,9 @@ void validate_transactions(State_d new_state_d,
 
   Integer customer_delayed_script_hash[8];
 
+  // dump_buffer("cust_deplay_script_preimage0=", customer_delayed_script_hash_preimage[0]);
+  // dump_buffer("cust_deplay_script_preimage1=", customer_delayed_script_hash_preimage[1]);
+
   computeSHA256_2d(customer_delayed_script_hash_preimage, customer_delayed_script_hash);
 
   // 150 bytes
@@ -613,6 +616,10 @@ void validate_transactions(State_d new_state_d,
   hash_outputs_preimage[2][15] = Integer(32, 1200, PUBLIC); 
 
   Integer hash_outputs[8];
+
+  // dump_buffer("hash_outputs_preimage0=", hash_outputs_preimage[0]);
+  // dump_buffer("hash_outputs_preimage1=", hash_outputs_preimage[1]);
+  // dump_buffer("hash_outputs_preimage2=", hash_outputs_preimage[2]);
 
   computeDoubleSHA256_3d(hash_outputs_preimage, hash_outputs);
 
@@ -695,6 +702,11 @@ void validate_transactions(State_d new_state_d,
   total_preimage_escrow[3][13]  = Integer(32, 0, PUBLIC);
   total_preimage_escrow[3][14]  = Integer(32, 0, PUBLIC); //0x00000000;
   total_preimage_escrow[3][15]  = Integer(32, 1824, PUBLIC); // 228*8 = 1824 bits
+
+  // dump_buffer("total_preimage_escrow0=", total_preimage_escrow[0]);
+  // dump_buffer("total_preimage_escrow1=", total_preimage_escrow[1]);
+  // dump_buffer("total_preimage_escrow2=", total_preimage_escrow[2]);
+  // dump_buffer("total_preimage_escrow3=", total_preimage_escrow[3]);
 
   // Integer escrow_digest[8];
   computeSHA256_4d(total_preimage_escrow, escrow_digest);
@@ -798,6 +810,12 @@ void validate_transactions(State_d new_state_d,
   total_preimage_merch[4][13]  = Integer(32, 0, PUBLIC);
   total_preimage_merch[4][14]  = Integer(32, 0, PUBLIC);//0x00000000;
   total_preimage_merch[4][15]  = Integer(32, 2168, PUBLIC); // 271*8 = 2168 bits
+
+  // dump_buffer("total_preimage_merch0=", total_preimage_merch[0]);
+  // dump_buffer("total_preimage_merch1=", total_preimage_merch[1]);
+  // dump_buffer("total_preimage_merch2=", total_preimage_merch[2]);
+  // dump_buffer("total_preimage_merch3=", total_preimage_merch[3]);
+  // dump_buffer("total_preimage_merch4=", total_preimage_merch[4]);
 
   computeSHA256_5d(total_preimage_merch, merch_digest);
 }

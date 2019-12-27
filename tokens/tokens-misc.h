@@ -211,6 +211,14 @@ void fillEcdsaPartialSig_l(EcdsaPartialSig_l *eps, string r, string kinv);
 
 Integer handle_error_case(Integer data, Bit mask);
 
+
+/****** Helpful for debugging ***********/
+
+Integer compose_buffer(Integer buffer[16]);
+void dump_buffer(string label, Integer buffer[16]);
+
+void dump_bit(string label, Bit b);
+
 /***************************** THIS FROM MARCELLA BEFORE THE GREAT RE-TYPING ************************/
 
 Integer makeInteger(bool *bits, int len, int intlen, int party);

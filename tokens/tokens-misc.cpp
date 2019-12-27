@@ -436,3 +436,25 @@ Integer handle_error_case(Integer data, Bit mask) {
   return to_return;
 }
 
+Integer compose_buffer(Integer buffer[16]) {
+  Integer thirtytwo(512, 32, PUBLIC);
+  buffer[0].resize(512, false);
+  Integer to_return = buffer[0];
+  for(int i=1; i<16; i++) {
+    buffer[i].resize(512, false);
+    to_return = (to_return << thirtytwo) | buffer[i];
+  }
+  return to_return;
+}
+
+void dump_buffer(string label, Integer buffer[16]) {
+  Integer temp = compose_buffer(buffer);
+
+  string temp_string = temp.reveal_unsigned(PUBLIC,16);
+  cout << label << temp_string  << endl;
+}
+
+void dump_bit(string label, Bit b) {
+  string temp_string = b.reveal<string>(PUBLIC,16);
+  cout << label << temp_string  << endl;
+}
