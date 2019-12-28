@@ -19,6 +19,14 @@ enum ConnType { CUSTOM = 0, NETIO, UNIXNETIO };
  */
 typedef void* (*IOCallback)(ConnType c, int party);
 
+/* Returns a pointer to a NetIO ptr */
+void* get_netio_ptr(char *address, int port);
+void free_netio_ptr(void *io_ptr);
+
+/* Returns a pointer to a UnixNetIO ptr */
+void* get_unixnetio_ptr(char *socket_path, int party);
+void free_unixnetio_ptr(void *io);
+
 /*
  * describes an API for calling MPC functions 
  * 

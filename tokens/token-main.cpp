@@ -12,9 +12,6 @@ void *io_callback(ConnType c, int party) {
     } else if (c == UNIXNETIO) {
         string socket_path = "tmpcon";
         bool is_server = (party == MERCH) ? true : false;
-        if (is_server) {
-            unlink(socket_path.c_str());
-        }
         UnixNetIO *io = new UnixNetIO(socket_path.c_str(), is_server);
         return io;
     }
