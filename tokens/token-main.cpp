@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 
   assert (argc == 3);
   int party = atoi(argv[1]);
-  int conn_type = atoi(argv[2]);
+  ConnType conn_type = static_cast<ConnType>(atoi(argv[2]));
 
   if (conn_type != NETIO && conn_type != UNIXNETIO) {
     cout << "Specified invalid connection type. Options: NETIO(" << NETIO << "), UNIXNETIO(" << UNIXNETIO << ")\n";

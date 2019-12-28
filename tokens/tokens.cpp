@@ -11,15 +11,16 @@
 
 using namespace emp;
 
-void* get_netio_ptr(char *address, int port) {
-    NetIO *io_ptr = new NetIO(address, port);
+void* get_netio_ptr(char *address, int port, int party) {
+    char *address_ptr = (party == MERCH) ? nullptr : address;
+    NetIO *io_ptr = new NetIO(address_ptr, port);
     return static_cast<void *>(io_ptr);
 }
 
-void free_netio_ptr(void *io_ptr) {
-    NetIO *io = static_cast<NetIO *>(io_ptr);
-    delete io;
-}
+//void free_netio_ptr(void *io_ptr) {
+//    NetIO *io = static_cast<NetIO *>(io_ptr);
+//    delete io;
+//}
 
 /* Returns a pointer to a UnixNetIO ptr */
 void* get_unixnetio_ptr(char *socket_path, int party) {
@@ -28,10 +29,10 @@ void* get_unixnetio_ptr(char *socket_path, int party) {
     return static_cast<void *>(io_ptr);
 }
 
-void free_unixnetio_ptr(void *io_ptr) {
-    UnixNetIO *io = static_cast<UnixNetIO *>(io_ptr);
-    delete io;
-}
+//void free_unixnetio_ptr(void *io_ptr) {
+//    UnixNetIO *io = static_cast<UnixNetIO *>(io_ptr);
+//    delete io;
+//}
 
 // TODO: add fail bit and count up all the validations
 void issue_tokens(
@@ -174,7 +175,7 @@ void issue_tokens(
  * Assumes close_tx_escrow and close_tx_merch are padded to 
  * exactly 1024 bits according to the SHA256 spec.
  */
-void build_masked_tokens_cust(IOCallback io_callback, int conn_type,
+void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
 
@@ -264,7 +265,7 @@ issue_tokens(
 }
 
 void build_masked_tokens_merch(IOCallback io_callback,
-  int conn_type,
+  ConnType conn_type,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
 
@@ -289,7 +290,7 @@ void build_masked_tokens_merch(IOCallback io_callback,
   UnixNetIO *io1 = nullptr;
   NetIO *io2 = nullptr;
   if (io_callback != NULL) {
-    auto *io_ptr = io_callback((ConnType)conn_type, MERCH);
+    auto *io_ptr = io_callback(conn_type, MERCH);
     if (conn_type == UNIXNETIO) {
         io1 = static_cast<UnixNetIO *>(io_ptr);
         setup_semi_honest(io1, MERCH);

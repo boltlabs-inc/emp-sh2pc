@@ -20,12 +20,12 @@ enum ConnType { CUSTOM = 0, NETIO, UNIXNETIO };
 typedef void* (*IOCallback)(ConnType c, int party);
 
 /* Returns a pointer to a NetIO ptr */
-void* get_netio_ptr(char *address, int port);
-void free_netio_ptr(void *io_ptr);
+void* get_netio_ptr(char *address, int port, int party);
+//void free_netio_ptr(void *io_ptr);
 
 /* Returns a pointer to a UnixNetIO ptr */
 void* get_unixnetio_ptr(char *socket_path, int party);
-void free_unixnetio_ptr(void *io);
+//void free_unixnetio_ptr(void *io);
 
 /*
  * describes an API for calling MPC functions 
@@ -194,7 +194,7 @@ struct State_l {
  */
 void build_masked_tokens_cust(
   IOCallback io_callback,
-  int conn_type,
+  ConnType conn_type,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   struct MaskCommitment_l paymask_com,
@@ -253,7 +253,7 @@ void build_masked_tokens_cust(
  */
 void build_masked_tokens_merch(
   IOCallback io_callback,
-  int conn_type,
+  ConnType conn_type,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   struct MaskCommitment_l paymask_com,
