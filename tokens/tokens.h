@@ -7,6 +7,19 @@ extern "C" {
 #endif
 
 /*
+ * Types of allowed IO connections
+ * - CUSTOM = custom connection handle defined by caller
+ * - NETIO = tcp socket on localhost
+ * - UNIXNETIO = unix domain socket with a specified file
+ */
+enum ConnType { CUSTOM = 0, NETIO, UNIXNETIO };
+
+/* IO Channel Callback interface - allows caller to handle
+ * how connection is made between customer and merchant
+ */
+typedef void* (*IOCallback)(ConnType c, int party);
+
+/*
  * describes an API for calling MPC functions 
  * 
  * to be integrated into Rust implementation
@@ -172,10 +185,10 @@ struct State_l {
  *
  */
 void build_masked_tokens_cust(
+  IOCallback io_callback,
+  int conn_type,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
-  int port,
-  char ip_addr[15], // TYPISSUE: do we want to support ipv6?
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
   struct BitcoinPublicKey_l merch_escrow_pub_key_l,
@@ -231,10 +244,10 @@ void build_masked_tokens_cust(
  *
  */
 void build_masked_tokens_merch(
+  IOCallback io_callback,
+  int conn_type,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
-  int port,
-  char ip_addr[15], // TYPISSUE: what IP version?
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
   struct BitcoinPublicKey_l merch_escrow_pub_key_l,
@@ -242,7 +255,6 @@ void build_masked_tokens_merch(
   struct PublicKeyHash_l merch_publickey_hash,
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
-
   struct HMACKey_l hmac_key,
   struct Mask_l merch_mask_l,
   struct Mask_l escrow_mask_l,

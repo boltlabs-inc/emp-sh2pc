@@ -151,11 +151,10 @@ void issue_tokens(
  * Assumes close_tx_escrow and close_tx_merch are padded to 
  * exactly 1024 bits according to the SHA256 spec.
  */
-void build_masked_tokens_cust(
+void build_masked_tokens_cust(IOCallback io_callback, int conn_type,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
-  int port,
-  char ip_addr[15],
+
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
   struct BitcoinPublicKey_l merch_escrow_pub_key_l,
@@ -175,9 +174,24 @@ void build_masked_tokens_cust(
   struct EcdsaSig_l* ct_escrow,
   struct EcdsaSig_l* ct_merch
 ) {
-  // todo: replace new/delete with sweet auto
-  NetIO * io = new NetIO("127.0.0.1", port);
-  setup_semi_honest(io, CUST);
+  // select the IO interface
+  if (io_callback != NULL) {
+    auto *io_ptr = io_callback((ConnType)conn_type, CUST);
+    if (conn_type == UNIXNETIO) {
+        UnixNetIO *io = static_cast<UnixNetIO *>(io_ptr);
+        setup_semi_honest(io, CUST);
+    } else if (conn_type == NETIO) {
+        NetIO *io = static_cast<NetIO *>(io_ptr);
+        setup_semi_honest(io, CUST);
+    } else {
+        /* custom IO connection */
+        cout << "specify a supported connection type" << endl;
+        return;
+    }
+  } else {
+    cout << "did not specify a IO connection callback for customer" << endl;
+    return;
+  }
 
   // placeholders for vars passed by merchant
   // TODO maybe do all the distributing here, before calling issue_tokens
@@ -220,14 +234,14 @@ issue_tokens(
 
   cout << "customer finished!" << endl;
 
-  delete io;
+  // delete io;
 }
 
-void build_masked_tokens_merch(
+void build_masked_tokens_merch(IOCallback io_callback,
+  int conn_type,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
-  int port,
-  char ip_addr[15],
+
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
   struct BitcoinPublicKey_l merch_escrow_pub_key_l,
@@ -246,9 +260,23 @@ void build_masked_tokens_merch(
 ) {
 
   // todo: replace new/delete with sweet auto
-  NetIO * io = new NetIO(nullptr, port);
-  setup_semi_honest(io, MERCH);
-
+  if (io_callback != NULL) {
+    auto *io_ptr = io_callback((ConnType)conn_type, MERCH);
+    if (conn_type == UNIXNETIO) {
+        UnixNetIO *io = static_cast<UnixNetIO *>(io_ptr);
+        setup_semi_honest(io, MERCH);
+    } else if (conn_type == NETIO) {
+        NetIO *io = static_cast<NetIO *>(io_ptr);
+        setup_semi_honest(io, MERCH);
+    } else {
+        /* custom IO connection */
+        cout << "specify a supported connection type" << endl;
+        return;
+    }
+  } else {
+    cout << "did not specify a IO connection callback for merchant" << endl;
+    return;
+  }
 
   State_l old_state_l;
   State_l new_state_l;
@@ -292,7 +320,7 @@ issue_tokens(
 
   cout << "merchant finished!" << endl;
 
-  delete io;
+  // delete io;
 }
 
 

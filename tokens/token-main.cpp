@@ -5,21 +5,43 @@
 
 using namespace std;
 
+void *io_callback(ConnType c, int party) {
+    if (c == NETIO) {
+        NetIO *io = new NetIO((party == MERCH) ? nullptr : "127.0.0.1", 12345);
+        return io;
+    } else if (c == UNIXNETIO) {
+        string socket_path = "tmpcon";
+        bool is_server = (party == MERCH) ? true : false;
+        if (is_server) {
+            unlink(socket_path.c_str());
+        }
+        UnixNetIO *io = new UnixNetIO(socket_path.c_str(), is_server);
+        return io;
+    }
+    return NULL;
+}
+
 /* 
  * Test main for token generation
  * generates fake data for now.
  */
 int main(int argc, char** argv) {
 
-  assert (argc == 2);
+  assert (argc == 3);
   int party = atoi(argv[1]);
+  int conn_type = atoi(argv[2]);
 
-  char ip[15] = "127.0.0.1";
+  if (conn_type != NETIO && conn_type != UNIXNETIO) {
+    cout << "Specified invalid connection type. Options: NETIO(" << NETIO << "), UNIXNETIO(" << UNIXNETIO << ")\n";
+    exit(1);
+  }
+
+  // char ip[15] = "127.0.0.1";
   Balance_l amt;
   RevLockCommitment_l rl;
   MaskCommitment_l paymask_com;
   HMACKeyCommitment_l key_com;
-  int port = 12345;
+  // int port = 12345;
   BitcoinPublicKey_l merch_escrow_pub_key_l;
   BitcoinPublicKey_l merch_dispute_key_l;
   PublicKeyHash_l merch_publickey_hash;
@@ -34,9 +56,9 @@ int main(int argc, char** argv) {
     fillEcdsaPartialSig_l(&sig, r, k_inv);
     struct HMACKey_l hmac_key;
     struct Mask_l mask;
-	build_masked_tokens_merch(
-	  amt, rl, port, ip,
-      paymask_com, key_com, merch_escrow_pub_key_l,
+
+	build_masked_tokens_merch(io_callback, conn_type,
+	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
       merch_dispute_key_l, merch_publickey_hash,
       merch_payout_pub_key_l, nonce_l,
       hmac_key,
@@ -50,9 +72,8 @@ int main(int argc, char** argv) {
     EcdsaSig_l ct_escrow;
     EcdsaSig_l ct_merch;
 
-	build_masked_tokens_cust(
-	  amt, rl, port, ip,
-      paymask_com, key_com, merch_escrow_pub_key_l,
+	build_masked_tokens_cust(io_callback, conn_type,
+	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
       merch_dispute_key_l, merch_publickey_hash,
       merch_payout_pub_key_l, nonce_l,
 	  w, w, nullptr, pt_old, cust_escrow_pub_key_l, cust_payout_pub_key_l,
