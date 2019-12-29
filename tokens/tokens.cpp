@@ -104,21 +104,15 @@ void issue_tokens(
 
   // generate the hash of the properly formed transacation
   cout << "validating transactions" << endl;
-  /*
+
   // TODO: Something is broken in here that causes the customer to hang when we run this end-to-end.
   // Commenting it out for now, but we need to debug.
   validate_transactions(new_state_d, 
     cust_escrow_pub_key_d, cust_payout_pub_key_d,
     merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, 
     merch_publickey_hash_d, escrow_digest, merch_digest);
-  */
-  // we should return into these txserialized_d or hash 
 
-  // initialize digests with dummy vars to skip the above function
-  for (int i=0; i<8; i++) {
-    escrow_digest[i] = Integer(32,i,MERCH);
-    merch_digest[i] = Integer(32,i,MERCH);
-  }
+  // we should return into these txserialized_d or hash 
 
   // sign new close transactions 
   cout << "signing transactions" << endl;
@@ -134,13 +128,14 @@ void issue_tokens(
   // Transform the signed_merch_tx into the correct format --> array of 8 32bit uints
   EcdsaSig_d signed_merch_tx_parsed;
   EcdsaSig_d signed_escrow_tx_parsed;
-  // Integer signed_merch_tx_parsed[8];
-  // Integer signed_escrow_tx_parsed[8];
 
-  // mask pay and close tokens
+  bigint_into_smallint_array(signed_merch_tx_parsed.sig, signed_merch_tx);
+  bigint_into_smallint_array(signed_escrow_tx_parsed.sig, signed_escrow_tx);
+
+  // // mask pay and close tokens
   cout << "masking pay token" << endl;
   error_signal = ( error_signal | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d)); // pay token 
-  // cout << "b: "<< b.reveal<bool>(PUBLIC) << endl;
+  // // cout << "b: "<< b.reveal<bool>(PUBLIC) << endl;
 
   cout << "masking close merch token" << endl;
   mask_closemerchtoken(signed_merch_tx_parsed.sig, merch_mask_d); // close token - merchant close 
@@ -673,11 +668,9 @@ void validate_transactions(State_d new_state_d,
 
   Integer hash_outputs[8];
 
-  // dump_buffer("hash_outputs_preimage0=", hash_outputs_preimage[0]);
-  // dump_buffer("hash_outputs_preimage1=", hash_outputs_preimage[1]);
-  // dump_buffer("hash_outputs_preimage2=", hash_outputs_preimage[2]);
 
   computeDoubleSHA256_3d(hash_outputs_preimage, hash_outputs);
+
 
   // The total preimage is 228 bytes
   Integer total_preimage_escrow[4][16];
@@ -759,10 +752,6 @@ void validate_transactions(State_d new_state_d,
   total_preimage_escrow[3][14]  = Integer(32, 0, PUBLIC); //0x00000000;
   total_preimage_escrow[3][15]  = Integer(32, 1824, PUBLIC); // 228*8 = 1824 bits
 
-  // dump_buffer("total_preimage_escrow0=", total_preimage_escrow[0]);
-  // dump_buffer("total_preimage_escrow1=", total_preimage_escrow[1]);
-  // dump_buffer("total_preimage_escrow2=", total_preimage_escrow[2]);
-  // dump_buffer("total_preimage_escrow3=", total_preimage_escrow[3]);
 
   // Integer escrow_digest[8];
   computeSHA256_4d(total_preimage_escrow, escrow_digest);
@@ -867,13 +856,26 @@ void validate_transactions(State_d new_state_d,
   total_preimage_merch[4][14]  = Integer(32, 0, PUBLIC);//0x00000000;
   total_preimage_merch[4][15]  = Integer(32, 2168, PUBLIC); // 271*8 = 2168 bits
 
+  computeSHA256_5d(total_preimage_merch, merch_digest);
+
+  // dump_buffer("hash_outputs_preimage0=", hash_outputs_preimage[0]);
+  // dump_buffer("hash_outputs_preimage1=", hash_outputs_preimage[1]);
+  // dump_buffer("hash_outputs_preimage2=", hash_outputs_preimage[2]);
+
+  // dump_hash("innermost hash=", customer_delayed_script_hash);
+
+  // dump_buffer("total_preimage_escrow0=", total_preimage_escrow[0]);
+  // dump_buffer("total_preimage_escrow1=", total_preimage_escrow[1]);
+  // dump_buffer("total_preimage_escrow2=", total_preimage_escrow[2]);
+  // dump_buffer("total_preimage_escrow3=", total_preimage_escrow[3]);
+
+  // dump_hash("middle hash=", hash_outputs);
+
   // dump_buffer("total_preimage_merch0=", total_preimage_merch[0]);
   // dump_buffer("total_preimage_merch1=", total_preimage_merch[1]);
   // dump_buffer("total_preimage_merch2=", total_preimage_merch[2]);
   // dump_buffer("total_preimage_merch3=", total_preimage_merch[3]);
   // dump_buffer("total_preimage_merch4=", total_preimage_merch[4]);
-
-  computeSHA256_5d(total_preimage_merch, merch_digest);
 }
 
 // mask pay and close tokens

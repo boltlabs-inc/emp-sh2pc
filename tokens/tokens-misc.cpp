@@ -1,5 +1,6 @@
 #include "emp-sh2pc/emp-sh2pc.h"
 #include "tokens-misc.h"
+#include "sha256.h"
 
 HMACKey_d distribute_HMACKey(HMACKey_l key, int party) {
 
@@ -429,6 +430,48 @@ Integer handle_error_case(Integer data, Bit mask) {
   return to_return;
 }
 
+void bigint_into_smallint_array(Integer target[8], Integer source) {
+  Integer mask(256, 4294967295 /* 0xffffffff */, PUBLIC);
+
+  target[7] = mask & source;
+  target[7] = target[7].resize(32);
+
+  mask = mask << 32;
+  target[6] = mask & source;
+  target[6] = target[6] >> 32;
+  target[6] = target[6].resize(32);
+
+  mask = mask << 32;
+  target[5] = mask & source;
+  target[5] = target[5] >> 64;
+  target[5] = target[5].resize(32);
+
+  mask = mask << 32;
+  target[4] = mask & source;
+  target[4] = target[4] >> 96;
+  target[4] = target[4].resize(32);
+
+  mask = mask << 32;
+  target[3] = mask & source;
+  target[3] = target[3] >> 128;
+  target[3] = target[3].resize(32);
+
+  mask = mask << 32;
+  target[2] = mask & source;
+  target[2] = target[2] >> 160;
+  target[2] = target[2].resize(32);
+
+  mask = mask << 32;
+  target[1] = mask & source;
+  target[1] = target[1] >> 192;
+  target[1] = target[1].resize(32);
+
+  mask = mask << 32;
+  target[0] = mask & source;
+  target[0] = target[0] >> 224;
+  target[0] = target[0].resize(32);
+}
+
 Integer compose_buffer(Integer buffer[16]) {
   Integer thirtytwo(512, 32, PUBLIC);
   buffer[0].resize(512, false);
@@ -446,6 +489,14 @@ void dump_buffer(string label, Integer buffer[16]) {
   string temp_string = temp.reveal_unsigned(PUBLIC,16);
   std::cout << label << temp_string  << std::endl;
 }
+
+void dump_hash(string label, Integer buffer[8]) {
+  Integer temp = composeSHA256result(buffer);
+
+  string temp_string = temp.reveal_unsigned(PUBLIC,16);
+  std::cout << label << temp_string  << std::endl;
+}
+
 
 void dump_bit(string label, Bit b) {
   string temp_string = b.reveal<string>(PUBLIC);

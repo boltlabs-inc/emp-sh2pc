@@ -216,6 +216,7 @@ Integer handle_error_case(Integer data, Bit mask);
 
 Integer compose_buffer(Integer buffer[16]);
 void dump_buffer(string label, Integer buffer[16]);
+void dump_hash(string label, Integer buffer[8]);
 
 void dump_bit(string label, Bit b);
 
@@ -345,5 +346,8 @@ Bit mask_paytoken(Integer paytoken[8], Mask_d mask, MaskCommitment_d maskcommitm
  */
 void mask_closemerchtoken(Integer token[8], Mask_d mask);
 void mask_closeescrowtoken(Integer token[8], Mask_d mask);
+
+
+void bigint_into_smallint_array(Integer target[8], Integer source);
 
 
