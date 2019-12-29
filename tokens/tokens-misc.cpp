@@ -472,6 +472,14 @@ void bigint_into_smallint_array(Integer target[8], Integer source) {
   target[0] = target[0].resize(32);
 }
 
+Integer combine_balance(Balance_d balance) {
+  balance.balance[0].resize(64);
+  balance.balance[1].resize(64);
+  balance.balance[0] = balance.balance[0] << 32;
+  return balance.balance[0] | balance.balance[1];
+}
+
+
 Integer compose_buffer(Integer buffer[16]) {
   Integer thirtytwo(512, 32, PUBLIC);
   buffer[0].resize(512, false);

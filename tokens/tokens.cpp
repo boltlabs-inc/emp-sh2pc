@@ -145,6 +145,7 @@ void issue_tokens(
 
   // ...return masked tokens
   // If b = 1, we need to return nothing of value.  Otherwise we need to return all 1's or something.
+  cout << "handling errors" << endl;
   for(int i=0; i<8; i++) {
     new_paytoken_d.paytoken[i] = handle_error_case(new_paytoken_d.paytoken[i], error_signal);
   }
@@ -455,20 +456,15 @@ Bit compare_wallets(State_d old_state_d, State_d new_state_d, RevLockCommitment_
      b = b | not_equal;
   }
 
-  // Transform balances into Integer64_t
-  // Integer epsilon_d_local = 
-  // TODO THIS IS VERY VERY BROKEN!!!
-  // Need to know how to compare and do math on balances
-  b = (b | (!new_state_d.balance_merch.balance[0].equal(old_state_d.balance_merch.balance[0] + epsilon_d.balance[0])));
-  b = (b | (!new_state_d.balance_cust.balance[0].equal(old_state_d.balance_cust.balance[0] - epsilon_d.balance[0])));
+  for(int i=0; i<8; i++) {
+     Bit not_equal = !(old_state_d.HashPrevOuts_merch.txid[i].equal(new_state_d.HashPrevOuts_merch.txid[i]));
+     b = b | not_equal;
+  }
 
-
-  // ZERO CHECK
-  // Make sure both Custom and Merch are going to be nonzero balances after epsilon
-  Integer zero(32, 0, PUBLIC);
-
-  b = (b | (!new_state_d.balance_merch.balance[0].geq(zero)));
-  b = (b | (!new_state_d.balance_cust.balance[0].geq(zero)));
+  for(int i=0; i<8; i++) {
+     Bit not_equal = !(old_state_d.HashPrevOuts_escrow.txid[i].equal(new_state_d.HashPrevOuts_escrow.txid[i]));
+     b = b | not_equal;
+  }
 
   // nonce_d has to match the nonce in old state
 
@@ -480,6 +476,23 @@ Bit compare_wallets(State_d old_state_d, State_d new_state_d, RevLockCommitment_
   // check that the rlc is a commitment to the rl in old_state
 
   b = (b | verify_revlock_commitment(old_state_d.rl, rlc_d));
+
+  Integer epsilon_combined = combine_balance(epsilon_d);
+  Integer old_balance_merch_combined = combine_balance(old_state_d.balance_merch);
+  Integer old_balance_cust_combined = combine_balance(old_state_d.balance_cust);
+  Integer new_balance_merch_combined = combine_balance(new_state_d.balance_merch);
+  Integer new_balance_cust_combined = combine_balance(new_state_d.balance_cust);
+
+  // Make sure that balances have been correctly updated
+  b = (b | (!new_balance_merch_combined.equal(old_balance_merch_combined + epsilon_combined)));
+  b = (b | (!new_balance_cust_combined.equal(old_balance_cust_combined - epsilon_combined)));
+
+  // ZERO CHECK
+  // make sure theres enough funds for the amount we have payed
+  Integer zero(64, 0, PUBLIC);
+
+  b = (b | (!(old_balance_merch_combined + epsilon_combined).geq(zero)));
+  b = (b | (!(old_balance_cust_combined - epsilon_combined).geq(zero)));
 
   return b;
 }

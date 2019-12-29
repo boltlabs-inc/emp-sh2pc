@@ -194,6 +194,8 @@ Balance_d convert_to_big_endian(Balance_d little_endian_balance);
 
 Balance_d sum_balances(Balance_d lhs, Balance_d rhs);
 
+Integer combine_balance(Balance_d balance);
+
 BitcoinPublicKey_d distribute_BitcoinPublicKey(BitcoinPublicKey_l pubKey, int party);
 BitcoinPublicKey_l localize_BitcoinPublicKey(BitcoinPublicKey_d pubKey, int party);
 
