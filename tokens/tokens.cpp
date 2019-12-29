@@ -4,11 +4,35 @@
 #include "hmac.h"
 #include "sha256.h"
 #include "emp-sh2pc/emp-sh2pc.h"
+#include <memory>
 
 #define MERCH ALICE
 #define CUST BOB
 
 using namespace emp;
+
+void* get_netio_ptr(char *address, int port, int party) {
+    char *address_ptr = (party == MERCH) ? nullptr : address;
+    NetIO *io_ptr = new NetIO(address_ptr, port);
+    return static_cast<void *>(io_ptr);
+}
+
+//void free_netio_ptr(void *io_ptr) {
+//    NetIO *io = static_cast<NetIO *>(io_ptr);
+//    delete io;
+//}
+
+/* Returns a pointer to a UnixNetIO ptr */
+void* get_unixnetio_ptr(char *socket_path, int party) {
+    bool is_server = (party == MERCH) ? true : false;
+    UnixNetIO *io_ptr = new UnixNetIO(socket_path, is_server);
+    return static_cast<void *>(io_ptr);
+}
+
+//void free_unixnetio_ptr(void *io_ptr) {
+//    UnixNetIO *io = static_cast<UnixNetIO *>(io_ptr);
+//    delete io;
+//}
 
 // TODO: add fail bit and count up all the validations
 void issue_tokens(
@@ -151,11 +175,10 @@ void issue_tokens(
  * Assumes close_tx_escrow and close_tx_merch are padded to 
  * exactly 1024 bits according to the SHA256 spec.
  */
-void build_masked_tokens_cust(
+void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
-  int port,
-  char ip_addr[15],
+
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
   struct BitcoinPublicKey_l merch_escrow_pub_key_l,
@@ -175,9 +198,26 @@ void build_masked_tokens_cust(
   struct EcdsaSig_l* ct_escrow,
   struct EcdsaSig_l* ct_merch
 ) {
-  // todo: replace new/delete with sweet auto
-  NetIO * io = new NetIO("127.0.0.1", port);
-  setup_semi_honest(io, CUST);
+  // select the IO interface
+  UnixNetIO *io1 = nullptr;
+  NetIO *io2 = nullptr;
+  if (io_callback != NULL) {
+    auto *io_ptr = io_callback((ConnType)conn_type, CUST);
+    if (conn_type == UNIXNETIO) {
+        io1 = static_cast<UnixNetIO *>(io_ptr);
+        setup_semi_honest(io1, CUST);
+    } else if (conn_type == NETIO) {
+        io2 = static_cast<NetIO *>(io_ptr);
+        setup_semi_honest(io2, CUST);
+    } else {
+        /* custom IO connection */
+        cout << "specify a supported connection type" << endl;
+        return;
+    }
+  } else {
+    cout << "did not specify a IO connection callback for customer" << endl;
+    return;
+  }
 
   // placeholders for vars passed by merchant
   // TODO maybe do all the distributing here, before calling issue_tokens
@@ -220,14 +260,15 @@ issue_tokens(
 
   cout << "customer finished!" << endl;
 
-  delete io;
+  if (io1 != nullptr) delete io1;
+  if (io2 != nullptr) delete io2;
 }
 
-void build_masked_tokens_merch(
+void build_masked_tokens_merch(IOCallback io_callback,
+  ConnType conn_type,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
-  int port,
-  char ip_addr[15],
+
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
   struct BitcoinPublicKey_l merch_escrow_pub_key_l,
@@ -245,10 +286,26 @@ void build_masked_tokens_merch(
   struct EcdsaPartialSig_l sig3
 ) {
 
-  // todo: replace new/delete with sweet auto
-  NetIO * io = new NetIO(nullptr, port);
-  setup_semi_honest(io, MERCH);
-
+  // TODO: switch to smart pointer
+  UnixNetIO *io1 = nullptr;
+  NetIO *io2 = nullptr;
+  if (io_callback != NULL) {
+    auto *io_ptr = io_callback(conn_type, MERCH);
+    if (conn_type == UNIXNETIO) {
+        io1 = static_cast<UnixNetIO *>(io_ptr);
+        setup_semi_honest(io1, MERCH);
+    } else if (conn_type == NETIO) {
+        io2 = static_cast<NetIO *>(io_ptr);
+        setup_semi_honest(io2, MERCH);
+    } else {
+        /* custom IO connection */
+        cout << "specify a supported connection type" << endl;
+        return;
+    }
+  } else {
+    cout << "did not specify a IO connection callback for merchant" << endl;
+    return;
+  }
 
   State_l old_state_l;
   State_l new_state_l;
@@ -292,7 +349,8 @@ issue_tokens(
 
   cout << "merchant finished!" << endl;
 
-  delete io;
+  if (io1 != nullptr) delete io1;
+  if (io2 != nullptr) delete io2;
 }
 
 
