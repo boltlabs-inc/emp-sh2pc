@@ -118,8 +118,8 @@ void issue_tokens(
   cout << "signing transactions" << endl;
   EcdsaPartialSig_d epsd1 = distribute_EcdsaPartialSig(sig1);
   EcdsaPartialSig_d epsd2 = distribute_EcdsaPartialSig(sig2);
-  Integer signed_merch_tx = ecdsa_sign_hashed(escrow_digest, epsd1);
-  Integer signed_escrow_tx = ecdsa_sign_hashed(merch_digest, epsd2);
+  Integer signed_escrow_tx = ecdsa_sign_hashed(escrow_digest, epsd1);
+  Integer signed_merch_tx = ecdsa_sign_hashed(merch_digest, epsd2);
 
   // sign new pay token
   cout << "signing token" << endl;
@@ -159,8 +159,8 @@ void issue_tokens(
   }
 
   localize_PayToken(pt_return, new_paytoken_d, CUST);
-  localize_EcdsaSig(ct_escrow, signed_merch_tx_parsed, CUST);
-  localize_EcdsaSig(ct_merch, signed_escrow_tx_parsed, CUST);
+  localize_EcdsaSig(ct_escrow, signed_escrow_tx_parsed, CUST);
+  localize_EcdsaSig(ct_merch, signed_merch_tx_parsed, CUST);
 }
 
 /* customer's token generation function
