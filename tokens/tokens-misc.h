@@ -153,41 +153,41 @@ struct EcdsaPartialSig_d {
 
 /********************* Casting functions  **********************/
 
-HMACKey_d distribute_HMACKey(HMACKey_l key, int party);
-HMACKey_l localize_HMACKey(HMACKey_d key, int party);
+HMACKey_d distribute_HMACKey(HMACKey_l key, const int party);
+HMACKey_l localize_HMACKey(HMACKey_d key, const int party);
 
-RevLock_d distribute_RevLock(RevLock_l revlock, int party);
-RevLock_l localize_RevLock(RevLock_d revlock, int party);
+RevLock_d distribute_RevLock(RevLock_l revlock, const int party);
+RevLock_l localize_RevLock(RevLock_d revlock, const int party);
 
-RevLockCommitment_d distribute_RevLockCommitment(RevLockCommitment_l rlc, int party);
-RevLockCommitment_l localize_RevLockCommitment(RevLockCommitment_d rlc, int party);
+RevLockCommitment_d distribute_RevLockCommitment(RevLockCommitment_l rlc, const int party);
+RevLockCommitment_l localize_RevLockCommitment(RevLockCommitment_d rlc, const int party);
 
-PayToken_d distribute_PayToken(PayToken_l paytoken, int party);
-void localize_PayToken(PayToken_l *target, PayToken_d paytoken, int party);
+PayToken_d distribute_PayToken(PayToken_l paytoken, const int party);
+void localize_PayToken(PayToken_l *target, PayToken_d paytoken, const int party=CUST);
 
-Nonce_d distribute_Nonce(Nonce_l nonce, int party);
-Nonce_l localize_Nonce(Nonce_d nonce, int party);
+Nonce_d distribute_Nonce(Nonce_l nonce, const int party);
+Nonce_l localize_Nonce(Nonce_d nonce, const int party);
 
-Txid_d distribute_Txid(Txid_l txid, int party);
-Txid_l localize_Txid(Txid_d txid, int party);
+Txid_d distribute_Txid(Txid_l txid, const int party);
+Txid_l localize_Txid(Txid_d txid, const int party);
 
-State_d distribute_State(State_l state, int party);
-State_l localize_State(State_d state, int party);
+State_d distribute_State(State_l state, const int party);
+State_l localize_State(State_d state, const int party);
 
-HMACKeyCommitment_d distribute_HMACKeyCommitment(HMACKeyCommitment_l commitment, int party);
-HMACKeyCommitment_l localize_HMACKeyCommitment(HMACKeyCommitment_d commitment, int party);
+HMACKeyCommitment_d distribute_HMACKeyCommitment(HMACKeyCommitment_l commitment, const int party);
+HMACKeyCommitment_l localize_HMACKeyCommitment(HMACKeyCommitment_d commitment, const int party);
 
-MaskCommitment_d distribute_MaskCommitment(MaskCommitment_l commitment, int party);
-MaskCommitment_l localize_MaskCommitment(MaskCommitment_d commitment, int party);
+MaskCommitment_d distribute_MaskCommitment(MaskCommitment_l commitment, const int party);
+MaskCommitment_l localize_MaskCommitment(MaskCommitment_d commitment, const int party);
 
-PublicKeyHash_d distribute_PublicKeyHash(PublicKeyHash_l hash, int party);
-PublicKeyHash_l localize_PublicKeyHash(PublicKeyHash_d hash, int party);
+PublicKeyHash_d distribute_PublicKeyHash(PublicKeyHash_l hash, const int party);
+PublicKeyHash_l localize_PublicKeyHash(PublicKeyHash_d hash, const int party);
 
-Mask_d distribute_Mask(Mask_l mask, int party);
-Mask_l localize_Mask(Mask_d mask, int party);
+Mask_d distribute_Mask(Mask_l mask, const int party);
+Mask_l localize_Mask(Mask_d mask, const int party);
 
-Balance_d distribute_Balance(Balance_l balance, int party);
-Balance_l localize_Balance(Balance_d balance, int party);
+Balance_d distribute_Balance(Balance_l balance, const int party);
+Balance_l localize_Balance(Balance_d balance, const int party);
 
 Balance_d convert_to_little_endian(Balance_d big_endian_balance);
 Balance_d convert_to_big_endian(Balance_d little_endian_balance);
@@ -196,14 +196,14 @@ Balance_d sum_balances(Balance_d lhs, Balance_d rhs);
 
 Integer combine_balance(Balance_d balance);
 
-BitcoinPublicKey_d distribute_BitcoinPublicKey(BitcoinPublicKey_l pubKey, int party);
-BitcoinPublicKey_l localize_BitcoinPublicKey(BitcoinPublicKey_d pubKey, int party);
+BitcoinPublicKey_d distribute_BitcoinPublicKey(BitcoinPublicKey_l pubKey, const int party);
+BitcoinPublicKey_l localize_BitcoinPublicKey(BitcoinPublicKey_d pubKey, const int party);
 
-EcdsaPartialSig_d distribute_EcdsaPartialSig(EcdsaPartialSig_l ecdsapartialsig, int party=MERCH);
-EcdsaPartialSig_l localize_EcdsaPartialSig(EcdsaPartialSig_d ecdsapartialsig, int party);
+EcdsaPartialSig_d distribute_EcdsaPartialSig(EcdsaPartialSig_l ecdsapartialsig, const int party=MERCH);
+EcdsaPartialSig_l localize_EcdsaPartialSig(EcdsaPartialSig_d ecdsapartialsig, const int party);
 
-EcdsaSig_d distribute_EcdsaSig(EcdsaSig_l EcdsaSig, int party=MERCH);
-void localize_EcdsaSig(EcdsaSig_l *target, EcdsaSig_d EcdsaSig, int party);
+EcdsaSig_d distribute_EcdsaSig(EcdsaSig_l EcdsaSig, const int party=MERCH);
+void localize_EcdsaSig(EcdsaSig_l *target, EcdsaSig_d EcdsaSig, const int party=CUST);
 
 // easy initialization of ecdsapartialsig
 void fillEcdsaPartialSig_l(EcdsaPartialSig_l *eps, string r, string kinv);
@@ -224,7 +224,7 @@ void dump_bit(string label, Bit b);
 
 /***************************** THIS FROM MARCELLA BEFORE THE GREAT RE-TYPING ************************/
 
-Integer makeInteger(bool *bits, int len, int intlen, int party);
+Integer makeInteger(bool *bits, int len, int intlen, const int party);
 
 /* TODO: Fix types for all of these */
 

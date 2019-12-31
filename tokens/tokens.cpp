@@ -157,10 +157,10 @@ void issue_tokens(
     signed_escrow_tx_parsed.sig[i] = handle_error_case(signed_escrow_tx_parsed.sig[i], error_signal);
   }
 
-  // Return masked tokens
-  localize_PayToken(pt_return, new_paytoken_d, CUST);
-  localize_EcdsaSig(ct_escrow, signed_escrow_tx_parsed, CUST);
-  localize_EcdsaSig(ct_merch, signed_merch_tx_parsed, CUST);
+  // Return masked tokens (default returns to customer)
+  localize_PayToken(pt_return, new_paytoken_d);
+  localize_EcdsaSig(ct_escrow, signed_escrow_tx_parsed);
+  localize_EcdsaSig(ct_merch, signed_merch_tx_parsed);
 }
 
 /* customer's token generation function
