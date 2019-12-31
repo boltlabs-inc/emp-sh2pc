@@ -15,7 +15,7 @@ Integer ROR32(Integer x, Integer n) {
   return (x >> n) | (x << (thirtytwo - n));
 }
 Integer ROR32(Integer x, uint n) {
-  Integer shiftamt(BITS, 32 - n, PUBLIC);
+  int shiftamt = 32 - n;
   return (x >> n) | (x << shiftamt);
 }
 uint ROR32(uint x, uint n) {

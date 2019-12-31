@@ -36,14 +36,14 @@ HMACKey_l localize_HMACKey(HMACKey_d key, const int party) {
 RevLockCommitment_d distribute_RevLockCommitment(RevLockCommitment_l rlc, const int party) {
   RevLockCommitment_d to_return;
 
-  to_return.commitment[0] = Integer(32, rlc.commitment[0], party);
-  to_return.commitment[1] = Integer(32, rlc.commitment[1], party);
-  to_return.commitment[2] = Integer(32, rlc.commitment[2], party);
-  to_return.commitment[3] = Integer(32, rlc.commitment[3], party);
-  to_return.commitment[4] = Integer(32, rlc.commitment[4], party);
-  to_return.commitment[5] = Integer(32, rlc.commitment[5], party);
-  to_return.commitment[6] = Integer(32, rlc.commitment[6], party);
-  to_return.commitment[7] = Integer(32, rlc.commitment[7], party);
+  to_return.commitment[0] = Integer(32, rlc.commitment[0], party, true);
+  to_return.commitment[1] = Integer(32, rlc.commitment[1], party, true);
+  to_return.commitment[2] = Integer(32, rlc.commitment[2], party, true);
+  to_return.commitment[3] = Integer(32, rlc.commitment[3], party, true);
+  to_return.commitment[4] = Integer(32, rlc.commitment[4], party, true);
+  to_return.commitment[5] = Integer(32, rlc.commitment[5], party, true);
+  to_return.commitment[6] = Integer(32, rlc.commitment[6], party, true);
+  to_return.commitment[7] = Integer(32, rlc.commitment[7], party, true);
 
   return to_return;
 }
@@ -102,10 +102,10 @@ Nonce_d distribute_Nonce(Nonce_l nonce, const int party)  {
 
   Nonce_d to_return;
 
-  to_return.nonce[0] = Integer(32, nonce.nonce[0], party);
-  to_return.nonce[1] = Integer(32, nonce.nonce[1], party);
-  to_return.nonce[2] = Integer(32, nonce.nonce[2], party);
-  to_return.nonce[3] = Integer(32, nonce.nonce[3], party);
+  to_return.nonce[0] = Integer(32, nonce.nonce[0], party, true);
+  to_return.nonce[1] = Integer(32, nonce.nonce[1], party, true);
+  to_return.nonce[2] = Integer(32, nonce.nonce[2], party, true);
+  to_return.nonce[3] = Integer(32, nonce.nonce[3], party, true);
 
   return to_return;
 }
@@ -169,14 +169,14 @@ HMACKeyCommitment_d distribute_HMACKeyCommitment(HMACKeyCommitment_l commitment,
 
   HMACKeyCommitment_d to_return;
 
-  to_return.commitment[0] = Integer(32, commitment.commitment[0], party);
-  to_return.commitment[1] = Integer(32, commitment.commitment[1], party);
-  to_return.commitment[2] = Integer(32, commitment.commitment[2], party);
-  to_return.commitment[3] = Integer(32, commitment.commitment[3], party);
-  to_return.commitment[4] = Integer(32, commitment.commitment[4], party);
-  to_return.commitment[5] = Integer(32, commitment.commitment[5], party);
-  to_return.commitment[6] = Integer(32, commitment.commitment[6], party);
-  to_return.commitment[7] = Integer(32, commitment.commitment[7], party);
+  to_return.commitment[0] = Integer(32, commitment.commitment[0], party, true);
+  to_return.commitment[1] = Integer(32, commitment.commitment[1], party, true);
+  to_return.commitment[2] = Integer(32, commitment.commitment[2], party, true);
+  to_return.commitment[3] = Integer(32, commitment.commitment[3], party, true);
+  to_return.commitment[4] = Integer(32, commitment.commitment[4], party, true);
+  to_return.commitment[5] = Integer(32, commitment.commitment[5], party, true);
+  to_return.commitment[6] = Integer(32, commitment.commitment[6], party, true);
+  to_return.commitment[7] = Integer(32, commitment.commitment[7], party, true);
 
   return to_return;  
 
@@ -193,14 +193,14 @@ MaskCommitment_d distribute_MaskCommitment(MaskCommitment_l commitment, const in
 
   MaskCommitment_d to_return;
 
-  to_return.commitment[0] = Integer(32, commitment.commitment[0], party);
-  to_return.commitment[1] = Integer(32, commitment.commitment[1], party);
-  to_return.commitment[2] = Integer(32, commitment.commitment[2], party);
-  to_return.commitment[3] = Integer(32, commitment.commitment[3], party);
-  to_return.commitment[4] = Integer(32, commitment.commitment[4], party);
-  to_return.commitment[5] = Integer(32, commitment.commitment[5], party);
-  to_return.commitment[6] = Integer(32, commitment.commitment[6], party);
-  to_return.commitment[7] = Integer(32, commitment.commitment[7], party);
+  to_return.commitment[0] = Integer(32, commitment.commitment[0], party, true);
+  to_return.commitment[1] = Integer(32, commitment.commitment[1], party, true);
+  to_return.commitment[2] = Integer(32, commitment.commitment[2], party, true);
+  to_return.commitment[3] = Integer(32, commitment.commitment[3], party, true);
+  to_return.commitment[4] = Integer(32, commitment.commitment[4], party, true);
+  to_return.commitment[5] = Integer(32, commitment.commitment[5], party, true);
+  to_return.commitment[6] = Integer(32, commitment.commitment[6], party, true);
+  to_return.commitment[7] = Integer(32, commitment.commitment[7], party, true);
 
   return to_return;  
 
@@ -216,11 +216,11 @@ MaskCommitment_l localize_MaskCommitment(MaskCommitment_d commitment, const int 
 PublicKeyHash_d distribute_PublicKeyHash(PublicKeyHash_l hash, const int party) {
   PublicKeyHash_d to_return;
 
-  to_return.hash[0] = Integer(32, hash.hash[0], party);
-  to_return.hash[1] = Integer(32, hash.hash[1], party);
-  to_return.hash[2] = Integer(32, hash.hash[2], party);
-  to_return.hash[3] = Integer(32, hash.hash[3], party);
-  to_return.hash[4] = Integer(32, hash.hash[4], party);
+  to_return.hash[0] = Integer(32, hash.hash[0], party, true);
+  to_return.hash[1] = Integer(32, hash.hash[1], party, true);
+  to_return.hash[2] = Integer(32, hash.hash[2], party, true);
+  to_return.hash[3] = Integer(32, hash.hash[3], party, true);
+  to_return.hash[4] = Integer(32, hash.hash[4], party, true);
 
   return to_return;
 }
@@ -234,8 +234,9 @@ PublicKeyHash_l localize_PublicKeyHash(PublicKeyHash_d hash, const int party) {
 Balance_d distribute_Balance(Balance_l balance, const int party) {
   Balance_d to_return;
 
-  to_return.balance[0] = Integer(32, balance.balance[0], party);
-  to_return.balance[1] = Integer(32, balance.balance[1], party);
+  // validate public inputs
+  to_return.balance[0] = Integer(32, balance.balance[0], party, true);
+  to_return.balance[1] = Integer(32, balance.balance[1], party, true);
 
   return to_return;
 }
@@ -273,15 +274,15 @@ BitcoinPublicKey_d distribute_BitcoinPublicKey(BitcoinPublicKey_l pubKey, const 
 
   BitcoinPublicKey_d to_return;
 
-  to_return.key[0] = Integer(32, pubKey.key[0], party);
-  to_return.key[1] = Integer(32, pubKey.key[1], party);
-  to_return.key[2] = Integer(32, pubKey.key[2], party);
-  to_return.key[3] = Integer(32, pubKey.key[3], party);
-  to_return.key[4] = Integer(32, pubKey.key[4], party);
-  to_return.key[5] = Integer(32, pubKey.key[5], party);
-  to_return.key[6] = Integer(32, pubKey.key[6], party);
-  to_return.key[7] = Integer(32, pubKey.key[7], party);
-  to_return.key[8] = Integer(32, pubKey.key[8], party);
+  to_return.key[0] = Integer(32, pubKey.key[0], party, true);
+  to_return.key[1] = Integer(32, pubKey.key[1], party, true);
+  to_return.key[2] = Integer(32, pubKey.key[2], party, true);
+  to_return.key[3] = Integer(32, pubKey.key[3], party, true);
+  to_return.key[4] = Integer(32, pubKey.key[4], party, true);
+  to_return.key[5] = Integer(32, pubKey.key[5], party, true);
+  to_return.key[6] = Integer(32, pubKey.key[6], party, true);
+  to_return.key[7] = Integer(32, pubKey.key[7], party, true);
+  to_return.key[8] = Integer(32, pubKey.key[8], party, true);
 
   return to_return;
 }

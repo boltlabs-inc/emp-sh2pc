@@ -33,8 +33,10 @@ int main(int argc, char** argv) {
     exit(1);
   }
 
+  // Declare shared vars
   // char ip[15] = "127.0.0.1";
   Balance_l amt;
+
   RevLockCommitment_l rl;
   MaskCommitment_l paymask_com;
   HMACKeyCommitment_l key_com;
@@ -45,6 +47,28 @@ int main(int argc, char** argv) {
   BitcoinPublicKey_l merch_payout_pub_key_l;
   Nonce_l nonce_l;
 
+  // Initialize shared vars
+  amt.balance[0] = 1000;
+  amt.balance[1] = 0;
+  for(int i=0; i<4; i++) {
+	nonce_l.nonce[i] = 0;
+  }
+  for(int i=0; i<5; i++) {
+	merch_publickey_hash.hash[i] = 0;
+  }
+  for(int i=0; i<8; i++) {
+	rl.commitment[i] = 0;
+	paymask_com.commitment[i] = 0;
+	key_com.commitment[i] = 0;
+  }
+  for(int i=0; i<9; i++) {
+	merch_escrow_pub_key_l.key[i] = 0;
+	merch_dispute_key_l.key[i] = 0;
+	merch_payout_pub_key_l.key[i] = 0;
+  }
+  
+
+  // Initialized single-party vars and call functions
   if (party == MERCH) {
 	EcdsaPartialSig_l sig;
 	string r = "108792476108599305057612221643697785065475034835954270988586688301027220077907";
