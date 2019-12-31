@@ -194,8 +194,6 @@ void test_negative_digest() {
   string digest = "fcfbbeec974c9394b6d3c85a84f3c227e1712af52201d8fdcc1c3d1ebc9ebf8b";
   Integer dig(257, change_base(digest,16,10), PUBLIC);
 
-  cout << change_base(digest,16,10) << endl;
-
   Integer sig = ecdsa_sign_hashed(dig,psd);
   string actual_sig = change_base(sig.reveal<string>(PUBLIC), 10,16);
 
@@ -203,6 +201,24 @@ void test_negative_digest() {
 
   cout << "Passed 1 \"negative\" digest test" << endl;
 
+}
+
+// todo: find a way to run this correctly
+// e.g. the test passes if these Integer declarations throw an assertion fail
+void test_int_validation(int party) {
+  Integer t(32, "10", PUBLIC, false);
+  Integer s;
+  Integer u;
+
+  if (party == ALICE) {
+	u = Integer(32, 1, PUBLIC, true);
+	s = Integer(32, "0", PUBLIC, true);
+  } else {
+	u = Integer(32, 11, PUBLIC, true);
+	s = Integer(32, "01", PUBLIC, true);
+  }
+
+  cout << "no assertions failed :( " << endl;
 }
 
 int main(int argc, char** argv) {
@@ -219,9 +235,10 @@ int main(int argc, char** argv) {
   setup_semi_honest(io, party);
 
   test_negative_digest();
-
   test_types();
   test_hardcoded_vector();
+
+  // test_int_validation(party);
 
   delete io;
   return 0;
