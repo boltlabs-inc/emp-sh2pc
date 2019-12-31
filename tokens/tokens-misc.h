@@ -346,8 +346,7 @@ Bit mask_paytoken(Integer paytoken[8], Mask_d mask, MaskCommitment_d maskcommitm
  * \param[in] token : Sequence of bits representing a token
  *
  */
-void mask_closemerchtoken(Integer token[8], Mask_d mask);
-void mask_closeescrowtoken(Integer token[8], Mask_d mask);
+void mask_closetoken(Integer token[8], Mask_d mask);
 
 
 void bigint_into_smallint_array(Integer target[8], Integer source);
