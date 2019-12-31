@@ -10,11 +10,7 @@ using namespace std;
 #define MERCH ALICE
 #define CUST BOB
 
-const int QLEN = 256;
-
 // computes SHA256 hash of the input
-// todo; maybe require this in a different format 
-// (e.g. padded and in blocks)
 void parseSHA256_2l(char cmsg[1024], uint message[2][16]);
 
 // hard-coded conversion of secp256k1 point order 
@@ -23,12 +19,18 @@ void parseSHA256_2l(char cmsg[1024], uint message[2][16]);
 string get_ECDSA_params(); 
 
 // ecdsa-signs a message based on the given parameters
-// a message and a partial signature
-// returns signature, encoded in Integer
-Integer ecdsa_sign(char msg[1024], EcdsaPartialSig_l s);
-Integer ecdsa_sign(Integer message[2][16], EcdsaPartialSig_d partialsig);
+// \param[in] msg : message. Assumed to be padded to exactly 2 blocks.
+// \param[in] partialsig : holds ecdsa parameters
+//
+// \return signature, encoded in Integer
+// IMPORTANT: The signature represents an unsigned integer. It may produce incorrect results if used 
+// for arithmetic operations (EMP-toolkit will assume it is a _signed_ integer).
+Integer ecdsa_sign(char msg[1024], EcdsaPartialSig_l partialsig);
+Integer ecdsa_sign(Integer msg[2][16], EcdsaPartialSig_d partialsig);
 
-// ecdsa signs a hashed private message
+// ecdsa-signs a hashed private message
+// Hash digest can be encoded as a single 256-bit digest or as a set of 8 32-bit integers.
+// returns a signature (same caveat as above)
 Integer ecdsa_sign_hashed(Integer broken_digest[8], EcdsaPartialSig_d partialsig);
 Integer ecdsa_sign_hashed(Integer digest, EcdsaPartialSig_d partialsig);
 

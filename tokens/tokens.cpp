@@ -126,6 +126,7 @@ void issue_tokens(
   PayToken_d new_paytoken_d = sign_token(new_state_d, hmac_key_d);
 
   // Transform the signed_merch_tx into the correct format --> array of 8 32bit uints
+  // TODO: why is this format better than one 256-bit uint? We only do bitwise operations on these values
   EcdsaSig_d signed_merch_tx_parsed;
   EcdsaSig_d signed_escrow_tx_parsed;
 
@@ -135,7 +136,6 @@ void issue_tokens(
   // // mask pay and close tokens
   cout << "masking pay token" << endl;
   error_signal = ( error_signal | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d)); // pay token 
-  // // cout << "b: "<< b.reveal<bool>(PUBLIC) << endl;
 
   cout << "masking close merch token" << endl;
   mask_closemerchtoken(signed_merch_tx_parsed.sig, merch_mask_d); // close token - merchant close 
@@ -143,21 +143,21 @@ void issue_tokens(
   cout << "masking close escrow token" << endl;
   mask_closeescrowtoken(signed_escrow_tx_parsed.sig, escrow_mask_d); // close token - escrow close 
 
-  // ...return masked tokens
-  // If b = 1, we need to return nothing of value.  Otherwise we need to return all 1's or something.
+  // handle errors
+  // If there has been an error, we need to destroy the token values. 
+  // TODO: why does this hang when it's a single for loop?
   cout << "handling errors" << endl;
   for(int i=0; i<8; i++) {
     new_paytoken_d.paytoken[i] = handle_error_case(new_paytoken_d.paytoken[i], error_signal);
   }
-
   for(int i=0; i<8; i++) {
     signed_merch_tx_parsed.sig[i] = handle_error_case(signed_merch_tx_parsed.sig[i], error_signal);
   }
-
   for(int i=0; i<8; i++) {
     signed_escrow_tx_parsed.sig[i] = handle_error_case(signed_escrow_tx_parsed.sig[i], error_signal);
   }
 
+  // Return masked tokens
   localize_PayToken(pt_return, new_paytoken_d, CUST);
   localize_EcdsaSig(ct_escrow, signed_escrow_tx_parsed, CUST);
   localize_EcdsaSig(ct_merch, signed_merch_tx_parsed, CUST);

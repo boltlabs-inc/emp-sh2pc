@@ -57,9 +57,12 @@ Integer ecdsa_sign(Integer message[2][16], EcdsaPartialSig_d partialsig) {
 }
 
 // ecdsa-signs a message based on the given parameters
-// parameters here are appended -c because they're in the clear
-// mc : message text (in the clear)
+// msg: message text (in the clear)
 // pubsig : partial ecdsa signature in the clear (see token.h)
+//
+// returns a 256-bit integer representing the signature
+// IMPORTANT: this represents an unsigned integer. It may produce incorrect results if used 
+// for arithmetic operations (EMP-toolkit will assume it is a _signed_ integer).
 Integer ecdsa_sign(char msg[1024], EcdsaPartialSig_l pubsig) {
   EcdsaPartialSig_d partialsig = distribute_EcdsaPartialSig(pubsig);
 
@@ -80,18 +83,17 @@ Integer ecdsa_sign_hashed(Integer broken_digest[8], EcdsaPartialSig_d partialsig
 }
 
 Integer ecdsa_sign_hashed(Integer digest, EcdsaPartialSig_d partialsig) {
-  // get shared/fixed q
-  Integer q(257, get_ECDSA_params(), PUBLIC);
+  // retrieve shared/fixed q
+  Integer q(258, get_ECDSA_params(), PUBLIC);
 
-  digest.resize(257, true);
+  digest.resize(258, false);
   digest = digest % q;
 
-  // can we keep q in the clear and use it as the modulus?
   Integer s = digest + partialsig.r;
   s = s % q;
 
-  s.resize(513,true);
-  q.resize(513,true);
+  s.resize(516,true);
+  q.resize(516,true);
   s = partialsig.k_inv * s;
   s = s % q;
 
