@@ -105,8 +105,6 @@ void issue_tokens(
   // generate the hash of the properly formed transacation
   cout << "validating transactions" << endl;
 
-  // TODO: Something is broken in here that causes the customer to hang when we run this end-to-end.
-  // Commenting it out for now, but we need to debug.
   validate_transactions(new_state_d, 
     cust_escrow_pub_key_d, cust_payout_pub_key_d,
     merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, 
@@ -127,7 +125,6 @@ void issue_tokens(
   PayToken_d new_paytoken_d = sign_token(new_state_d, hmac_key_d);
 
   // Transform the signed_merch_tx into the correct format --> array of 8 32bit uints
-  // TODO: why is this format better than one 256-bit uint? We only do bitwise operations on these values
   EcdsaSig_d signed_merch_tx_parsed;
   EcdsaSig_d signed_escrow_tx_parsed;
 
@@ -146,7 +143,6 @@ void issue_tokens(
 
   // handle errors
   // If there has been an error, we need to destroy the token values. 
-  // TODO: why does this hang when it's a single for loop?
   cout << "handling errors" << endl;
   for(int i=0; i<8; i++) {
     new_paytoken_d.paytoken[i] = handle_error_case(new_paytoken_d.paytoken[i], error_signal);
