@@ -2,7 +2,7 @@
 #include "tokens-misc.h"
 #include "sha256.h"
 
-HMACKey_d distribute_HMACKey(HMACKey_l key, int party) {
+HMACKey_d distribute_HMACKey(HMACKey_l key, const int party) {
 
   HMACKey_d to_return;
 
@@ -26,34 +26,34 @@ HMACKey_d distribute_HMACKey(HMACKey_l key, int party) {
   return to_return;
 }
 
-HMACKey_l localize_HMACKey(HMACKey_d key, int party) {
+HMACKey_l localize_HMACKey(HMACKey_d key, const int party) {
   HMACKey_l to_return;
   // GABE TODO
   
   return to_return;
 }
 
-RevLockCommitment_d distribute_RevLockCommitment(RevLockCommitment_l rlc, int party) {
+RevLockCommitment_d distribute_RevLockCommitment(RevLockCommitment_l rlc, const int party) {
   RevLockCommitment_d to_return;
 
-  to_return.commitment[0] = Integer(32, rlc.commitment[0], party);
-  to_return.commitment[1] = Integer(32, rlc.commitment[1], party);
-  to_return.commitment[2] = Integer(32, rlc.commitment[2], party);
-  to_return.commitment[3] = Integer(32, rlc.commitment[3], party);
-  to_return.commitment[4] = Integer(32, rlc.commitment[4], party);
-  to_return.commitment[5] = Integer(32, rlc.commitment[5], party);
-  to_return.commitment[6] = Integer(32, rlc.commitment[6], party);
-  to_return.commitment[7] = Integer(32, rlc.commitment[7], party);
+  to_return.commitment[0] = Integer(32, rlc.commitment[0], party, true);
+  to_return.commitment[1] = Integer(32, rlc.commitment[1], party, true);
+  to_return.commitment[2] = Integer(32, rlc.commitment[2], party, true);
+  to_return.commitment[3] = Integer(32, rlc.commitment[3], party, true);
+  to_return.commitment[4] = Integer(32, rlc.commitment[4], party, true);
+  to_return.commitment[5] = Integer(32, rlc.commitment[5], party, true);
+  to_return.commitment[6] = Integer(32, rlc.commitment[6], party, true);
+  to_return.commitment[7] = Integer(32, rlc.commitment[7], party, true);
 
   return to_return;
 }
 
-RevLockCommitment_l localize_RevLockCommitment(RevLockCommitment_d rlc, int party) {
+RevLockCommitment_l localize_RevLockCommitment(RevLockCommitment_d rlc, const int party) {
   RevLockCommitment_l to_return;
   return to_return;
 }
 
-RevLock_d distribute_RevLock(RevLock_l revlock, int party) {
+RevLock_d distribute_RevLock(RevLock_l revlock, const int party) {
 
   RevLock_d to_return;
 
@@ -69,14 +69,14 @@ RevLock_d distribute_RevLock(RevLock_l revlock, int party) {
   return to_return;
 }
 
-RevLock_l localize_RevLock(RevLock_d revlock, int party) {
+RevLock_l localize_RevLock(RevLock_d revlock, const int party) {
   RevLock_l to_return;
   // GABE TODO
 
   return to_return;
 }
 
-PayToken_d distribute_PayToken(PayToken_l paytoken, int party) {
+PayToken_d distribute_PayToken(PayToken_l paytoken, const int party) {
 
   PayToken_d to_return;
 
@@ -92,32 +92,32 @@ PayToken_d distribute_PayToken(PayToken_l paytoken, int party) {
   return to_return;
 }
 
-void localize_PayToken(PayToken_l* target, PayToken_d paytoken, int party) {  
+void localize_PayToken(PayToken_l* target, PayToken_d paytoken, const int party) {  
   for(int i=0; i<8; i++) {
-    target->paytoken[i] = paytoken.paytoken[i].reveal<uint32_t>(CUST);
+    target->paytoken[i] = paytoken.paytoken[i].reveal<uint32_t>(party);
   }
 }
 
-Nonce_d distribute_Nonce(Nonce_l nonce, int party)  {
+Nonce_d distribute_Nonce(Nonce_l nonce, const int party)  {
 
   Nonce_d to_return;
 
-  to_return.nonce[0] = Integer(32, nonce.nonce[0], party);
-  to_return.nonce[1] = Integer(32, nonce.nonce[1], party);
-  to_return.nonce[2] = Integer(32, nonce.nonce[2], party);
-  to_return.nonce[3] = Integer(32, nonce.nonce[3], party);
+  to_return.nonce[0] = Integer(32, nonce.nonce[0], party, true);
+  to_return.nonce[1] = Integer(32, nonce.nonce[1], party, true);
+  to_return.nonce[2] = Integer(32, nonce.nonce[2], party, true);
+  to_return.nonce[3] = Integer(32, nonce.nonce[3], party, true);
 
   return to_return;
 }
 
-Nonce_l localize_Nonce(Nonce_d nonce, int party) {
+Nonce_l localize_Nonce(Nonce_d nonce, const int party) {
   Nonce_l to_return;
   // GABE TODO
 
   return to_return;
 }
 
-Txid_d distribute_Txid(Txid_l txid, int party) {
+Txid_d distribute_Txid(Txid_l txid, const int party) {
 
   Txid_d to_return;
 
@@ -133,13 +133,13 @@ Txid_d distribute_Txid(Txid_l txid, int party) {
   return to_return;  
 }
 
-Txid_l localize_Txid(Txid_d txid, int party) {
+Txid_l localize_Txid(Txid_d txid, const int party) {
   Txid_l to_return;
 
   return to_return;
 }
 
-State_d distribute_State(State_l state, int party) {
+State_d distribute_State(State_l state, const int party) {
 
   State_d to_return;
 
@@ -158,95 +158,96 @@ State_d distribute_State(State_l state, int party) {
   return to_return;
 }
 
-State_l localize_State(State_d state, int party){
+State_l localize_State(State_d state, const int party){
   State_l to_return;
   // GABE TODO
 
   return to_return;
 }
 
-HMACKeyCommitment_d distribute_HMACKeyCommitment(HMACKeyCommitment_l commitment, int party) {
+HMACKeyCommitment_d distribute_HMACKeyCommitment(HMACKeyCommitment_l commitment, const int party) {
 
   HMACKeyCommitment_d to_return;
 
-  to_return.commitment[0] = Integer(32, commitment.commitment[0], party);
-  to_return.commitment[1] = Integer(32, commitment.commitment[1], party);
-  to_return.commitment[2] = Integer(32, commitment.commitment[2], party);
-  to_return.commitment[3] = Integer(32, commitment.commitment[3], party);
-  to_return.commitment[4] = Integer(32, commitment.commitment[4], party);
-  to_return.commitment[5] = Integer(32, commitment.commitment[5], party);
-  to_return.commitment[6] = Integer(32, commitment.commitment[6], party);
-  to_return.commitment[7] = Integer(32, commitment.commitment[7], party);
+  to_return.commitment[0] = Integer(32, commitment.commitment[0], party, true);
+  to_return.commitment[1] = Integer(32, commitment.commitment[1], party, true);
+  to_return.commitment[2] = Integer(32, commitment.commitment[2], party, true);
+  to_return.commitment[3] = Integer(32, commitment.commitment[3], party, true);
+  to_return.commitment[4] = Integer(32, commitment.commitment[4], party, true);
+  to_return.commitment[5] = Integer(32, commitment.commitment[5], party, true);
+  to_return.commitment[6] = Integer(32, commitment.commitment[6], party, true);
+  to_return.commitment[7] = Integer(32, commitment.commitment[7], party, true);
 
   return to_return;  
 
 }
 
-HMACKeyCommitment_l localize_HMACKeyCommitment(HMACKeyCommitment_d commitment, int party) {
+HMACKeyCommitment_l localize_HMACKeyCommitment(HMACKeyCommitment_d commitment, const int party) {
   HMACKeyCommitment_l to_return;
   // GABE TODO
 
   return to_return;
 }
 
-MaskCommitment_d distribute_MaskCommitment(MaskCommitment_l commitment, int party) {
+MaskCommitment_d distribute_MaskCommitment(MaskCommitment_l commitment, const int party) {
 
   MaskCommitment_d to_return;
 
-  to_return.commitment[0] = Integer(32, commitment.commitment[0], party);
-  to_return.commitment[1] = Integer(32, commitment.commitment[1], party);
-  to_return.commitment[2] = Integer(32, commitment.commitment[2], party);
-  to_return.commitment[3] = Integer(32, commitment.commitment[3], party);
-  to_return.commitment[4] = Integer(32, commitment.commitment[4], party);
-  to_return.commitment[5] = Integer(32, commitment.commitment[5], party);
-  to_return.commitment[6] = Integer(32, commitment.commitment[6], party);
-  to_return.commitment[7] = Integer(32, commitment.commitment[7], party);
+  to_return.commitment[0] = Integer(32, commitment.commitment[0], party, true);
+  to_return.commitment[1] = Integer(32, commitment.commitment[1], party, true);
+  to_return.commitment[2] = Integer(32, commitment.commitment[2], party, true);
+  to_return.commitment[3] = Integer(32, commitment.commitment[3], party, true);
+  to_return.commitment[4] = Integer(32, commitment.commitment[4], party, true);
+  to_return.commitment[5] = Integer(32, commitment.commitment[5], party, true);
+  to_return.commitment[6] = Integer(32, commitment.commitment[6], party, true);
+  to_return.commitment[7] = Integer(32, commitment.commitment[7], party, true);
 
   return to_return;  
 
 }
 
-MaskCommitment_l localize_MaskCommitment(MaskCommitment_d commitment, int party) {
+MaskCommitment_l localize_MaskCommitment(MaskCommitment_d commitment, const int party) {
   MaskCommitment_l to_return;
   // GABE TODO
 
   return to_return;
 }
 
-PublicKeyHash_d distribute_PublicKeyHash(PublicKeyHash_l hash, int party) {
+PublicKeyHash_d distribute_PublicKeyHash(PublicKeyHash_l hash, const int party) {
   PublicKeyHash_d to_return;
 
-  to_return.hash[0] = Integer(32, hash.hash[0], party);
-  to_return.hash[1] = Integer(32, hash.hash[1], party);
-  to_return.hash[2] = Integer(32, hash.hash[2], party);
-  to_return.hash[3] = Integer(32, hash.hash[3], party);
-  to_return.hash[4] = Integer(32, hash.hash[4], party);
+  to_return.hash[0] = Integer(32, hash.hash[0], party, true);
+  to_return.hash[1] = Integer(32, hash.hash[1], party, true);
+  to_return.hash[2] = Integer(32, hash.hash[2], party, true);
+  to_return.hash[3] = Integer(32, hash.hash[3], party, true);
+  to_return.hash[4] = Integer(32, hash.hash[4], party, true);
 
   return to_return;
 }
 
-PublicKeyHash_l localize_PublicKeyHash(PublicKeyHash_d hash, int party) {
+PublicKeyHash_l localize_PublicKeyHash(PublicKeyHash_d hash, const int party) {
   PublicKeyHash_l to_return;
 
   return to_return;
 }
 
-Balance_d distribute_Balance(Balance_l balance, int party) {
+Balance_d distribute_Balance(Balance_l balance, const int party) {
   Balance_d to_return;
 
-  to_return.balance[0] = Integer(32, balance.balance[0], party);
-  to_return.balance[1] = Integer(32, balance.balance[1], party);
+  // validate public inputs
+  to_return.balance[0] = Integer(32, balance.balance[0], party, true);
+  to_return.balance[1] = Integer(32, balance.balance[1], party, true);
 
   return to_return;
 }
 
-Balance_l localize_Balance(Balance_d balance, int party) {
+Balance_l localize_Balance(Balance_d balance, const int party) {
   Balance_l to_return;
 
   return to_return;
 }
 
-Mask_d distribute_Mask(Mask_l mask, int party) {
+Mask_d distribute_Mask(Mask_l mask, const int party) {
 
   Mask_d to_return;
 
@@ -262,31 +263,31 @@ Mask_d distribute_Mask(Mask_l mask, int party) {
   return to_return;  
 }
 
-Mask_l localize_Mask(Mask_d mask, int party) {
+Mask_l localize_Mask(Mask_d mask, const int party) {
   Mask_l to_return;
   // GABE TODO
 
   return to_return;
 }
 
-BitcoinPublicKey_d distribute_BitcoinPublicKey(BitcoinPublicKey_l pubKey, int party) {
+BitcoinPublicKey_d distribute_BitcoinPublicKey(BitcoinPublicKey_l pubKey, const int party) {
 
   BitcoinPublicKey_d to_return;
 
-  to_return.key[0] = Integer(32, pubKey.key[0], party);
-  to_return.key[1] = Integer(32, pubKey.key[1], party);
-  to_return.key[2] = Integer(32, pubKey.key[2], party);
-  to_return.key[3] = Integer(32, pubKey.key[3], party);
-  to_return.key[4] = Integer(32, pubKey.key[4], party);
-  to_return.key[5] = Integer(32, pubKey.key[5], party);
-  to_return.key[6] = Integer(32, pubKey.key[6], party);
-  to_return.key[7] = Integer(32, pubKey.key[7], party);
-  to_return.key[8] = Integer(32, pubKey.key[8], party);
+  to_return.key[0] = Integer(32, pubKey.key[0], party, true);
+  to_return.key[1] = Integer(32, pubKey.key[1], party, true);
+  to_return.key[2] = Integer(32, pubKey.key[2], party, true);
+  to_return.key[3] = Integer(32, pubKey.key[3], party, true);
+  to_return.key[4] = Integer(32, pubKey.key[4], party, true);
+  to_return.key[5] = Integer(32, pubKey.key[5], party, true);
+  to_return.key[6] = Integer(32, pubKey.key[6], party, true);
+  to_return.key[7] = Integer(32, pubKey.key[7], party, true);
+  to_return.key[8] = Integer(32, pubKey.key[8], party, true);
 
   return to_return;
 }
 
-BitcoinPublicKey_l localize_BitcoinPublicKey(BitcoinPublicKey_d pubKey, int party) {
+BitcoinPublicKey_l localize_BitcoinPublicKey(BitcoinPublicKey_d pubKey, const int party) {
   BitcoinPublicKey_l to_return;
 
   return to_return;
@@ -310,13 +311,13 @@ void fillEcdsaPartialSig_l(EcdsaPartialSig_l *eps, string r, string k_inv) {
   }
 }
 
-EcdsaPartialSig_d distribute_EcdsaPartialSig(EcdsaPartialSig_l psl, int party){
+EcdsaPartialSig_d distribute_EcdsaPartialSig(EcdsaPartialSig_l psl, const int party){
   EcdsaPartialSig_d to_return;
   string r(psl.r);
-  to_return.r = Integer(257, r, party);
+  to_return.r = Integer(258, r, party);
   string kinv(psl.k_inv);
 
-  to_return.k_inv = Integer(513, kinv, party);
+  to_return.k_inv = Integer(516, kinv, party);
   to_return.k_inv = to_return.k_inv;
 
   return to_return;
@@ -324,7 +325,7 @@ EcdsaPartialSig_d distribute_EcdsaPartialSig(EcdsaPartialSig_l psl, int party){
 
 // honestly, if we ever need to do this (which we shouldn't outside of testing)
 // we definitely should not reveal them publicly.
-EcdsaPartialSig_l localize_EcdsaPartialSig(EcdsaPartialSig_d psd, int party){
+EcdsaPartialSig_l localize_EcdsaPartialSig(EcdsaPartialSig_d psd, const int party){
   EcdsaPartialSig_l to_return;
 
   string r = psd.r.reveal<string>(party);
@@ -334,7 +335,7 @@ EcdsaPartialSig_l localize_EcdsaPartialSig(EcdsaPartialSig_d psd, int party){
   return to_return;
 }
 
-EcdsaSig_d distribute_EcdsaSig(EcdsaSig_l EcdsaSig, int party) {
+EcdsaSig_d distribute_EcdsaSig(EcdsaSig_l EcdsaSig, const int party) {
   EcdsaSig_d to_return;
 
   to_return.sig[0] = Integer(32, EcdsaSig.sig[0], party);
@@ -349,9 +350,9 @@ EcdsaSig_d distribute_EcdsaSig(EcdsaSig_l EcdsaSig, int party) {
   return to_return;
 }
 
-void localize_EcdsaSig(EcdsaSig_l* target, EcdsaSig_d EcdsaSig, int party) {
+void localize_EcdsaSig(EcdsaSig_l* target, EcdsaSig_d EcdsaSig, const int party) {
   for(int i=0; i<8; i++) {
-    target->sig[i] = EcdsaSig.sig[i].reveal<uint32_t>(CUST);
+    target->sig[i] = EcdsaSig.sig[i].reveal<uint32_t>(party);
   }
 }
 

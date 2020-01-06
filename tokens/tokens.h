@@ -207,7 +207,6 @@ void build_masked_tokens_cust(
 
   struct State_l w_new,
   struct State_l w_old,
-  char *t,
   struct PayToken_l pt_old,
   struct BitcoinPublicKey_l cust_escrow_pub_key_l,
   struct BitcoinPublicKey_l cust_payout_pub_key_l,
@@ -268,8 +267,7 @@ void build_masked_tokens_merch(
   struct Mask_l escrow_mask_l,
   struct Mask_l paytoken_mask_l,
   struct EcdsaPartialSig_l sig1,
-  struct EcdsaPartialSig_l sig2,
-  struct EcdsaPartialSig_l sig3
+  struct EcdsaPartialSig_l sig2
 );
 
 #ifdef __cplusplus

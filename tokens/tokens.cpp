@@ -118,42 +118,42 @@ void issue_tokens(
   cout << "signing transactions" << endl;
   EcdsaPartialSig_d epsd1 = distribute_EcdsaPartialSig(sig1);
   EcdsaPartialSig_d epsd2 = distribute_EcdsaPartialSig(sig2);
-  Integer signed_escrow_tx = ecdsa_sign_hashed(escrow_digest, epsd1);
-  Integer signed_merch_tx = ecdsa_sign_hashed(merch_digest, epsd2);
+
+  Integer signed_merch_tx = ecdsa_sign_hashed(merch_digest, epsd1);
+  Integer signed_escrow_tx = ecdsa_sign_hashed(escrow_digest, epsd2);
 
   // sign new pay token
   cout << "signing token" << endl;
   PayToken_d new_paytoken_d = sign_token(new_state_d, hmac_key_d);
 
   // Transform the signed_merch_tx into the correct format --> array of 8 32bit uints
+  // TODO: why is this format better than one 256-bit uint? We only do bitwise operations on these values
   EcdsaSig_d signed_merch_tx_parsed;
   EcdsaSig_d signed_escrow_tx_parsed;
 
   bigint_into_smallint_array(signed_merch_tx_parsed.sig, signed_merch_tx);
   bigint_into_smallint_array(signed_escrow_tx_parsed.sig, signed_escrow_tx);
 
-  // // mask pay and close tokens
+  // mask pay and close tokens
   cout << "masking pay token" << endl;
   error_signal = ( error_signal | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d)); // pay token 
-  // // cout << "b: "<< b.reveal<bool>(PUBLIC) << endl;
 
   cout << "masking close merch token" << endl;
-  mask_closemerchtoken(signed_merch_tx_parsed.sig, merch_mask_d); // close token - merchant close 
+  mask_closetoken(signed_merch_tx_parsed.sig, merch_mask_d); // close token - merchant close 
 
   cout << "masking close escrow token" << endl;
-  mask_closeescrowtoken(signed_escrow_tx_parsed.sig, escrow_mask_d); // close token - escrow close 
+  mask_closetoken(signed_escrow_tx_parsed.sig, escrow_mask_d); // close token - escrow close 
 
-  // ...return masked tokens
-  // If b = 1, we need to return nothing of value.  Otherwise we need to return all 1's or something.
+  // handle errors
+  // If there has been an error, we need to destroy the token values. 
+  // TODO: why does this hang when it's a single for loop?
   cout << "handling errors" << endl;
   for(int i=0; i<8; i++) {
     new_paytoken_d.paytoken[i] = handle_error_case(new_paytoken_d.paytoken[i], error_signal);
   }
-
   for(int i=0; i<8; i++) {
     signed_merch_tx_parsed.sig[i] = handle_error_case(signed_merch_tx_parsed.sig[i], error_signal);
   }
-
   for(int i=0; i<8; i++) {
     signed_escrow_tx_parsed.sig[i] = handle_error_case(signed_escrow_tx_parsed.sig[i], error_signal);
   }
@@ -185,7 +185,6 @@ void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type,
 
   struct State_l w_new,
   struct State_l w_old,
-  char *t,
   struct PayToken_l pt_old,
   struct BitcoinPublicKey_l cust_escrow_pub_key_l,
   struct BitcoinPublicKey_l cust_payout_pub_key_l,
@@ -278,8 +277,7 @@ void build_masked_tokens_merch(IOCallback io_callback,
   struct Mask_l escrow_mask_l,
   struct Mask_l paytoken_mask_l,
   struct EcdsaPartialSig_l sig1,
-  struct EcdsaPartialSig_l sig2,
-  struct EcdsaPartialSig_l sig3
+  struct EcdsaPartialSig_l sig2
 ) {
 
   // TODO: switch to smart pointer
@@ -358,30 +356,6 @@ Integer makeInteger(bool *bits, int len, int intlen, int party) {
   bitstr = change_base(bitstr,2,10);
   return Integer(intlen, bitstr, party);
 }
-
-/*
-PrivateEcdsaPartialSig setEcdsaPartialSig(EcdsaPartialSig pub) { 
-  PrivateEcdsaPartialSig priv;
-  // probably should abstract this int initialization away
-  priv.r = makeInteger(pub.r, 256, 257, MERCH);
-  priv.k_inv = makeInteger(pub.k_inv, 256, 513, MERCH);
-  return priv;
-
-  string r_bitstr = "";
-  string k_bitstr = "";
-  for (int i=0; i < 256; i++) {
-    r_bitstr += pub.r[i] ? "1" : "0";
-    k_bitstr += pub.k_inv[i] ? "1" : "0";
-  }
-  r_bitstr = change_base(r_bitstr,2,10); // assume r is positive, not in 2's complement notation
-  priv.r = Integer(257, r_bitstr, MERCH);
-
-  k_bitstr = change_base(k_bitstr,2,10); // assume k is positive, not in 2's complement notation
-  priv.k_inv = Integer(513, k_bitstr, MERCH);
-
-  return priv;
-}
-*/
 
 PayToken_d sign_token(State_d state, HMACKey_d key) {
   PayToken_d paytoken;
@@ -907,22 +881,8 @@ Bit mask_paytoken(Integer paytoken[8], Mask_d mask, MaskCommitment_d maskcommitm
   return b;
 }
 
-void mask_closemerchtoken(Integer token[8], Mask_d mask) {
-
-  // The sig is 256 bits long.
-  // Thus the mask is 256 bits long.
-
-  for(int i=0; i<8; i++) {
-    token[i] = token[i] ^ mask.mask[i];
-  }
-
-}
-
-void mask_closeescrowtoken(Integer token[8], Mask_d mask){
-
-  // The sig is 256 bits long.
-  // Thus the mask is 256 bits long.
-
+// applies a mask to a 256-bit token (made of 8x32-bit integers)
+void mask_closetoken(Integer token[8], Mask_d mask) {
   for(int i=0; i<8; i++) {
     token[i] = token[i] ^ mask.mask[i];
   }

@@ -47,6 +47,21 @@ string get_ECDSA_params() {
   return "115792089237316195423570985008687907852837564279074904382605163141518161494337";
 }
 
+// sets sign of signature according to bitcoin specification.
+// if s > q/2, set s = q-s.
+Integer set_signature_sign(Integer signature) {
+  // q2 = ceil( q/2 ), where q is the secp256k1 point order
+  const int size = 516;
+  assert(signature.size() == size);
+  string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
+  Integer q2(size, q2str, PUBLIC);
+  Integer q (size, get_ECDSA_params(), PUBLIC);
+  Bit flip = signature.geq(q2);
+  Integer flipsig = q - signature;
+  signature = signature.select(flip, flipsig);
+  return signature;
+}
+
 // signs a message using the Ecdsa partial signature 
 Integer ecdsa_sign(Integer message[2][16], EcdsaPartialSig_d partialsig) {
   Integer result[8];
@@ -57,9 +72,12 @@ Integer ecdsa_sign(Integer message[2][16], EcdsaPartialSig_d partialsig) {
 }
 
 // ecdsa-signs a message based on the given parameters
-// parameters here are appended -c because they're in the clear
-// mc : message text (in the clear)
+// msg: message text (in the clear)
 // pubsig : partial ecdsa signature in the clear (see token.h)
+//
+// returns a 256-bit integer representing the signature
+// IMPORTANT: this represents an unsigned integer. It may produce incorrect results if used 
+// for arithmetic operations (EMP-toolkit will assume it is a _signed_ integer).
 Integer ecdsa_sign(char msg[1024], EcdsaPartialSig_l pubsig) {
   EcdsaPartialSig_d partialsig = distribute_EcdsaPartialSig(pubsig);
 
@@ -80,23 +98,22 @@ Integer ecdsa_sign_hashed(Integer broken_digest[8], EcdsaPartialSig_d partialsig
 }
 
 Integer ecdsa_sign_hashed(Integer digest, EcdsaPartialSig_d partialsig) {
-  // get shared/fixed q
-  Integer q(257, get_ECDSA_params(), PUBLIC);
+  // retrieve shared/fixed q
+  Integer q(258, get_ECDSA_params(), PUBLIC);
 
-  digest.resize(257, true);
+  digest.resize(258, false);
   digest = digest % q;
 
-  // can we keep q in the clear and use it as the modulus?
   Integer s = digest + partialsig.r;
   s = s % q;
 
-  s.resize(513,true);
-  q.resize(513,true);
+  s.resize(516,true);
+  q.resize(516,true);
   s = partialsig.k_inv * s;
   s = s % q;
 
+  s = set_signature_sign(s);
   s.resize(256,true);
-
   return s;
 }
 

@@ -158,8 +158,8 @@ void test_types() {
   string r = "71885597085076080808223374723556375270869851655515045146228640565664402290406";
   string k_inv = "93372873638179070860692927744143538466251360047033516825130235139248584327377";
 
-  Integer r_d(257, r, PUBLIC);
-  Integer k_inv_d(513, k_inv, PUBLIC);
+  Integer r_d(258, r, PUBLIC);
+  Integer k_inv_d(516, k_inv, PUBLIC);
 
   EcdsaPartialSig_l psl;
   fillEcdsaPartialSig_l(&psl, r, k_inv);
@@ -180,6 +180,47 @@ void test_types() {
   cout << "Passed 1 typing test" << endl;
 }
 
+void test_negative_digest() {
+  string r = "84750087551137145508569723723318916624966061516474090269198051528080207972580";
+  string k_inv = "79397698664012980400740238981271955301031248322103675284372917040350808229657";
+  EcdsaPartialSig_l psl;
+  fillEcdsaPartialSig_l(&psl, r, k_inv);
+  EcdsaPartialSig_d psd = distribute_EcdsaPartialSig(psl);
+
+  string expected_sig = "457d698b9b17a3970be1c696b00db3b57ab13a19b9759b1861b52f1845182548";
+
+  // this is a 256-bit digest with a 1 in the most significant bit
+  // it's not actually negative, but it is interpreted as such when put in a 256-bit EMP integer
+  string digest = "fcfbbeec974c9394b6d3c85a84f3c227e1712af52201d8fdcc1c3d1ebc9ebf8b";
+  Integer dig(257, change_base(digest,16,10), PUBLIC);
+
+  Integer sig = ecdsa_sign_hashed(dig,psd);
+  string actual_sig = change_base(sig.reveal<string>(PUBLIC), 10,16);
+
+  assert(actual_sig.compare(expected_sig) == 0);
+
+  cout << "Passed 1 \"negative\" digest test" << endl;
+
+}
+
+// todo: find a way to run this correctly
+// e.g. the test passes if these Integer declarations throw an assertion fail
+void test_int_validation(int party) {
+  Integer t(32, "10", PUBLIC, false);
+  Integer s;
+  Integer u;
+
+  if (party == ALICE) {
+	u = Integer(32, 1, PUBLIC, true);
+	s = Integer(32, "0", PUBLIC, true);
+  } else {
+	u = Integer(32, 11, PUBLIC, true);
+	s = Integer(32, "01", PUBLIC, true);
+  }
+
+  cout << "no assertions failed :( " << endl;
+}
+
 int main(int argc, char** argv) {
   // run in semihonest library
   int port, party;
@@ -193,8 +234,11 @@ int main(int argc, char** argv) {
 
   setup_semi_honest(io, party);
 
+  test_negative_digest();
   test_types();
   test_hardcoded_vector();
+
+  // test_int_validation(party);
 
   delete io;
   return 0;
