@@ -80,4 +80,6 @@ void computeSHA256_4d(Integer message[4][16], Integer result[8]);
 void computeSHA256_5d(Integer message[5][16], Integer result[8]);
 
 void computeDoubleSHA256_3d(Integer message[3][16], Integer result[8]);
+void computeDoubleSHA256_4d(Integer message[4][16], Integer result[8]);
+void computeDoubleSHA256_5d(Integer message[5][16], Integer result[8]);
 

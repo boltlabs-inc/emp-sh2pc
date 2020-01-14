@@ -737,7 +737,7 @@ void validate_transactions(State_d new_state_d,
 
 
   // Integer escrow_digest[8];
-  computeSHA256_4d(total_preimage_escrow, escrow_digest);
+  computeDoubleSHA256_4d(total_preimage_escrow, escrow_digest);
 
     // The total preimage is 228 bytes
   Integer total_preimage_merch[5][16];
@@ -839,7 +839,7 @@ void validate_transactions(State_d new_state_d,
   total_preimage_merch[4][14]  = Integer(32, 0, PUBLIC);//0x00000000;
   total_preimage_merch[4][15]  = Integer(32, 2168, PUBLIC); // 271*8 = 2168 bits
 
-  computeSHA256_5d(total_preimage_merch, merch_digest);
+  computeDoubleSHA256_5d(total_preimage_merch, merch_digest);
 
   // dump_buffer("hash_outputs_preimage0=", hash_outputs_preimage[0]);
   // dump_buffer("hash_outputs_preimage1=", hash_outputs_preimage[1]);
