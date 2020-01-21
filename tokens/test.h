@@ -10,7 +10,7 @@ extern "C" {
 // tests ecdsa
 // takes partial signature as input (e.g. generated in rust)
 // returns 256-bit ecdsa digest
-void test_ecdsa_e2e(EcdsaPartialSig_l psl, uint32_t digest[8]);
+void test_ecdsa_e2e(EcdsaPartialSig_l psl, uint32_t party, uint32_t digest[8]);
 
 #ifdef __cplusplus
 }

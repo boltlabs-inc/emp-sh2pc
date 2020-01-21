@@ -13,6 +13,7 @@
 #include <typeinfo>
 #include "emp-sh2pc/emp-sh2pc.h"
 #include "tokens/ecdsa.h"
+#include "tokens/test.h"
 using namespace emp;
 using namespace std;
 
@@ -221,6 +222,23 @@ void test_int_validation(int party) {
   cout << "no assertions failed :( " << endl;
 }
 
+
+/* this is just a test for the end-to-end tests.
+ * to make sure the functions described in test_e2e work as expected
+ */
+void test_e2e(int party) {
+  string r = "84750087551137145508569723723318916624966061516474090269198051528080207972580";
+  string k_inv = "79397698664012980400740238981271955301031248322103675284372917040350808229657";
+  EcdsaPartialSig_l psl;
+  fillEcdsaPartialSig_l(&psl, r, k_inv);
+  uint32_t digest[8] = { 0 };
+  test_ecdsa_e2e(psl, party, digest);
+
+  cout << "Testing framework didn't fail" << endl;
+
+}
+
+
 int main(int argc, char** argv) {
   // run in semihonest library
   int port, party;
@@ -239,7 +257,11 @@ int main(int argc, char** argv) {
   test_hardcoded_vector();
 
   // test_int_validation(party);
-
   delete io;
+
+  // this test sets up its own semi-honest setting
+  test_e2e(party);
+
+
   return 0;
 }
