@@ -274,6 +274,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, HMACKey_d opening, State_d 
 
 
 /* checks that the wallets are appropriately updated
+ * TODO: update this documentation to describe rlc, nonce stuff
  * 0. old wallet ID matches publicly revealed wkpi --> TODO??
  * 1. wallet customer keys match
  * 2. escrow transactions match
@@ -324,6 +325,7 @@ void validate_transactions(State_d new_state_d,
   BitcoinPublicKey_d cust_escrow_pub_key_d, BitcoinPublicKey_d cust_payout_pub_key_d,
   BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, 
   PublicKeyHash_d merch_publickey_hash_d, Integer escrow_digest[8], Integer merch_digest[8]);
+
 /* applies a mask to a pay token
  * uses a one-time-pad scheme (just xors mask with token bits)
  * Also checks to make sure that the mask matches the commited to randomness

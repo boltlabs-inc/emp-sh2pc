@@ -34,7 +34,8 @@ void* get_unixnetio_ptr(char *socket_path, int party) {
 //    delete io;
 //}
 
-// TODO: add fail bit and count up all the validations
+// TODO: add more meaningful fail / error states
+// TODO: rename to update_state
 void issue_tokens(
 /* CUSTOMER INPUTS */
   State_l old_state_l,
@@ -94,16 +95,15 @@ void issue_tokens(
   Bit error_signal = verify_token_sig(hmac_key_commitment_d, hmac_key_d, old_state_d, old_paytoken_d);
 
   // make sure wallets are well-formed
+  // TODO: change name (state, not wallet)
   cout << "comparing wallets" << endl;
   error_signal = (error_signal | compare_wallets(old_state_d, new_state_d, rlc_d, nonce_d, epsilon_d));
 
-  
-  // make sure customer committed to this new wallet
+  // constructs new close transactions and computes hash
+  cout << "hashing transactions" << endl;
+
   Integer escrow_digest[8];
   Integer merch_digest[8];
-
-  // generate the hash of the properly formed transacation
-  cout << "validating transactions" << endl;
 
   validate_transactions(new_state_d, 
     cust_escrow_pub_key_d, cust_payout_pub_key_d,

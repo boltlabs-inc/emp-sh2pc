@@ -242,9 +242,9 @@ void build_masked_tokens_cust(
    \param[in] open_hmac_key : (private) The opening of the commitment to the HMAC key
  * \param[in] close_mask    : (private) A random mask for the close token TYPISSUE: break this into escrow and merch-close separate masks?
  * \param[in] pay_mask      : (private) A random mask for the pay token 
- * \param[in] sig1          : (private) A partial ECDSA signature
+ * \param[in] sig1          : (private) A partial ECDSA signature TODO EXPLAIN THESE
  * \param[in] sig2          : (private) A partial ECDSA signature
- * \param[in] sig3          : (private) A partial ECDSA signature
+ * \param[in] sig3          : (private) A partial ECDSA signature TODO is this for the pay token? remove if so.
  *
  * Merchant does not receive output.
  *
@@ -258,7 +258,7 @@ void build_masked_tokens_merch(
   struct HMACKeyCommitment_l key_com,
   struct BitcoinPublicKey_l merch_escrow_pub_key_l,
   struct BitcoinPublicKey_l merch_dispute_key_l,
-  struct PublicKeyHash_l merch_publickey_hash,
+  struct PublicKeyHash_l merch_publickey_hash, // TODO: what is this?
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
   struct HMACKey_l hmac_key,
