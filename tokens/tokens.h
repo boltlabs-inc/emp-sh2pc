@@ -143,6 +143,10 @@ struct Balance_l {
   uint32_t balance[2];
 };
 
+struct CommitmentRandomness_l {
+  uint32_t randomness[4];
+}
+
 /* state type
  *
  * \param nonce         : unique identifier for the transaction?
@@ -196,6 +200,8 @@ void build_masked_tokens_cust(
   ConnType conn_type,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
+  struct CommitmentRandomness_l revlock_commitment_randomness_l,
+
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
   struct BitcoinPublicKey_l merch_escrow_pub_key_l,
@@ -265,6 +271,8 @@ void build_masked_tokens_merch(
   struct Mask_l merch_mask_l,
   struct Mask_l escrow_mask_l,
   struct Mask_l paytoken_mask_l,
+  struct CommitmentRandomness_l hmac_commitment_randomness_l,
+  struct CommitmentRandomness_l paytoken_mask_commitment_randomness_l,
   struct EcdsaPartialSig_l sig1,
   struct EcdsaPartialSig_l sig2
 );

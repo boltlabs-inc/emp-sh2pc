@@ -231,6 +231,23 @@ PublicKeyHash_l localize_PublicKeyHash(PublicKeyHash_d hash, const int party) {
   return to_return;
 }
 
+CommitmentRandomness_d distribute_CommitmentRandomness(CommitmentRandomness_l rand, const int party){
+  CommitmentRandomness_d to_return;
+
+  to_return.randomness[0] = Integer(32, rand.randomness[0], party, true);
+  to_return.randomness[1] = Integer(32, rand.randomness[1], party, true);
+  to_return.randomness[2] = Integer(32, rand.randomness[2], party, true);
+  to_return.randomness[3] = Integer(32, rand.randomness[3], party, true);
+
+  return to_return;
+}
+
+CommitmentRandomness_l localize_CommitmentRandomness(CommitmentRandomness_d rand, const int party) {
+  CommitmentRandomness_l to_return;
+
+  return to_return;
+}
+
 Balance_d distribute_Balance(Balance_l balance, const int party) {
   Balance_d to_return;
 

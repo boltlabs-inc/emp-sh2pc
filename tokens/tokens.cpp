@@ -43,6 +43,7 @@ void issue_tokens(
   PayToken_l old_paytoken_l,
   BitcoinPublicKey_l cust_escrow_pub_key_l,
   BitcoinPublicKey_l cust_payout_pub_key_l,
+  CommitmentRandomness_l revlock_commitment_randomness_l,
 /* MERCHANT INPUTS */
   HMACKey_l hmac_key_l,
   Mask_l paytoken_mask_l,
@@ -50,6 +51,9 @@ void issue_tokens(
   Mask_l escrow_mask_l,
   EcdsaPartialSig_l sig1,
   EcdsaPartialSig_l sig2,
+  CommitmentRandomness_l hmac_commitment_randomness_l,
+  CommitmentRandomness_l paytoken_mask_commitment_randomness_l,
+
 /* TODO: ECDSA Key info */
 /* PUBLIC INPUTS */
   Balance_l epsilon_l,
@@ -74,11 +78,16 @@ void issue_tokens(
   PayToken_d old_paytoken_d = distribute_PayToken(old_paytoken_l, CUST);
   BitcoinPublicKey_d cust_escrow_pub_key_d = distribute_BitcoinPublicKey(cust_escrow_pub_key_l, CUST);
   BitcoinPublicKey_d cust_payout_pub_key_d = distribute_BitcoinPublicKey(cust_payout_pub_key_l, CUST);
+  CommitmentRandomness_d revlock_commitment_randomness_d = distribute_CommitmentRandomness(revlock_commitment_randomness_l, CUST);
+
 
   HMACKey_d hmac_key_d = distribute_HMACKey(hmac_key_l, MERCH);
   Mask_d paytoken_mask_d = distribute_Mask(paytoken_mask_l, MERCH);
   Mask_d merch_mask_d = distribute_Mask(merch_mask_l, MERCH);
   Mask_d escrow_mask_d = distribute_Mask(escrow_mask_l, MERCH);
+
+  CommitmentRandomness_d hmac_commitment_randomness_d = distribute_CommitmentRandomness(hmac_commitment_randomness_l, MERCH);
+  CommitmentRandomness_d paytoken_mask_commitment_randomness_d = distribute_CommitmentRandomness(paytoken_mask_commitment_randomness_l, MERCH);
 
   Balance_d epsilon_d = distribute_Balance(epsilon_l, PUBLIC); // IVE BEEN TREATING THIS LIKE A 32 BIT VALUE, BUT ITS 64
   HMACKeyCommitment_d hmac_key_commitment_d = distribute_HMACKeyCommitment(hmac_key_commitment_l, PUBLIC);
@@ -90,14 +99,15 @@ void issue_tokens(
   BitcoinPublicKey_d merch_payout_pub_key_d = distribute_BitcoinPublicKey(merch_payout_pub_key_l, PUBLIC);
   PublicKeyHash_d merch_publickey_hash_d = distribute_PublicKeyHash(merch_publickey_hash_l, PUBLIC);
 
+
   cout << "distributed everything. verifying token sig" << endl;
   // check old pay token
-  Bit error_signal = verify_token_sig(hmac_key_commitment_d, hmac_key_d, old_state_d, old_paytoken_d);
+  Bit error_signal = verify_token_sig(hmac_key_commitment_d, hmac_commitment_randomness_d, hmac_key_d, old_state_d, old_paytoken_d);
 
   // make sure wallets are well-formed
   // TODO: change name (state, not wallet)
   cout << "comparing wallets" << endl;
-  error_signal = (error_signal | compare_wallets(old_state_d, new_state_d, rlc_d, nonce_d, epsilon_d));
+  error_signal = (error_signal | compare_wallets(old_state_d, new_state_d, rlc_d, revlock_commitment_randomness_d, nonce_d, epsilon_d));
 
   // constructs new close transactions and computes hash
   cout << "hashing transactions" << endl;
@@ -133,7 +143,7 @@ void issue_tokens(
 
   // mask pay and close tokens
   cout << "masking pay token" << endl;
-  error_signal = ( error_signal | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d)); // pay token 
+  error_signal = ( error_signal | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d, paytoken_mask_commitment_randomness_d)); // pay token 
 
   cout << "masking close merch token" << endl;
   mask_closetoken(signed_merch_tx_parsed.sig, merch_mask_d); // close token - merchant close 
@@ -170,6 +180,7 @@ void issue_tokens(
 void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
+  struct CommitmentRandomness_l revlock_commitment_randomness_l,
 
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
@@ -218,6 +229,9 @@ void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type,
   Mask_l escrow_mask_l;
   EcdsaPartialSig_l dummy_sig;
 
+  CommitmentRandomness_l hmac_commitment_randomness_l;
+  CommitmentRandomness_l paytoken_mask_commitment_randomness_l;
+
 issue_tokens(
 /* CUSTOMER INPUTS */
   w_old,
@@ -225,6 +239,8 @@ issue_tokens(
   pt_old,
   cust_escrow_pub_key_l,
   cust_payout_pub_key_l,
+  revlock_commitment_randomness_l,
+
 /* MERCHANT INPUTS */
   hmac_key_l,
   paytoken_mask_l,
@@ -232,6 +248,8 @@ issue_tokens(
   escrow_mask_l,
   dummy_sig,
   dummy_sig,
+  hmac_commitment_randomness_l,
+  paytoken_mask_commitment_randomness_l,
 /* TODO: ECDSA Key info */
 /* PUBLIC INPUTS */
   epsilon_l,
@@ -272,6 +290,8 @@ void build_masked_tokens_merch(IOCallback io_callback,
   struct Mask_l merch_mask_l,
   struct Mask_l escrow_mask_l,
   struct Mask_l paytoken_mask_l,
+  struct CommitmentRandomness_l hmac_commitment_randomness_l,
+  struct CommitmentRandomness_l paytoken_mask_commitment_randomness_l,
   struct EcdsaPartialSig_l sig1,
   struct EcdsaPartialSig_l sig2
 ) {
@@ -305,6 +325,8 @@ void build_masked_tokens_merch(IOCallback io_callback,
   PayToken_l pt_return;
   EcdsaSig_l ct_escrow;
   EcdsaSig_l ct_merch;
+  CommitmentRandomness_l revlock_commitment_randomness_l;
+
 
 issue_tokens(
 /* CUSTOMER INPUTS */
@@ -313,6 +335,8 @@ issue_tokens(
   old_paytoken_l,
   cust_escrow_pub_key_l,
   cust_payout_pub_key_l,
+  revlock_commitment_randomness_l,
+
 /* MERCHANT INPUTS */
   hmac_key,
   paytoken_mask_l,
@@ -320,6 +344,8 @@ issue_tokens(
   escrow_mask_l,
   sig1,
   sig2,
+  hmac_commitment_randomness_l,
+  paytoken_mask_commitment_randomness_l,
 /* TODO: ECDSA Key info */
 /* PUBLIC INPUTS */
   epsilon_l,
@@ -359,7 +385,7 @@ PayToken_d sign_token(State_d state, HMACKey_d key) {
   return paytoken;
 }
 
-Bit verify_token_sig(HMACKeyCommitment_d commitment, HMACKey_d opening, State_d old_state, PayToken_d old_paytoken) {
+Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac_commitment_randomness_d, HMACKey_d opening, State_d old_state, PayToken_d old_paytoken) {
 
   // check that the opening is valid 
   Integer message[2][16];
@@ -369,11 +395,11 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, HMACKey_d opening, State_d 
   }
 
   // Padding
-  message[1][0] = Integer(32, -2147483648, PUBLIC); //0x80000000;
-  message[1][1] = Integer(32, 0, PUBLIC); //0x00000000;
-  message[1][2] = Integer(32, 0, PUBLIC); //0x00000000;
-  message[1][3] = Integer(32, 0, PUBLIC); //0x00000000;
-  message[1][4] = Integer(32, 0, PUBLIC); //0x00000000;
+  message[1][0] = hmac_commitment_randomness_d.randomness[0];
+  message[1][1] = hmac_commitment_randomness_d.randomness[1];
+  message[1][2] = hmac_commitment_randomness_d.randomness[2];
+  message[1][3] = hmac_commitment_randomness_d.randomness[3];
+  message[1][4] = Integer(32, -2147483648, PUBLIC); //0x80000000;
   message[1][5] = Integer(32, 0, PUBLIC); //0x00000000;
   message[1][6] = Integer(32, 0, PUBLIC); //0x00000000;
   message[1][7] = Integer(32, 0, PUBLIC); //0x00000000;
@@ -386,7 +412,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, HMACKey_d opening, State_d 
 
   // Message length 
   message[1][14] = Integer(32, 0, PUBLIC); //0x00000000;
-  message[1][15] = Integer(32, 512, PUBLIC);
+  message[1][15] = Integer(32, 640, PUBLIC);
 
   Integer hashresult[8];
 
@@ -411,7 +437,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, HMACKey_d opening, State_d 
 }
 
 // make sure wallets are well-formed
-Bit compare_wallets(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, Nonce_d nonce_d, Balance_d epsilon_d) {
+Bit compare_wallets(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d revlock_commitment_randomness_d, Nonce_d nonce_d, Balance_d epsilon_d) {
 
   //Make sure the fields are all correct
   Bit b; // TODO initialize to 0
@@ -445,7 +471,8 @@ Bit compare_wallets(State_d old_state_d, State_d new_state_d, RevLockCommitment_
 
   // check that the rlc is a commitment to the rl in old_state
 
-  b = (b | verify_revlock_commitment(old_state_d.rl, rlc_d));
+  // TODO add the randomness to this commitment
+  b = (b | verify_revlock_commitment(old_state_d.rl, rlc_d, revlock_commitment_randomness_d));
 
   Integer epsilon_combined = combine_balance(epsilon_d);
   Integer old_balance_merch_combined = combine_balance(old_state_d.balance_merch);
@@ -473,7 +500,7 @@ Bit open_commitment() {
   return b;
 }
 
-Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d) {
+Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d) {
   Bit b;  // TODO initialize to 0
 
   Integer message[1][16];
@@ -482,16 +509,16 @@ Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d) {
     message[0][i] = rl_d.revlock[i];
   }
 
-  message[0][8] = Integer(32, -2147483648, PUBLIC); //0x80000000;
-  message[0][9] = Integer(32, 0, PUBLIC); //0x00000000;
-  message[0][10] = Integer(32, 0, PUBLIC); //0x00000000;
-  message[0][11] = Integer(32, 0, PUBLIC); //0x00000000;
-  message[0][12] = Integer(32, 0, PUBLIC); //0x00000000;
+  message[0][8] = rl_rand_d.randomness[0];
+  message[0][9] = rl_rand_d.randomness[1];
+  message[0][10] = rl_rand_d.randomness[2];
+  message[0][11] = rl_rand_d.randomness[3];
+  message[0][12] = Integer(32, -2147483648, PUBLIC); //0x80000000;
   message[0][13] = Integer(32, 0, PUBLIC); //0x00000000;
 
   // Message length 
   message[0][14] = Integer(32, 0, PUBLIC); //0x00000000;
-  message[0][15] = Integer(32, 256, PUBLIC);
+  message[0][15] = Integer(32, 384, PUBLIC); // 256 bit RL
 
   Integer hashresult[8];
 
@@ -504,7 +531,7 @@ Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d) {
   return b;
 }
 
-Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment) {
+Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d mask_commitment_randomness_d) {
   Bit b;  // TODO initialize to 0
 
   Integer message[1][16];
@@ -513,16 +540,16 @@ Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment) {
     message[0][i] = mask.mask[i];
   }
 
-  message[0][8] = Integer(32, -2147483648, PUBLIC); //0x80000000;
-  message[0][9] = Integer(32, 0, PUBLIC); //0x00000000;
-  message[0][10] = Integer(32, 0, PUBLIC); //0x00000000;
-  message[0][11] = Integer(32, 0, PUBLIC); //0x00000000;
-  message[0][12] = Integer(32, 0, PUBLIC); //0x00000000;
+  message[0][8] = mask_commitment_randomness_d.randomness[0];
+  message[0][9] = mask_commitment_randomness_d.randomness[1];
+  message[0][10] = mask_commitment_randomness_d.randomness[2];
+  message[0][11] = mask_commitment_randomness_d.randomness[3];
+  message[0][12] = Integer(32, -2147483648, PUBLIC); //0x80000000;
   message[0][13] = Integer(32, 0, PUBLIC); //0x00000000;
 
   // Message length 
   message[0][14] = Integer(32, 0, PUBLIC); //0x00000000;
-  message[0][15] = Integer(32, 256, PUBLIC);
+  message[0][15] = Integer(32, 384, PUBLIC);
 
   Integer hashresult[8];
 
@@ -862,13 +889,13 @@ void validate_transactions(State_d new_state_d,
 }
 
 // mask pay and close tokens
-Bit mask_paytoken(Integer paytoken[8], Mask_d mask, MaskCommitment_d maskcommitment) {
+Bit mask_paytoken(Integer paytoken[8], Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d paytoken_mask_commitment_randomness_d) {
 
   // The pay token is 256 bits long.
   // Thus the mask is 256 bits long.
   // First we check to see if the mask was correct
 
-  Bit b = verify_mask_commitment(mask, maskcommitment);
+  Bit b = verify_mask_commitment(mask, maskcommitment, paytoken_mask_commitment_randomness_d);
 
   for(int i=0; i<8; i++) {
     paytoken[i] = paytoken[i] ^ mask.mask[i];

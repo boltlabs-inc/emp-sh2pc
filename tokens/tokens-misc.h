@@ -89,6 +89,10 @@ struct Balance_d {
   Integer balance[2];
 };
 
+struct CommitmentRandomness_d {
+  Integer randomness[4];
+}
+
 /* This is the second part of an ecdsa signature
  * In this case 256 bits
  */
@@ -192,6 +196,9 @@ Balance_l localize_Balance(Balance_d balance, const int party);
 Balance_d convert_to_little_endian(Balance_d big_endian_balance);
 Balance_d convert_to_big_endian(Balance_d little_endian_balance);
 
+CommitmentRandomness_d distribute_CommitmentRandomness(CommitmentRandomness_l rand, const int party);
+CommitmentRandomness_l localize_CommitmentRandomness(CommitmentRandomness_d rand, const int party);
+
 Balance_d sum_balances(Balance_d lhs, Balance_d rhs);
 
 Integer combine_balance(Balance_d balance);
@@ -270,7 +277,7 @@ void issue_tokens(
 // void sign_token();
 PayToken_d sign_token(State_d state, HMACKey_d key);
 // Bit verify_token_sig();
-Bit verify_token_sig(HMACKeyCommitment_d commitment, HMACKey_d opening, State_d old_state, PayToken_d old_paytoken);
+Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac_commitment_randomness_d, HMACKey_d opening, State_d old_state, PayToken_d old_paytoken);
 
 
 /* checks that the wallets are appropriately updated
@@ -302,9 +309,9 @@ Bit compare_wallets(State_d old_state_d, State_d new_state_d, RevLockCommitment_
  */
 Bit open_commitment();
 
-Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d);
+Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, CommitmentRandomness rl_rand_d);
 
-Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment);
+Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d mask_commitment_randomness_d);
 
 
 /* validates closing transactions against a wallet
@@ -336,7 +343,7 @@ void validate_transactions(State_d new_state_d,
  * \param[in] token : Sequence of bits representing a token
  *
  */
-Bit mask_paytoken(Integer paytoken[8], Mask_d mask, MaskCommitment_d maskcommitment);
+Bit mask_paytoken(Integer paytoken[8], Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d paytoken_mask_commitment_randomness_d);
 
 /* applies a mask to a token
  * uses a one-time-pad scheme (just xors mask with token bits)
