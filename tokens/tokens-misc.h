@@ -91,7 +91,7 @@ struct Balance_d {
 
 struct CommitmentRandomness_d {
   Integer randomness[4];
-}
+};
 
 /* This is the second part of an ecdsa signature
  * In this case 256 bits
@@ -295,7 +295,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
  *
  * \return b 	: success bit
  */
-Bit compare_wallets(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, Nonce_d nonce_d, Balance_d epsilon_d);
+Bit compare_wallets(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d, Nonce_d nonce_d, Balance_d epsilon_d);
 
 /* opens and verifies commitment to a wallet
  * e.g. checks that com == commit(w;t)
@@ -309,7 +309,7 @@ Bit compare_wallets(State_d old_state_d, State_d new_state_d, RevLockCommitment_
  */
 Bit open_commitment();
 
-Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, CommitmentRandomness rl_rand_d);
+Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d);
 
 Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d mask_commitment_randomness_d);
 

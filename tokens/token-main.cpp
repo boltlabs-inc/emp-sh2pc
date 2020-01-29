@@ -77,26 +77,28 @@ int main(int argc, char** argv) {
     fillEcdsaPartialSig_l(&sig, r, k_inv);
     struct HMACKey_l hmac_key;
     struct Mask_l mask;
+    CommitmentRandomness_l hmac_rand;
+    CommitmentRandomness_l pay_token_rand;
 
 	build_masked_tokens_merch(io_callback, conn_type,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
       merch_dispute_key_l, merch_publickey_hash,
       merch_payout_pub_key_l, nonce_l,
-      hmac_key,
-	  mask, mask, mask, sig, sig);
+      hmac_key, mask, mask, mask, hmac_rand, pay_token_rand, sig, sig);
   } else {
-	State_l w;
+    State_l w;
     PayToken_l pt_old;
-	BitcoinPublicKey_l cust_escrow_pub_key_l;
+    CommitmentRandomness_l rl_rand;
+    BitcoinPublicKey_l cust_escrow_pub_key_l;
     BitcoinPublicKey_l cust_payout_pub_key_l;
     PayToken_l pt_return;
     EcdsaSig_l ct_escrow;
     EcdsaSig_l ct_merch;
 
-	build_masked_tokens_cust(io_callback, conn_type,
-	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
-      merch_dispute_key_l, merch_publickey_hash,
-      merch_payout_pub_key_l, nonce_l,
+    build_masked_tokens_cust(io_callback, conn_type,
+	  amt, rl, rl_rand, paymask_com, key_com, merch_escrow_pub_key_l,
+          merch_dispute_key_l, merch_publickey_hash,
+          merch_payout_pub_key_l, nonce_l,
 	  w, w, pt_old, cust_escrow_pub_key_l, cust_payout_pub_key_l,
 	  &pt_return, &ct_escrow, &ct_merch);
   }

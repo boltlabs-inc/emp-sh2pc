@@ -145,7 +145,7 @@ struct Balance_l {
 
 struct CommitmentRandomness_l {
   uint32_t randomness[4];
-}
+};
 
 /* state type
  *
