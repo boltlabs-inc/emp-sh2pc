@@ -231,8 +231,9 @@ void test_e2e(int party) {
   string k_inv = "79397698664012980400740238981271955301031248322103675284372917040350808229657";
   EcdsaPartialSig_l psl;
   fillEcdsaPartialSig_l(&psl, r, k_inv);
+  char hmsg[256]= "469457f5921cb642d5df1854342507b3c0df6c8f5b352fc85de05ac0b5cb26c9\0";
   uint32_t digest[8] = { 0 };
-  test_ecdsa_e2e(psl, party, digest);
+  test_ecdsa_e2e(psl, hmsg, party, digest);
 
   cout << "Testing framework didn't fail" << endl;
 
