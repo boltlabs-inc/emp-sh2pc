@@ -13,7 +13,7 @@
 #include <typeinfo>
 #include "emp-sh2pc/emp-sh2pc.h"
 #include "tokens/ecdsa.h"
-#include "tokens/test.h"
+#include "tokens/test-e2e.h"
 using namespace emp;
 using namespace std;
 
