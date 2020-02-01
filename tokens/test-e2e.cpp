@@ -1,4 +1,4 @@
-#include "test.h"
+#include "test-e2e.h"
 #include "ecdsa.h"
 #include "tokens-misc.h"
 
