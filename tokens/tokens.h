@@ -172,37 +172,42 @@ struct State_l {
  * runs MPC to compute masked tokens (close- and pay-).
  * blocks until computation is finished.
  *
- * Pads close_tx_escrow and close_tx_merch to exactly 1024 bits according to the SHA256 spec.
+ * \param[in] io_callback : (admin) info for communication channel
+ * \param[in] conn_type   : (admin) type of communication channel
  *
- * option: port could be fixed in advance (not passed in here)
- * 
- * \param[in] pkM         : (shared) merchant public key TYPISSUE: what is this?
- * \param[in] amount      : (shared) transaction amount 
- * \param[in] rl_com      : (shared) A commitment to the previous state revocation lock
- * \param[in] port        : (shared) communication port
- * \param[in] ip_addr     : (shared) customer's IP address
- * \param[in] paymask_com : (shared) A commitment to the pay mask (using HMAC)
- * \param[in] com_to_key  : (shared) A commitment to an HMAC key
+ * \param[in] epsilon     : (shared) transaction amount 
+ * \param[in] rlc         : (shared) commitment to the revocation lock for the previous state
+ * \param[in] revlock_commitment_randomness 
+ *                        : (shared???) randomness used to commit to revlock (TYPISSUE - is this private??)
+ * \param[in] paymask_com : (shared) commitment to the mask for the pay token
+ * \param[in] key_com     : (shared) commitment to the key used for HMACs
+ * \param[in] merch_escrow_pub_key
+ *                        : (shared) bitcoin public key that the merchant uses to receive (?) funds from the escrow transaction
+ * \param[in] merch_dispute_key
+ *                        : (shared) bitcoin public key that the merchatn uses to recieve (?) funds when they dispute a posted closing transaction
+ * \param[in] nonce       : (shared) random nonce used to uniquely identify state
  *
  * \param[in] w_new     : (private) new state object
  * \param[in] w_old     : (private) previous state object
- * \param[in] t_new     : (private) commitment randomness (TYPISSUE - size?)
  * \param[in] pt_old    : (private) previous pay token
- * \param[in] close_tx_escrow   : (private) bits of new close transaction (spends from escrow). no more than 1024 bits.
- * \param[in] close_tx_merch    : (private) bits of new close transaction (spends from merchant close transaction). No more than 1024 bits.
- * 
- * \param[out] ct_masked    : masked close token (ECDSA signature) (TYPISSUE - representation (serialized)?)
- * \param[out] pt_masked    : masked pay token (tentative: ECDSA signature) (TYPISSUE - representation (serialized)?)
+ * \param[in] cust_escrow_pub_key
+ *                      : (private) bitcoin public key that the customer uses to receive (?) funds from the escrow transaction
+ * \param[in] cust_payout_pub_key
+ *                      : (private) bitcoin public key that the customer uses to ???
+ *
+ * \param[out] pt_masked    : masked pay token 
+ * \param[out] ct_escrow    : masked close token - spends from escrow transaction (ECDSA signature) 
+ * \param[out] ct_merch     : masked close token - spends from merchant close transaction (ECDSA signature) 
  *
  */
 void build_masked_tokens_cust(
   IOCallback io_callback,
   ConnType conn_type,
+
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   struct CommitmentRandomness_l revlock_commitment_randomness_l,
-
-  struct MaskCommitment_l paymask_com,
+  struct MaskCommitment_l paymask_com, 
   struct HMACKeyCommitment_l key_com,
   struct BitcoinPublicKey_l merch_escrow_pub_key_l,
   struct BitcoinPublicKey_l merch_dispute_key_l,
@@ -224,33 +229,39 @@ void build_masked_tokens_cust(
 
 /* merchant's close-token computation function 
  *
- * Pre-computes some parameters, then runs MPC to compute masked tokens (close- and pay-)
- * blocks until computation is finished.
+ * Runs MPC to compute masked tokens (close- and pay-)
+ * Blocks until computation is finished.
  *
- * Generates a partial ECDSA signature:
+ * Takes a partial ECDSA signature:
  *   1. Sample: k <- Z_q, k
  *   2. Compute random curve point: (r_x, r_y) = k * G
  *   3. Compute secret curve point: spt = (r_x * skM) mod q
  *   4. Compute inverse: k_inv = k^(-1)
  * Then calls MPC with shared inputs, plus k_inv, spt.
  *
- * option: port could be fixed in advance (not passed in here)
+ * \param[in] io_callback : (admin) info for communication channel
+ * \param[in] conn_type   : (admin) type of communication channel
  *
- * \param[in] pkM         : (shared) merchant public key TYPISSUE: what is this?
- * \param[in] amount      : (shared) transaction amount 
- * \param[in] rl_com      : (shared) A commitment to the previous state revocation lock
- * \param[in] port        : (shared) communication port
- * \param[in] ip_addr     : (shared) customer's IP address
- * \param[in] paymask_com : (shared) A commitment to the pay mask (using HMAC)
- * \param[in] com_to_key  : (shared) A commitment to an HMAC key
+ * \param[in] epsilon     : (shared) transaction amount 
+ * \param[in] rlc         : (shared) commitment to the revocation lock for the previous state 
+ * \param[in] paymask_com : (shared) commitment to the mask for the pay token
+ * \param[in] key_com     : (shared) commitment to the key used for HMACs
+ * \param[in] merch_escrow_pub_key
+ *                        : (shared) bitcoin public key that the merchant uses to receive (?) funds from the escrow transaction
+ * \param[in] merch_dispute_key
+ *                        : (shared) bitcoin public key that the merchatn uses to recieve (?) funds when they dispute a posted closing transaction
  *
- * \param[in] hmac_key      : (private) The key used to make HMACs
-   \param[in] open_hmac_key : (private) The opening of the commitment to the HMAC key
- * \param[in] close_mask    : (private) A random mask for the close token TYPISSUE: break this into escrow and merch-close separate masks?
- * \param[in] pay_mask      : (private) A random mask for the pay token 
- * \param[in] sig1          : (private) A partial ECDSA signature TODO EXPLAIN THESE
- * \param[in] sig2          : (private) A partial ECDSA signature
- * \param[in] sig3          : (private) A partial ECDSA signature TODO is this for the pay token? remove if so.
+ * \param[in] merch_publickey_hash : (?) TYPISSUE: what is this?
+ * \param[in] merch_payout_pub_key : (?) TYPISSUE: what is this?
+ *
+ * \param[in] nonce       : (shared) random nonce used to uniquely identify state
+ *
+ * \param[in] hmac_key      : (private) The key used to make HMACs (e.g. ? and ?)
+ * \param[in] merch_mask    : (private) Random mask for merchant close transaction
+ * \param[in] escrow_mask   : (private) Random mask for the escrow close transaction
+ * \param[in] paytoken_mask : (private) Random mask for the pay token 
+ * \param[in] sig1          : (private) A partial ECDSA signature for merchant close transaction
+ * \param[in] sig2          : (private) A partial ECDSA signature escrow close transaction
  *
  * Merchant does not receive output.
  *
@@ -259,7 +270,7 @@ void build_masked_tokens_merch(
   IOCallback io_callback,
   ConnType conn_type,
   struct Balance_l epsilon_l,
-  struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
+  struct RevLockCommitment_l rlc_l, 
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
   struct BitcoinPublicKey_l merch_escrow_pub_key_l,
@@ -267,6 +278,7 @@ void build_masked_tokens_merch(
   struct PublicKeyHash_l merch_publickey_hash, // TODO: what is this?
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
+
   struct HMACKey_l hmac_key,
   struct Mask_l merch_mask_l,
   struct Mask_l escrow_mask_l,
