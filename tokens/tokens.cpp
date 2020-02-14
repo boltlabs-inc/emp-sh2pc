@@ -29,6 +29,13 @@ void* get_unixnetio_ptr(char *socket_path, int party) {
     return static_cast<void *>(io_ptr);
 }
 
+/* Returns a pointer to a LndNetIO ptr */
+void* get_lndnetio_ptr(size_t peer, int party) {
+    bool is_server = (party == MERCH) ? true : false;
+    LndNetIO *io_ptr = new LndNetIO(peer, is_server);
+    return static_cast<void *>(io_ptr);
+}
+
 //void free_unixnetio_ptr(void *io_ptr) {
 //    UnixNetIO *io = static_cast<UnixNetIO *>(io_ptr);
 //    delete io;

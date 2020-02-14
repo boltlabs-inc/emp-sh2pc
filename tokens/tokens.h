@@ -11,9 +11,10 @@ extern "C" {
  * - CUSTOM = custom connection handle defined by caller
  * - NETIO = tcp socket on localhost
  * - UNIXNETIO = unix domain socket with a specified file
+ * - LNDNETIO = use peers in the LND network to communicate
  * - TORNETIO = onion-routing based connection
  */
-enum ConnType { CUSTOM = 0, NETIO, UNIXNETIO, TORNETIO };
+enum ConnType { CUSTOM = 0, NETIO, UNIXNETIO, LNDNETIO, TORNETIO };
 
 /* IO Channel Callback interface - allows caller to handle
  * how connection is made between customer and merchant
@@ -25,6 +26,9 @@ void* get_netio_ptr(char *address, int port, int party);
 
 /* Returns a pointer to a UnixNetIO ptr */
 void* get_unixnetio_ptr(char *socket_path, int party);
+
+/* Returns a pointer to a LndNetIO ptr */
+void* get_lndnetio_ptr(__SIZE_TYPE__ peer, int party);
 
 /*
  * describes an API for calling MPC functions 
