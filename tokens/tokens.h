@@ -202,6 +202,7 @@ struct State_l {
 void build_masked_tokens_cust(
   IOCallback io_callback,
   ConnType conn_type,
+  __SIZE_TYPE__ peer,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   struct CommitmentRandomness_l revlock_commitment_randomness_l,
@@ -262,6 +263,7 @@ void build_masked_tokens_cust(
 void build_masked_tokens_merch(
   IOCallback io_callback,
   ConnType conn_type,
+  __SIZE_TYPE__ peer,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   struct MaskCommitment_l paymask_com,

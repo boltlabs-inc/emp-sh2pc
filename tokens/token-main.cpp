@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
     CommitmentRandomness_l hmac_rand;
     CommitmentRandomness_l pay_token_rand;
 
-	build_masked_tokens_merch(io_callback, conn_type,
+	build_masked_tokens_merch(io_callback, conn_type, 0,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
       merch_dispute_key_l, merch_publickey_hash,
       merch_payout_pub_key_l, nonce_l,
@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
     EcdsaSig_l ct_escrow;
     EcdsaSig_l ct_merch;
 
-    build_masked_tokens_cust(io_callback, conn_type,
+    build_masked_tokens_cust(io_callback, conn_type, 0,
 	  amt, rl, rl_rand, paymask_com, key_com, merch_escrow_pub_key_l,
           merch_dispute_key_l, merch_publickey_hash,
           merch_payout_pub_key_l, nonce_l,

@@ -184,7 +184,7 @@ void issue_tokens(
  * Assumes close_tx_escrow and close_tx_merch are padded to 
  * exactly 1024 bits according to the SHA256 spec.
  */
-void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type,
+void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type, size_t peer,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   struct CommitmentRandomness_l revlock_commitment_randomness_l,
@@ -210,18 +210,24 @@ void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type,
   // select the IO interface
   UnixNetIO *io1 = nullptr;
   NetIO *io2 = nullptr;
+  LndNetIO *io3 = nullptr;
   if (io_callback != NULL) {
-    auto *io_ptr = io_callback((ConnType)conn_type, CUST);
-    if (conn_type == UNIXNETIO) {
-        io1 = static_cast<UnixNetIO *>(io_ptr);
-        setup_semi_honest(io1, CUST);
-    } else if (conn_type == NETIO) {
-        io2 = static_cast<NetIO *>(io_ptr);
-        setup_semi_honest(io2, CUST);
+    if (conn_type == LNDNETIO) {
+        io3 = static_cast<LndNetIO *>(get_lndnetio_ptr(peer, CUST));
+        setup_semi_honest(io3, CUST);
     } else {
-        /* custom IO connection */
-        cout << "specify a supported connection type" << endl;
-        return;
+        auto *io_ptr = io_callback((ConnType)conn_type, CUST);
+        if (conn_type == UNIXNETIO) {
+            io1 = static_cast<UnixNetIO *>(io_ptr);
+            setup_semi_honest(io1, CUST);
+        } else if (conn_type == NETIO) {
+            io2 = static_cast<NetIO *>(io_ptr);
+            setup_semi_honest(io2, CUST);
+        } else {
+            /* custom IO connection */
+            cout << "specify a supported connection type" << endl;
+            return;
+        }
     }
   } else {
     cout << "did not specify a IO connection callback for customer" << endl;
@@ -278,10 +284,11 @@ issue_tokens(
 
   if (io1 != nullptr) delete io1;
   if (io2 != nullptr) delete io2;
+  if (io3 != nullptr) delete io3;
 }
 
 void build_masked_tokens_merch(IOCallback io_callback,
-  ConnType conn_type,
+  ConnType conn_type, size_t peer,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
 
@@ -306,18 +313,24 @@ void build_masked_tokens_merch(IOCallback io_callback,
   // TODO: switch to smart pointer
   UnixNetIO *io1 = nullptr;
   NetIO *io2 = nullptr;
+  LndNetIO *io3 = nullptr;
   if (io_callback != NULL) {
-    auto *io_ptr = io_callback(conn_type, MERCH);
-    if (conn_type == UNIXNETIO) {
-        io1 = static_cast<UnixNetIO *>(io_ptr);
-        setup_semi_honest(io1, MERCH);
-    } else if (conn_type == NETIO) {
-        io2 = static_cast<NetIO *>(io_ptr);
-        setup_semi_honest(io2, MERCH);
+    if (conn_type == LNDNETIO) {
+        io3 = static_cast<LndNetIO *>(get_lndnetio_ptr(peer, MERCH));
+        setup_semi_honest(io3, MERCH);
     } else {
-        /* custom IO connection */
-        cout << "specify a supported connection type" << endl;
-        return;
+        auto *io_ptr = io_callback(conn_type, MERCH);
+        if (conn_type == UNIXNETIO) {
+            io1 = static_cast<UnixNetIO *>(io_ptr);
+            setup_semi_honest(io1, MERCH);
+        } else if (conn_type == NETIO) {
+            io2 = static_cast<NetIO *>(io_ptr);
+            setup_semi_honest(io2, MERCH);
+        } else {
+            /* custom IO connection */
+            cout << "specify a supported connection type" << endl;
+            return;
+        }
     }
   } else {
     cout << "did not specify a IO connection callback for merchant" << endl;
@@ -374,6 +387,7 @@ issue_tokens(
 
   if (io1 != nullptr) delete io1;
   if (io2 != nullptr) delete io2;
+  if (io3 != nullptr) delete io3;
 }
 
 
