@@ -180,7 +180,6 @@ void issue_tokens(
 void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
-  struct CommitmentRandomness_l revlock_commitment_randomness_l,
 
   struct MaskCommitment_l paymask_com,
   struct HMACKeyCommitment_l key_com,
@@ -190,6 +189,7 @@ void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type,
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
 
+  struct CommitmentRandomness_l revlock_commitment_randomness_l,
   struct State_l w_new,
   struct State_l w_old,
   struct PayToken_l pt_old,

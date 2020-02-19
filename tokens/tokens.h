@@ -175,18 +175,18 @@ struct State_l {
  * \param[in] io_callback : (admin) info for communication channel
  * \param[in] conn_type   : (admin) type of communication channel
  *
- * \param[in] epsilon     : (shared) transaction amount 
- * \param[in] rlc         : (shared) commitment to the revocation lock for the previous state
- * \param[in] revlock_commitment_randomness 
- *                        : (shared???) randomness used to commit to revlock (TYPISSUE - is this private??)
- * \param[in] paymask_com : (shared) commitment to the mask for the pay token
- * \param[in] key_com     : (shared) commitment to the key used for HMACs
- * \param[in] merch_escrow_pub_key
- *                        : (shared) bitcoin public key that the merchant uses to receive (?) funds from the escrow transaction
- * \param[in] merch_dispute_key
- *                        : (shared) bitcoin public key that the merchatn uses to recieve (?) funds when they dispute a posted closing transaction
- * \param[in] nonce       : (shared) random nonce used to uniquely identify state
+ * \param[in] epsilon              : (shared) transaction amount 
+ * \param[in] rlc                  : (shared) commitment to the revocation lock for the previous state 
+ * \param[in] paymask_com          : (shared) commitment to the mask for the pay token
+ * \param[in] key_com              : (shared) commitment to the key used for HMACs
+ * \param[in] merch_escrow_pub_key : (shared) bitcoin public key that the merchant uses in the escrow transaction
+ * \param[in] merch_dispute_key    : (shared) bitcoin public key that the customer puts in the to_customer output of close transactions (e.g. if the merchant disputes the customer transaction, payout goes here)
+ * \param[in] merch_publickey_hash : (shared) merchant public key, hashed for bitcoin transaction
+ * \param[in] merch_payout_pub_key : (shared) merchant public key for payouts
+ * \param[in] nonce                : (shared) random nonce used to uniquely identify state
  *
+ * \param[in] revlock_commitment_randomness 
+ *                      : (private) randomness used to commit to revlock 
  * \param[in] w_new     : (private) new state object
  * \param[in] w_old     : (private) previous state object
  * \param[in] pt_old    : (private) previous pay token
@@ -205,8 +205,7 @@ void build_masked_tokens_cust(
   ConnType conn_type,
 
   struct Balance_l epsilon_l,
-  struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
-  struct CommitmentRandomness_l revlock_commitment_randomness_l,
+  struct RevLockCommitment_l rlc_l, 
   struct MaskCommitment_l paymask_com, 
   struct HMACKeyCommitment_l key_com,
   struct BitcoinPublicKey_l merch_escrow_pub_key_l,
@@ -215,6 +214,7 @@ void build_masked_tokens_cust(
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
 
+  struct CommitmentRandomness_l revlock_commitment_randomness_l,
   struct State_l w_new,
   struct State_l w_old,
   struct PayToken_l pt_old,
@@ -242,19 +242,15 @@ void build_masked_tokens_cust(
  * \param[in] io_callback : (admin) info for communication channel
  * \param[in] conn_type   : (admin) type of communication channel
  *
- * \param[in] epsilon     : (shared) transaction amount 
- * \param[in] rlc         : (shared) commitment to the revocation lock for the previous state 
- * \param[in] paymask_com : (shared) commitment to the mask for the pay token
- * \param[in] key_com     : (shared) commitment to the key used for HMACs
- * \param[in] merch_escrow_pub_key
- *                        : (shared) bitcoin public key that the merchant uses to receive (?) funds from the escrow transaction
- * \param[in] merch_dispute_key
- *                        : (shared) bitcoin public key that the merchatn uses to recieve (?) funds when they dispute a posted closing transaction
- *
- * \param[in] merch_publickey_hash : (?) TYPISSUE: what is this?
- * \param[in] merch_payout_pub_key : (?) TYPISSUE: what is this?
- *
- * \param[in] nonce       : (shared) random nonce used to uniquely identify state
+ * \param[in] epsilon              : (shared) transaction amount 
+ * \param[in] rlc                  : (shared) commitment to the revocation lock for the previous state 
+ * \param[in] paymask_com          : (shared) commitment to the mask for the pay token
+ * \param[in] key_com              : (shared) commitment to the key used for HMACs
+ * \param[in] merch_escrow_pub_key : (shared) bitcoin public key that the merchant uses in the escrow transaction
+ * \param[in] merch_dispute_key    : (shared) bitcoin public key that the customer puts in the to_customer output of close transactions (e.g. if the merchant disputes the customer transaction, payout goes here)
+ * \param[in] merch_publickey_hash : (shared) merchant public key, hashed for bitcoin transaction
+ * \param[in] merch_payout_pub_key : (shared) merchant public key for payouts
+ * \param[in] nonce                : (shared) random nonce used to uniquely identify state
  *
  * \param[in] hmac_key      : (private) The key used to make HMACs (e.g. ? and ?)
  * \param[in] merch_mask    : (private) Random mask for merchant close transaction

@@ -96,10 +96,10 @@ int main(int argc, char** argv) {
     EcdsaSig_l ct_merch;
 
     build_masked_tokens_cust(io_callback, conn_type,
-	  amt, rl, rl_rand, paymask_com, key_com, merch_escrow_pub_key_l,
+	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
           merch_dispute_key_l, merch_publickey_hash,
           merch_payout_pub_key_l, nonce_l,
-	  w, w, pt_old, cust_escrow_pub_key_l, cust_payout_pub_key_l,
+	  rl_rand, w, w, pt_old, cust_escrow_pub_key_l, cust_payout_pub_key_l,
 	  &pt_return, &ct_escrow, &ct_merch);
   }
 
