@@ -4,6 +4,7 @@
 #ifdef __cplusplus
 extern "C" {
 #include <stdint.h>
+//#include "emp-tool/io/libgo_io_channel.h"
 #endif
 
 /*
@@ -171,6 +172,11 @@ struct State_l {
   struct Txid_l HashPrevOuts_escrow;
 };
 
+typedef struct Receive_return;
+
+typedef Receive_return (*cb_receive)(void*);
+typedef char* (*cb_send)(char*, int, void*);
+
 /* customer's token generation function
  *
  * runs MPC to compute masked tokens (close- and pay-).
@@ -202,7 +208,9 @@ struct State_l {
 void build_masked_tokens_cust(
   IOCallback io_callback,
   ConnType conn_type,
-  __SIZE_TYPE__ peer,
+  void* peer,
+  cb_receive cb_r,
+  cb_send cb_s,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   struct CommitmentRandomness_l revlock_commitment_randomness_l,
@@ -263,7 +271,9 @@ void build_masked_tokens_cust(
 void build_masked_tokens_merch(
   IOCallback io_callback,
   ConnType conn_type,
-  __SIZE_TYPE__ peer,
+  void* peer,
+  cb_receive cb_r,
+  cb_send cb_s,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   struct MaskCommitment_l paymask_com,

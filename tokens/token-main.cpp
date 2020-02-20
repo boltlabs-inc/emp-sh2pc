@@ -46,6 +46,9 @@ int main(int argc, char** argv) {
   PublicKeyHash_l merch_publickey_hash;
   BitcoinPublicKey_l merch_payout_pub_key_l;
   Nonce_l nonce_l;
+  void* peer;
+  cb_receive cb_r;
+  cb_send cb_s;
 
   // Initialize shared vars
   amt.balance[0] = 1000;
@@ -80,7 +83,7 @@ int main(int argc, char** argv) {
     CommitmentRandomness_l hmac_rand;
     CommitmentRandomness_l pay_token_rand;
 
-	build_masked_tokens_merch(io_callback, conn_type, 0,
+	build_masked_tokens_merch(io_callback, conn_type, peer, cb_r, cb_s,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
       merch_dispute_key_l, merch_publickey_hash,
       merch_payout_pub_key_l, nonce_l,
@@ -95,7 +98,7 @@ int main(int argc, char** argv) {
     EcdsaSig_l ct_escrow;
     EcdsaSig_l ct_merch;
 
-    build_masked_tokens_cust(io_callback, conn_type, 0,
+    build_masked_tokens_cust(io_callback, conn_type, peer, cb_r, cb_s,
 	  amt, rl, rl_rand, paymask_com, key_com, merch_escrow_pub_key_l,
           merch_dispute_key_l, merch_publickey_hash,
           merch_payout_pub_key_l, nonce_l,

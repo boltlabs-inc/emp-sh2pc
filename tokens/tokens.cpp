@@ -30,9 +30,9 @@ void* get_unixnetio_ptr(char *socket_path, int party) {
 }
 
 /* Returns a pointer to a LndNetIO ptr */
-void* get_lndnetio_ptr(size_t peer, int party) {
+void* get_lndnetio_ptr(void* peer, cb_receive recv, cb_send send, int party) {
     bool is_server = (party == MERCH) ? true : false;
-    LndNetIO *io_ptr = new LndNetIO(peer, is_server);
+    LndNetIO *io_ptr = new LndNetIO(peer, recv, send, is_server);
     return static_cast<void *>(io_ptr);
 }
 
@@ -69,7 +69,7 @@ void issue_tokens(
   RevLockCommitment_l rlc_l,
   Nonce_l nonce_l,
   BitcoinPublicKey_l merch_escrow_pub_key_l,
-  BitcoinPublicKey_l merch_dispute_key_l, 
+  BitcoinPublicKey_l merch_dispute_key_l,
   BitcoinPublicKey_l merch_payout_pub_key_l,
   PublicKeyHash_l merch_publickey_hash_l,
 /* OUTPUTS */
@@ -122,14 +122,14 @@ void issue_tokens(
   Integer escrow_digest[8];
   Integer merch_digest[8];
 
-  validate_transactions(new_state_d, 
+  validate_transactions(new_state_d,
     cust_escrow_pub_key_d, cust_payout_pub_key_d,
-    merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, 
+    merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d,
     merch_publickey_hash_d, escrow_digest, merch_digest);
 
-  // we should return into these txserialized_d or hash 
+  // we should return into these txserialized_d or hash
 
-  // sign new close transactions 
+  // sign new close transactions
   cout << "signing transactions" << endl;
   EcdsaPartialSig_d epsd1 = distribute_EcdsaPartialSig(sig1);
   EcdsaPartialSig_d epsd2 = distribute_EcdsaPartialSig(sig2);
@@ -150,16 +150,16 @@ void issue_tokens(
 
   // mask pay and close tokens
   cout << "masking pay token" << endl;
-  error_signal = ( error_signal | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d, paytoken_mask_commitment_randomness_d)); // pay token 
+  error_signal = ( error_signal | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d, paytoken_mask_commitment_randomness_d)); // pay token
 
   cout << "masking close merch token" << endl;
-  mask_closetoken(signed_merch_tx_parsed.sig, merch_mask_d); // close token - merchant close 
+  mask_closetoken(signed_merch_tx_parsed.sig, merch_mask_d); // close token - merchant close
 
   cout << "masking close escrow token" << endl;
-  mask_closetoken(signed_escrow_tx_parsed.sig, escrow_mask_d); // close token - escrow close 
+  mask_closetoken(signed_escrow_tx_parsed.sig, escrow_mask_d); // close token - escrow close
 
   // handle errors
-  // If there has been an error, we need to destroy the token values. 
+  // If there has been an error, we need to destroy the token values.
   cout << "handling errors" << endl;
   for(int i=0; i<8; i++) {
     new_paytoken_d.paytoken[i] = handle_error_case(new_paytoken_d.paytoken[i], error_signal);
@@ -181,10 +181,11 @@ void issue_tokens(
  * runs MPC to compute masked tokens (close- and pay-).
  * blocks until computation is finished.
  *
- * Assumes close_tx_escrow and close_tx_merch are padded to 
+ * Assumes close_tx_escrow and close_tx_merch are padded to
  * exactly 1024 bits according to the SHA256 spec.
  */
-void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type, size_t peer,
+void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type,
+  void* peer, cb_receive cb_r, cb_send cb_s,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
   struct CommitmentRandomness_l revlock_commitment_randomness_l,
@@ -213,7 +214,7 @@ void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type, size_t
   LndNetIO *io3 = nullptr;
   if (io_callback != NULL) {
     if (conn_type == LNDNETIO) {
-        io3 = static_cast<LndNetIO *>(get_lndnetio_ptr(peer, CUST));
+        io3 = static_cast<LndNetIO *>(get_lndnetio_ptr(peer, cb_r, cb_s, CUST));
         setup_semi_honest(io3, CUST);
     } else {
         auto *io_ptr = io_callback((ConnType)conn_type, CUST);
@@ -271,7 +272,7 @@ issue_tokens(
   rlc_l,
   nonce_l,
   merch_escrow_pub_key_l,
-  merch_dispute_key_l, 
+  merch_dispute_key_l,
   merch_payout_pub_key_l,
   merch_publickey_hash,
 /* OUTPUTS */
@@ -288,7 +289,8 @@ issue_tokens(
 }
 
 void build_masked_tokens_merch(IOCallback io_callback,
-  ConnType conn_type, size_t peer,
+  ConnType conn_type, void* peer,
+  cb_receive cb_r, cb_send cb_s,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
 
@@ -316,7 +318,7 @@ void build_masked_tokens_merch(IOCallback io_callback,
   LndNetIO *io3 = nullptr;
   if (io_callback != NULL) {
     if (conn_type == LNDNETIO) {
-        io3 = static_cast<LndNetIO *>(get_lndnetio_ptr(peer, MERCH));
+        io3 = static_cast<LndNetIO *>(get_lndnetio_ptr(peer, cb_r, cb_s, MERCH));
         setup_semi_honest(io3, MERCH);
     } else {
         auto *io_ptr = io_callback(conn_type, MERCH);
