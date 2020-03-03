@@ -5,11 +5,14 @@
 
 using namespace std;
 
-void *io_callback(ConnType c, int party) {
-    if (c == NETIO) {
+void *io_callback(void *conn, int party) {
+    Conn_l *c = (Conn_l *) conn;
+    if (c == NULL) return NULL;
+
+    if (c->conn_type == NETIO) {
         NetIO *io = new NetIO((party == MERCH) ? nullptr : "127.0.0.1", 12345);
         return io;
-    } else if (c == UNIXNETIO) {
+    } else if (c->conn_type == UNIXNETIO) {
         string socket_path = "tmpcon";
         bool is_server = (party == MERCH) ? true : false;
         UnixNetIO *io = new UnixNetIO(socket_path.c_str(), is_server);
@@ -34,9 +37,14 @@ int main(int argc, char** argv) {
   }
 
   // Declare shared vars
-  // char ip[15] = "127.0.0.1";
+  char path[32] = "socketconn";
+  char ip[32] = "127.0.0.1";
+  Conn_l nc;
+  nc.conn_type = conn_type;
+  nc.path = path;
+  nc.dest_ip = ip;
+  nc.dest_port = 12345;
   Balance_l amt;
-
   RevLockCommitment_l rl;
   MaskCommitment_l paymask_com;
   HMACKeyCommitment_l key_com;
@@ -80,7 +88,7 @@ int main(int argc, char** argv) {
     CommitmentRandomness_l hmac_rand;
     CommitmentRandomness_l pay_token_rand;
 
-	build_masked_tokens_merch(io_callback, conn_type,
+	build_masked_tokens_merch(io_callback, nc,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
       merch_dispute_key_l, merch_publickey_hash,
       merch_payout_pub_key_l, nonce_l,
@@ -95,7 +103,7 @@ int main(int argc, char** argv) {
     EcdsaSig_l ct_escrow;
     EcdsaSig_l ct_merch;
 
-    build_masked_tokens_cust(io_callback, conn_type,
+    build_masked_tokens_cust(io_callback, nc,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
           merch_dispute_key_l, merch_publickey_hash,
           merch_payout_pub_key_l, nonce_l,

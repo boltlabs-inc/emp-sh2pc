@@ -177,7 +177,8 @@ void issue_tokens(
  * Assumes close_tx_escrow and close_tx_merch are padded to 
  * exactly 1024 bits according to the SHA256 spec.
  */
-void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type,
+void build_masked_tokens_cust(IOCallback io_callback,
+  struct Conn_l conn,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
 
@@ -203,8 +204,9 @@ void build_masked_tokens_cust(IOCallback io_callback, ConnType conn_type,
   // select the IO interface
   UnixNetIO *io1 = nullptr;
   NetIO *io2 = nullptr;
+  ConnType conn_type = conn.conn_type;
   if (io_callback != NULL) {
-    auto *io_ptr = io_callback((ConnType)conn_type, CUST);
+    auto *io_ptr = io_callback((void *) &conn, CUST);
     if (conn_type == UNIXNETIO) {
         io1 = static_cast<UnixNetIO *>(io_ptr);
         setup_semi_honest(io1, CUST);
@@ -274,7 +276,7 @@ issue_tokens(
 }
 
 void build_masked_tokens_merch(IOCallback io_callback,
-  ConnType conn_type,
+  struct Conn_l conn,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
 
@@ -299,8 +301,9 @@ void build_masked_tokens_merch(IOCallback io_callback,
   // TODO: switch to smart pointer
   UnixNetIO *io1 = nullptr;
   NetIO *io2 = nullptr;
+  ConnType conn_type = conn.conn_type;
   if (io_callback != NULL) {
-    auto *io_ptr = io_callback(conn_type, MERCH);
+    auto *io_ptr = io_callback((void *) &conn, MERCH);
     if (conn_type == UNIXNETIO) {
         io1 = static_cast<UnixNetIO *>(io_ptr);
         setup_semi_honest(io1, MERCH);

@@ -18,7 +18,7 @@ enum ConnType { CUSTOM = 0, NETIO, UNIXNETIO, TORNETIO };
 /* IO Channel Callback interface - allows caller to handle
  * how connection is made between customer and merchant
  */
-typedef void* (*IOCallback)(ConnType c, int party);
+typedef void* (*IOCallback)(void* nc, int party);
 
 /* Returns a pointer to a NetIO ptr */
 void* get_netio_ptr(char *address, int port, int party);
@@ -52,6 +52,14 @@ void* get_unixnetio_ptr(char *socket_path, int party);
  * You can tell because they all end in _l
  * They have distributed counterparts defined in tokens-misc.h
  */
+
+/* Network Config structure */
+struct Conn_l {
+  ConnType conn_type;
+  char *path;
+  char *dest_ip;
+  uint16_t dest_port;
+};
 
 /* HMAC Key structure.
  * HMAC Keys are the length of the block-size of the underlying hash functions
@@ -202,7 +210,7 @@ struct State_l {
  */
 void build_masked_tokens_cust(
   IOCallback io_callback,
-  ConnType conn_type,
+  struct Conn_l conn,
 
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, 
@@ -264,7 +272,7 @@ void build_masked_tokens_cust(
  */
 void build_masked_tokens_merch(
   IOCallback io_callback,
-  ConnType conn_type,
+  struct Conn_l conn,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, 
   struct MaskCommitment_l paymask_com,
