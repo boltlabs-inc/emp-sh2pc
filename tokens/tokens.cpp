@@ -34,6 +34,12 @@ void* get_unixnetio_ptr(char *socket_path, int party) {
 //    delete io;
 //}
 
+void* get_gonetio_ptr(void* peer, cb_receive recv, cb_send send, int party) {
+    bool is_server = (party == MERCH) ? true : false;
+    GoNetIO *io_ptr = new GoNetIO(peer, recv, send, is_server);
+    return static_cast<void *>(io_ptr);
+}
+
 // TODO: add more meaningful fail / error states
 // TODO: rename to update_state
 void issue_tokens(

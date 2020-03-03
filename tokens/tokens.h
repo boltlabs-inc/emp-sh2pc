@@ -26,6 +26,9 @@ void* get_netio_ptr(char *address, int port, int party);
 /* Returns a pointer to a UnixNetIO ptr */
 void* get_unixnetio_ptr(char *socket_path, int party);
 
+/* Returns a pointer to a GoNetIO ptr */
+void* get_gonetio_ptr(void* peer, int party);
+
 /*
  * describes an API for calling MPC functions 
  * 
@@ -53,12 +56,20 @@ void* get_unixnetio_ptr(char *socket_path, int party);
  * They have distributed counterparts defined in tokens-misc.h
  */
 
+struct Receive_l {
+	char* r0; /* msg */
+	int r1; /* length */
+	char* r2; /* errStr */
+};
+
 /* Network Config structure */
 struct Conn_l {
   ConnType conn_type;
   char *path;
   char *dest_ip;
   uint16_t dest_port;
+  char* (*cb_send)(void*, int, void*);
+  Receive_l (*cb_receive)(void*);
 };
 
 /* HMAC Key structure.
