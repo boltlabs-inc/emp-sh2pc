@@ -17,11 +17,6 @@ void* get_netio_ptr(char *address, int port, int party) {
     return static_cast<void *>(io_ptr);
 }
 
-//void free_netio_ptr(void *io_ptr) {
-//    NetIO *io = static_cast<NetIO *>(io_ptr);
-//    delete io;
-//}
-
 /* Returns a pointer to a UnixNetIO ptr */
 void* get_unixnetio_ptr(char *socket_path, int party) {
     bool is_server = (party == MERCH) ? true : false;
@@ -29,14 +24,9 @@ void* get_unixnetio_ptr(char *socket_path, int party) {
     return static_cast<void *>(io_ptr);
 }
 
-//void free_unixnetio_ptr(void *io_ptr) {
-//    UnixNetIO *io = static_cast<UnixNetIO *>(io_ptr);
-//    delete io;
-//}
-
-void* get_gonetio_ptr(void* peer, cb_receive recv, cb_send send, int party) {
+void* get_gonetio_ptr(void *raw_stream_fd, int party) {
     bool is_server = (party == MERCH) ? true : false;
-    GoNetIO *io_ptr = new GoNetIO(peer, recv, send, is_server);
+    GoNetIO *io_ptr = new GoNetIO(raw_stream_fd, is_server);
     return static_cast<void *>(io_ptr);
 }
 
@@ -210,6 +200,7 @@ void build_masked_tokens_cust(IOCallback io_callback,
   // select the IO interface
   UnixNetIO *io1 = nullptr;
   NetIO *io2 = nullptr;
+  GoNetIO *io3 = nullptr;
   ConnType conn_type = conn.conn_type;
   if (io_callback != NULL) {
     auto *io_ptr = io_callback((void *) &conn, CUST);
@@ -219,6 +210,9 @@ void build_masked_tokens_cust(IOCallback io_callback,
     } else if (conn_type == NETIO) {
         io2 = static_cast<NetIO *>(io_ptr);
         setup_semi_honest(io2, CUST);
+    } else if (conn_type == CUSTOM) {
+        io3 = static_cast<GoNetIO *>(io_ptr);
+        setup_semi_honest(io3, CUST);
     } else {
         /* custom IO connection */
         cout << "specify a supported connection type" << endl;
@@ -307,6 +301,7 @@ void build_masked_tokens_merch(IOCallback io_callback,
   // TODO: switch to smart pointer
   UnixNetIO *io1 = nullptr;
   NetIO *io2 = nullptr;
+  GoNetIO *io3 = nullptr;
   ConnType conn_type = conn.conn_type;
   if (io_callback != NULL) {
     auto *io_ptr = io_callback((void *) &conn, MERCH);
@@ -316,6 +311,9 @@ void build_masked_tokens_merch(IOCallback io_callback,
     } else if (conn_type == NETIO) {
         io2 = static_cast<NetIO *>(io_ptr);
         setup_semi_honest(io2, MERCH);
+    } else if (conn_type == CUSTOM) {
+        io3 = static_cast<GoNetIO *>(io_ptr);
+        setup_semi_honest(io3, MERCH);
     } else {
         /* custom IO connection */
         cout << "specify a supported connection type" << endl;
@@ -376,6 +374,7 @@ issue_tokens(
 
   if (io1 != nullptr) delete io1;
   if (io2 != nullptr) delete io2;
+  if (io3 != nullptr) delete io3;
 }
 
 
