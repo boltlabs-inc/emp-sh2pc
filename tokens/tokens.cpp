@@ -84,16 +84,18 @@ void issue_tokens(
 
   CommitmentRandomness_d hmac_commitment_randomness_d = distribute_CommitmentRandomness(hmac_commitment_randomness_l, MERCH);
   CommitmentRandomness_d paytoken_mask_commitment_randomness_d = distribute_CommitmentRandomness(paytoken_mask_commitment_randomness_l, MERCH);
+  EcdsaPartialSig_d epsd1 = distribute_EcdsaPartialSig(sig1);
+  EcdsaPartialSig_d epsd2 = distribute_EcdsaPartialSig(sig2);
 
-  Balance_d epsilon_d = distribute_Balance(epsilon_l, PUBLIC); // IVE BEEN TREATING THIS LIKE A 32 BIT VALUE, BUT ITS 64
-  HMACKeyCommitment_d hmac_key_commitment_d = distribute_HMACKeyCommitment(hmac_key_commitment_l, PUBLIC);
-  MaskCommitment_d paytoken_mask_commitment_d = distribute_MaskCommitment(paytoken_mask_commitment_l, PUBLIC);
-  RevLockCommitment_d rlc_d = distribute_RevLockCommitment(rlc_l, PUBLIC);
-  Nonce_d nonce_d = distribute_Nonce(nonce_l, PUBLIC);
-  BitcoinPublicKey_d merch_escrow_pub_key_d = distribute_BitcoinPublicKey(merch_escrow_pub_key_l, PUBLIC);
-  BitcoinPublicKey_d merch_dispute_key_d = distribute_BitcoinPublicKey(merch_dispute_key_l, PUBLIC);
-  BitcoinPublicKey_d merch_payout_pub_key_d = distribute_BitcoinPublicKey(merch_payout_pub_key_l, PUBLIC);
-  PublicKeyHash_d merch_publickey_hash_d = distribute_PublicKeyHash(merch_publickey_hash_l, PUBLIC);
+  Balance_d epsilon_d = distribute_Balance(epsilon_l, CUST); // IVE BEEN TREATING THIS LIKE A 32 BIT VALUE, BUT ITS 64
+  HMACKeyCommitment_d hmac_key_commitment_d = distribute_HMACKeyCommitment(hmac_key_commitment_l, CUST);
+  MaskCommitment_d paytoken_mask_commitment_d = distribute_MaskCommitment(paytoken_mask_commitment_l, CUST);
+  RevLockCommitment_d rlc_d = distribute_RevLockCommitment(rlc_l, CUST);
+  Nonce_d nonce_d = distribute_Nonce(nonce_l, CUST);
+  BitcoinPublicKey_d merch_escrow_pub_key_d = distribute_BitcoinPublicKey(merch_escrow_pub_key_l, CUST);
+  BitcoinPublicKey_d merch_dispute_key_d = distribute_BitcoinPublicKey(merch_dispute_key_l, CUST);
+  BitcoinPublicKey_d merch_payout_pub_key_d = distribute_BitcoinPublicKey(merch_payout_pub_key_l, CUST);
+  PublicKeyHash_d merch_publickey_hash_d = distribute_PublicKeyHash(merch_publickey_hash_l, CUST);
 
 
   cout << "distributed everything. verifying token sig" << endl;
@@ -111,17 +113,15 @@ void issue_tokens(
   Integer escrow_digest[8];
   Integer merch_digest[8];
 
-  validate_transactions(new_state_d, 
+  validate_transactions(new_state_d,
     cust_escrow_pub_key_d, cust_payout_pub_key_d,
-    merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, 
+    merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d,
     merch_publickey_hash_d, escrow_digest, merch_digest);
 
   // we should return into these txserialized_d or hash 
 
   // sign new close transactions 
   cout << "signing transactions" << endl;
-  EcdsaPartialSig_d epsd1 = distribute_EcdsaPartialSig(sig1);
-  EcdsaPartialSig_d epsd2 = distribute_EcdsaPartialSig(sig2);
 
   Integer signed_merch_tx = ecdsa_sign_hashed(merch_digest, epsd1);
   Integer signed_escrow_tx = ecdsa_sign_hashed(escrow_digest, epsd2);
@@ -139,13 +139,13 @@ void issue_tokens(
 
   // mask pay and close tokens
   cout << "masking pay token" << endl;
-  error_signal = ( error_signal | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d, paytoken_mask_commitment_randomness_d)); // pay token 
+  error_signal = ( error_signal | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d, paytoken_mask_commitment_randomness_d)); // pay token
 
   cout << "masking close merch token" << endl;
-  mask_closetoken(signed_merch_tx_parsed.sig, merch_mask_d); // close token - merchant close 
+  mask_closetoken(signed_merch_tx_parsed.sig, merch_mask_d); // close token - merchant close
 
   cout << "masking close escrow token" << endl;
-  mask_closetoken(signed_escrow_tx_parsed.sig, escrow_mask_d); // close token - escrow close 
+  mask_closetoken(signed_escrow_tx_parsed.sig, escrow_mask_d); // close token - escrow close
 
   // handle errors
   // If there has been an error, we need to destroy the token values. 

@@ -297,6 +297,42 @@ void build_masked_tokens_merch(
   struct EcdsaPartialSig_l sig2
 );
 
+void issue_tokens(
+  int party,
+/* CUSTOMER INPUTS */
+  State_l old_state_l,
+  State_l new_state_l,
+  PayToken_l old_paytoken_l,
+  BitcoinPublicKey_l cust_escrow_pub_key_l,
+  BitcoinPublicKey_l cust_payout_pub_key_l,
+  CommitmentRandomness_l revlock_commitment_randomness_l,
+/* MERCHANT INPUTS */
+  HMACKey_l hmac_key_l,
+  Mask_l paytoken_mask_l,
+  Mask_l merch_mask_l,
+  Mask_l escrow_mask_l,
+  EcdsaPartialSig_l sig1,
+  EcdsaPartialSig_l sig2,
+  CommitmentRandomness_l hmac_commitment_randomness_l,
+  CommitmentRandomness_l paytoken_mask_commitment_randomness_l,
+
+/* TODO: ECDSA Key info */
+/* PUBLIC INPUTS */
+  Balance_l epsilon_l,
+  HMACKeyCommitment_l hmac_key_commitment_l,
+  MaskCommitment_l paytoken_mask_commitment_l,
+  RevLockCommitment_l rlc_l,
+  Nonce_l nonce_l,
+  BitcoinPublicKey_l merch_escrow_pub_key_l,
+  BitcoinPublicKey_l merch_dispute_key_l,
+  BitcoinPublicKey_l merch_payout_pub_key_l,
+  PublicKeyHash_l merch_publickey_hash_l,
+/* OUTPUTS */
+  PayToken_l* pt_return,
+  EcdsaSig_l* ct_escrow,
+  EcdsaSig_l* ct_merch
+  );
+
 #ifdef __cplusplus
 }
 #endif
