@@ -140,7 +140,8 @@ void test_compose(int runs=50) {
     res = change_base(res, 2, 16);
 
     // secure -- note use of special unsigned reveal function
-    Integer hash = composeSHA256result(result);
+    Integer thirtytwo(256, 32, MERCH);
+    Integer hash = composeSHA256result(result, thirtytwo);
     string hres = change_base(hash.reveal_unsigned(PUBLIC), 10,16);
 
     assert ( hres.compare(res) == 0 );
@@ -285,7 +286,8 @@ string run_secure_sha256(string msg, uint blocks, Version test_type) {
   }
 
   // convert output to correct-length string
-  Integer hash = composeSHA256result(result);
+  Integer thirtytwo(256, 32, MERCH);
+  Integer hash = composeSHA256result(result, thirtytwo);
   string res = hash.reveal_unsigned(PUBLIC,16);
   while (res.length() < 64) {
     res = '0' + res;

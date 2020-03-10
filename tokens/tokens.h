@@ -298,7 +298,6 @@ void build_masked_tokens_merch(
 );
 
 void issue_tokens(
-  int party,
 /* CUSTOMER INPUTS */
   State_l old_state_l,
   State_l new_state_l,

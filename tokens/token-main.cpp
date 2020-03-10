@@ -2,6 +2,7 @@
 #include "ecdsa.h"
 #include "sha256.h"
 #include "tokens.h"
+#include "emp-sh2pc/emp-sh2pc.h"
 
 using namespace std;
 
@@ -21,11 +22,38 @@ void *io_callback(void *conn, int party) {
     return NULL;
 }
 
+void test_circ(uint32_t in1, uint32_t in2, uint32_t in3, uint32_t in4) {
+//    Integer test1 = Integer(32, in1, BOB);
+    Integer test3 = Integer(32, in3, ALICE);
+    Integer test4 = Integer(32, in4, ALICE);
+    Integer test2 = Integer(32, in2, BOB);
+
+    Integer test5 = test2 + test3;
+//    test1.reveal<uint32_t>(BOB);
+    Integer test6 = Integer(32, 0, PUBLIC);
+    test2.reveal<uint32_t>(BOB);
+    test3.reveal<uint32_t>(BOB);
+    test4.reveal<uint32_t>(BOB);
+    test5.reveal<uint32_t>(BOB);
+    test6.reveal<uint32_t>(BOB);
+}
+
 /* 
  * Test main for token generation
  * generates fake data for now.
  */
 int main(int argc, char** argv) {
+
+    if (argc ==2 && strcmp(argv[1], "-t") == 0) {
+        setup_plain_prot(true, "test.circuit.txt");
+        uint32_t in1;
+        uint32_t in2;
+        uint32_t in3;
+        uint32_t in4;
+        test_circ(in1, in2, in3, in4);
+        finalize_plain_prot();
+        return 0;
+    }
 
     if (argc == 2 && strcmp(argv[1], "-m") == 0 ) {
         setup_plain_prot(true, "tokens.circuit.txt");

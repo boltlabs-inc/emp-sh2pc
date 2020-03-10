@@ -235,9 +235,21 @@ string run_secure_HMACsign(string key, string msg) {
   PayToken_d paytoken_d;
   HMACKey_d merch_key_d = distribute_HMACKey(merch_key_l, MERCH);
   State_d state_d = distribute_State(state_l, CUST);
-  HMACsign(merch_key_d, state_d, paytoken_d.paytoken);
 
-  Integer hash = composeSHA256result(paytoken_d.paytoken);
+  Integer ipad(32, 909522486, MERCH);
+  Integer xeight(32, -2147483648, MERCH); //0x80000000;
+  Integer threeazero(32, 2048, MERCH); //0x000003a0;
+  Integer opad(32, 1549556828, MERCH);
+  Integer threehundred(32, 768, MERCH); //0x00000300;
+  Integer zero(32, 0, MERCH); //0x00000000;
+  Integer k[64];
+  Integer H[8];
+  initSHA256(k, H);
+
+  HMACsign(merch_key_d, state_d, paytoken_d.paytoken, ipad, xeight, threeazero, opad, threehundred, zero, k, H);
+
+  Integer thirtytwo(256, 32, MERCH);
+  Integer hash = composeSHA256result(paytoken_d.paytoken, thirtytwo);
   string res = hash.reveal_unsigned(PUBLIC,16);
   while (res.length() < 64) {
     res = '0' + res;

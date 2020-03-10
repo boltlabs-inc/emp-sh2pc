@@ -57,7 +57,7 @@ static const uint32_t IV_clear[8] = {
 
 void initSHA256(Integer k[64], Integer H[8]); 
 string get_bitstring(Integer x);
-Integer composeSHA256result(Integer result[8]);
+Integer composeSHA256result(Integer result[8], Integer thirtytwo);
 
 
 /* computes sha256 for a 2-block message
@@ -74,12 +74,18 @@ void computeSHA256_2l(uint message[2][16], Integer result[8]);
  * this takes already distributed variables.
  */
 void computeSHA256_1d(Integer message[1][16], Integer result[8]);
+void computeSHA256_1d_noinit(Integer message[1][16], Integer result[8], Integer k[64], Integer H[8]);
 void computeSHA256_2d(Integer message[2][16], Integer result[8]);
+void computeSHA256_2d_noinit(Integer message[5][16], Integer result[8], Integer k[64], Integer H[8]);
 void computeSHA256_3d(Integer message[3][16], Integer result[8]);
 void computeSHA256_4d(Integer message[4][16], Integer result[8]);
 void computeSHA256_5d(Integer message[5][16], Integer result[8]);
+void computeSHA256_5d_noinit(Integer message[5][16], Integer result[8], Integer k[64], Integer H[8]);
 
 void computeDoubleSHA256_3d(Integer message[3][16], Integer result[8]);
+void computeDoubleSHA256_3d_noinit(Integer message[3][16], Integer result[8], Integer k[64], Integer H[8], Integer xeight, Integer twofivesix, Integer zero);
 void computeDoubleSHA256_4d(Integer message[4][16], Integer result[8]);
+void computeDoubleSHA256_4d_noinit(Integer message[4][16], Integer result[8], Integer k[64], Integer H[8], Integer xeight, Integer twofivesix, Integer zero);
 void computeDoubleSHA256_5d(Integer message[5][16], Integer result[8]);
+void computeDoubleSHA256_5d_noinit(Integer message[5][16], Integer result[8], Integer k[64], Integer H[8], Integer xeight, Integer twofivesix, Integer zero);
 
