@@ -295,7 +295,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
  *
  * \return b 	: success bit
  */
-Bit compare_wallets(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d, Nonce_d nonce_d, Balance_d epsilon_d);
+Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d, Nonce_d nonce_d, Balance_d epsilon_d);
 
 /* opens and verifies commitment to a wallet
  * e.g. checks that com == commit(w;t)
