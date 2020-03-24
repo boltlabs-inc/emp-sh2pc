@@ -279,7 +279,6 @@ void issue_tokens(
   localize_PayToken(pt_return, new_paytoken_d, CUST);
   localize_EcdsaSig(ct_escrow, signed_escrow_tx_parsed, CUST);
   localize_EcdsaSig(ct_merch, signed_merch_tx_parsed, CUST);
-  q.reveal<string>(CUST);
 }
 
 /* customer's token generation function

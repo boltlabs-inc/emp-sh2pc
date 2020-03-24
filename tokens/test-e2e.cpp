@@ -20,7 +20,6 @@ void test_ecdsa_e2e(EcdsaPartialSig_l psl, char *hashedmsg, uint32_t party, uint
   // format partial signature
   EcdsaPartialSig_d psd = distribute_EcdsaPartialSig(psl);
 
-  // TODO: initialize message correctly (pass hash digest from rust?)
   //string hashedmsg = "469457f5921cb642d5df1854342507b3c0df6c8f5b352fc85de05ac0a5cb26c8";
   //hashedmsg = "fcfbbeec974c9394b6d3c85a84f3c227e1712af52201d8fdcc1c3d1ebc9ebf8b";
   string hmsg(hashedmsg);

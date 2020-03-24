@@ -22,20 +22,71 @@ void *io_callback(void *conn, int party) {
     return NULL;
 }
 
-void test_circ(uint32_t in1, uint32_t in2, uint32_t in3, uint32_t in4) {
-//    Integer test1 = Integer(32, in1, BOB);
-    Integer test3 = Integer(32, in3, ALICE);
-    Integer test4 = Integer(32, in4, ALICE);
-    Integer test2 = Integer(32, in2, BOB);
+void test_circ() {
+    uint32_t in1;
+    uint32_t in3;
+    Integer test1[3];
+    test1[0] = Integer(32, in1, BOB);
+    test1[1] = Integer(32, in1, BOB);
+    test1[2] = Integer(32, in1, BOB);
+    Integer test3[3];
+    test3[0] = Integer(32, in3, ALICE);
+    test3[1] = Integer(32, in3, ALICE);
+    test3[2] = Integer(32, in3, ALICE);
 
-    Integer test5 = test2 + test3;
-//    test1.reveal<uint32_t>(BOB);
-    Integer test6 = Integer(32, 0, PUBLIC);
-    test2.reveal<uint32_t>(BOB);
-    test3.reveal<uint32_t>(BOB);
-    test4.reveal<uint32_t>(BOB);
-    test5.reveal<uint32_t>(BOB);
-    test6.reveal<uint32_t>(BOB);
+    for(int i=0;i<3;i++) {
+        test1[i] = test1[i] ^ test3[i];
+    }
+    test1[0].reveal<uint32_t>(BOB);
+    test1[1].reveal<uint32_t>(BOB);
+    test1[2].reveal<uint32_t>(BOB);
+}
+
+void test_ecdsa_sign(EcdsaPartialSig_l psl, string hashedmsg) {
+    Integer(2060, 0, CUST);
+    EcdsaPartialSig_d psd = distribute_EcdsaPartialSig(psl);
+    Integer msg(256, hashedmsg, MERCH);
+    Integer fullF(256, 4294967295 /* 0xffffffff */, MERCH);
+    string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
+    Integer q2(516, q2str, MERCH);
+    string qstr = "115792089237316195423570985008687907852837564279074904382605163141518161494337";
+    Integer q(258, qstr, MERCH);
+    Integer target[8];
+    Integer signature = ecdsa_sign_hashed(msg, psd, q, q2);
+    bigint_into_smallint_array(target, signature, fullF);
+
+//    signature.reveal<uint32_t>(CUST);
+    for(int i=0; i<8; i++) {
+        target[i].reveal<uint32_t>(CUST);
+    }
+}
+
+void test_sha256() {
+    Integer result[8];
+    Integer k[64];
+    Integer H[8];
+    initSHA256(k, H);
+    Integer message[2][16];
+    for(int i=0; i<16; i++) {
+      message[0][i] = Integer(32, 0, MERCH);
+    }
+
+    for(int i=0; i<16; i++) {
+      message[1][i] = Integer(32, 0, MERCH);
+    }
+    computeSHA256_2d_noinit(message, result, k, H);
+    for(int i=0; i<8; i++) {
+        result[i].reveal<uint32_t>(CUST);
+    }
+}
+
+void test_CH() {
+    Integer(96, 0, CUST);
+    Integer x(32, 0, MERCH);
+    Integer y(32, 0, MERCH);
+    Integer z(32, 0, MERCH);
+    Integer w = MAJ(x, y, z);
+    w.reveal<uint32_t>(CUST);
 }
 
 /* 
@@ -46,11 +97,30 @@ int main(int argc, char** argv) {
 
     if (argc ==2 && strcmp(argv[1], "-t") == 0) {
         setup_plain_prot(true, "test.circuit.txt");
-        uint32_t in1;
-        uint32_t in2;
-        uint32_t in3;
-        uint32_t in4;
-        test_circ(in1, in2, in3, in4);
+        test_circ();
+        finalize_plain_prot();
+        return 0;
+    }
+
+    if (argc ==2 && strcmp(argv[1], "-s") == 0) {
+        setup_plain_prot(true, "ecdsa.circuit.txt");
+        EcdsaPartialSig_l psl;
+        string msg;
+        test_ecdsa_sign(psl, msg);
+        finalize_plain_prot();
+        return 0;
+    }
+
+    if (argc ==2 && strcmp(argv[1], "-h") == 0) {
+        setup_plain_prot(true, "sha256.circuit.txt");
+        test_sha256();
+        finalize_plain_prot();
+        return 0;
+    }
+
+    if (argc ==2 && strcmp(argv[1], "-c") == 0) {
+        setup_plain_prot(true, "CH.circuit.txt");
+        test_CH();
         finalize_plain_prot();
         return 0;
     }
