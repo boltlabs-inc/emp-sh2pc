@@ -282,7 +282,10 @@ Mask_d distribute_Mask(Mask_l mask, const int party) {
 
 Mask_l localize_Mask(Mask_d mask, const int party) {
   Mask_l to_return;
-  // GABE TODO
+
+  for(int i=0; i<8; i++) {
+    to_return.mask[i] = mask.mask[i].reveal<uint32_t>(party);
+  }
 
   return to_return;
 }
@@ -374,11 +377,13 @@ void localize_EcdsaSig(EcdsaSig_l* target, EcdsaSig_d EcdsaSig, const int party)
 }
 
 
-Balance_d convert_to_little_endian(Balance_d big_endian_balance) {
+Balance_d convert_to_little_endian(Balance_d big_endian_balance, Integer xzerozeroff, Integer ffzerozero) {
   Balance_d little_endian_balance;
 
-  Integer mask_second_leftmost_byte(32, 16711680 /* 00ff0000 */, PUBLIC);
-  Integer mask_second_rightmost_byte(32, 65280 /* 0000ff00 */, PUBLIC);
+  Integer mask_second_leftmost_byte = xzerozeroff;
+//  Integer mask_second_leftmost_byte(32, 16711680 /* 00ff0000 */, PUBLIC);
+  Integer mask_second_rightmost_byte = ffzerozero;
+//  Integer mask_second_rightmost_byte(32, 65280 /* 0000ff00 */, PUBLIC);
 
   little_endian_balance.balance[0] = ((big_endian_balance.balance[1]) << 24)
         | ((big_endian_balance.balance[1] & mask_second_rightmost_byte) << 8)
@@ -393,11 +398,13 @@ Balance_d convert_to_little_endian(Balance_d big_endian_balance) {
   return little_endian_balance;
 
 }
-Balance_d convert_to_big_endian(Balance_d little_endian_balance) {
+Balance_d convert_to_big_endian(Balance_d little_endian_balance, Integer xzerozeroff, Integer ffzerozero) {
   Balance_d big_endian_balance;
 
-  Integer mask_second_leftmost_byte(32, 16711680 /* 00ff0000 */, PUBLIC);
-  Integer mask_second_rightmost_byte(32, 65280 /* 0000ff00 */, PUBLIC);
+  Integer mask_second_leftmost_byte = xzerozeroff;
+//  Integer mask_second_leftmost_byte(32, 16711680 /* 00ff0000 */, PUBLIC);
+  Integer mask_second_rightmost_byte = ffzerozero;
+//  Integer mask_second_rightmost_byte(32, 65280 /* 0000ff00 */, PUBLIC);
 
   big_endian_balance.balance[0] = ((little_endian_balance.balance[1]) << 24)
         | ((little_endian_balance.balance[1] & mask_second_rightmost_byte) << 8)
@@ -412,10 +419,10 @@ Balance_d convert_to_big_endian(Balance_d little_endian_balance) {
   return big_endian_balance;
 }
 
-Balance_d sum_balances(Balance_d lhs, Balance_d rhs) {
+Balance_d sum_balances(Balance_d lhs, Balance_d rhs, Integer zero) {
   Balance_d to_return;
 
-  Integer result(64, 0, PUBLIC);
+  Integer result = zero.resize(64, false);
 
   lhs.balance[0].resize(64, true);
   lhs.balance[1].resize(64, true);
@@ -448,8 +455,9 @@ Integer handle_error_case(Integer data, Bit mask) {
   return to_return;
 }
 
-void bigint_into_smallint_array(Integer target[8], Integer source) {
-  Integer mask(256, 4294967295 /* 0xffffffff */, PUBLIC);
+void bigint_into_smallint_array(Integer target[8], Integer source, Integer fullF) {
+//  Integer mask(256, 4294967295 /* 0xffffffff */, PUBLIC);
+  Integer mask = fullF;
 
   target[7] = mask & source;
   target[7] = target[7].resize(32);
@@ -517,7 +525,8 @@ void dump_buffer(string label, Integer buffer[16]) {
 }
 
 void dump_hash(string label, Integer buffer[8]) {
-  Integer temp = composeSHA256result(buffer);
+  Integer thirtytwo(256, 32, PUBLIC);
+  Integer temp = composeSHA256result(buffer, thirtytwo);
 
   string temp_string = temp.reveal_unsigned(PUBLIC,16);
   std::cout << label << temp_string  << std::endl;

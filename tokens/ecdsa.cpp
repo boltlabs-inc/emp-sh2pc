@@ -2,6 +2,8 @@
 #include "ecdsa.h"
 #include "sha256.h"
 
+const int size = 516;
+
 // parses a 1024 char array (of 0/1s) into a 2-block sha256 input 
 // input: char [1024]
 // output: fills in uint [2][16]
@@ -49,13 +51,12 @@ string get_ECDSA_params() {
 
 // sets sign of signature according to bitcoin specification.
 // if s > q/2, set s = q-s.
-Integer set_signature_sign(Integer signature) {
+Integer set_signature_sign(Integer signature, Integer q, Integer q2) {
   // q2 = ceil( q/2 ), where q is the secp256k1 point order
-  const int size = 516;
   assert(signature.size() == size);
-  string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
-  Integer q2(size, q2str, PUBLIC);
-  Integer q (size, get_ECDSA_params(), PUBLIC);
+//  string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
+//  Integer q2(size, q2str, PUBLIC);
+//  Integer q (size, get_ECDSA_params(), PUBLIC);
   Bit flip = signature.geq(q2);
   Integer flipsig = q - signature;
   signature = signature.select(flip, flipsig);
@@ -63,12 +64,16 @@ Integer set_signature_sign(Integer signature) {
 }
 
 // signs a message using the Ecdsa partial signature 
-Integer ecdsa_sign(Integer message[2][16], EcdsaPartialSig_d partialsig) {
+Integer ecdsa_sign(Integer message[2][16], EcdsaPartialSig_d partialsig, Integer thirtytwo) {
   Integer result[8];
 
   computeSHA256_2d(message, result);
-  Integer hash = composeSHA256result(result);
-  return ecdsa_sign_hashed(hash, partialsig);
+  Integer hash = composeSHA256result(result, thirtytwo);
+  string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
+  Integer q2(size, q2str, MERCH);
+  string qstr = "115792089237316195423570985008687907852837564279074904382605163141518161494337";
+  Integer q(258, qstr, MERCH);
+  return ecdsa_sign_hashed(hash, partialsig, q, q2);
 }
 
 // ecdsa-signs a message based on the given parameters
@@ -78,7 +83,7 @@ Integer ecdsa_sign(Integer message[2][16], EcdsaPartialSig_d partialsig) {
 // returns a 256-bit integer representing the signature
 // IMPORTANT: this represents an unsigned integer. It may produce incorrect results if used 
 // for arithmetic operations (EMP-toolkit will assume it is a _signed_ integer).
-Integer ecdsa_sign(char msg[1024], EcdsaPartialSig_l pubsig) {
+Integer ecdsa_sign(char msg[1024], EcdsaPartialSig_l pubsig, Integer thirtytwo) {
   EcdsaPartialSig_d partialsig = distribute_EcdsaPartialSig(pubsig);
 
   // parse input for hashing
@@ -88,18 +93,22 @@ Integer ecdsa_sign(char msg[1024], EcdsaPartialSig_l pubsig) {
   // hash and sign
   Integer result[8];
   computeSHA256_2l(parsed_msg, result);
-  Integer hash = composeSHA256result(result);
-  return ecdsa_sign_hashed(hash, partialsig);
+  Integer hash = composeSHA256result(result, thirtytwo);
+  string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
+  Integer q2(size, q2str, MERCH);
+  string qstr = "115792089237316195423570985008687907852837564279074904382605163141518161494337";
+  Integer q(258, qstr, MERCH);
+  return ecdsa_sign_hashed(hash, partialsig, q, q2);
 }
 
-Integer ecdsa_sign_hashed(Integer broken_digest[8], EcdsaPartialSig_d partialsig) {
-  Integer digest = composeSHA256result(broken_digest);
-  return ecdsa_sign_hashed(digest, partialsig);
+Integer ecdsa_sign_hashed(Integer broken_digest[8], EcdsaPartialSig_d partialsig, Integer thirtytwo, Integer q, Integer q2) {
+  Integer digest = composeSHA256result(broken_digest, thirtytwo);
+  return ecdsa_sign_hashed(digest, partialsig, q, q2);
 }
 
-Integer ecdsa_sign_hashed(Integer digest, EcdsaPartialSig_d partialsig) {
+Integer ecdsa_sign_hashed(Integer digest, EcdsaPartialSig_d partialsig, Integer q, Integer q2) {
   // retrieve shared/fixed q
-  Integer q(258, get_ECDSA_params(), PUBLIC);
+//  Integer q(258, get_ECDSA_params(), PUBLIC);
 
   digest.resize(258, false);
   digest = digest % q;
@@ -112,7 +121,7 @@ Integer ecdsa_sign_hashed(Integer digest, EcdsaPartialSig_d partialsig) {
   s = partialsig.k_inv * s;
   s = s % q;
 
-  s = set_signature_sign(s);
+  s = set_signature_sign(s, q, q2);
   s.resize(256,true);
   return s;
 }

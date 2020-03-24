@@ -193,13 +193,13 @@ Mask_l localize_Mask(Mask_d mask, const int party);
 Balance_d distribute_Balance(Balance_l balance, const int party);
 Balance_l localize_Balance(Balance_d balance, const int party);
 
-Balance_d convert_to_little_endian(Balance_d big_endian_balance);
-Balance_d convert_to_big_endian(Balance_d little_endian_balance);
+Balance_d convert_to_little_endian(Balance_d big_endian_balance, Integer xzerozeroff, Integer ffzerozero);
+Balance_d convert_to_big_endian(Balance_d little_endian_balance, Integer xzerozeroff, Integer ffzerozero);
 
 CommitmentRandomness_d distribute_CommitmentRandomness(CommitmentRandomness_l rand, const int party);
 CommitmentRandomness_l localize_CommitmentRandomness(CommitmentRandomness_d rand, const int party);
 
-Balance_d sum_balances(Balance_d lhs, Balance_d rhs);
+Balance_d sum_balances(Balance_d lhs, Balance_d rhs, Integer zero);
 
 Integer combine_balance(Balance_d balance);
 
@@ -230,8 +230,6 @@ void dump_hash(string label, Integer buffer[8]);
 void dump_bit(string label, Bit b);
 
 /***************************** THIS FROM MARCELLA BEFORE THE GREAT RE-TYPING ************************/
-
-Integer makeInteger(bool *bits, int len, int intlen, const int party);
 
 /* TODO: Fix types for all of these */
 
@@ -275,9 +273,9 @@ void issue_tokens(
  * Also haven't finalized representation for tokens.
  */
 // void sign_token();
-PayToken_d sign_token(State_d state, HMACKey_d key);
+PayToken_d sign_token(State_d state, HMACKey_d key, Integer ipad, Integer xeight, Integer threeazero, Integer opad, Integer threehundred, Integer zero, Integer k[64], Integer H[8]);
 // Bit verify_token_sig();
-Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac_commitment_randomness_d, HMACKey_d opening, State_d old_state, PayToken_d old_paytoken);
+Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac_commitment_randomness_d, HMACKey_d opening, State_d old_state, PayToken_d old_paytoken, Integer ipad, Integer xeight, Integer threeazero, Integer opad, Integer threehundred, Integer sixforty, Integer zero, Integer k[64], Integer H[8]);
 
 
 /* checks that the wallets are appropriately updated
@@ -295,7 +293,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
  *
  * \return b 	: success bit
  */
-Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d, Nonce_d nonce_d, Balance_d epsilon_d);
+Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d, Nonce_d nonce_d, Balance_d epsilon_d, Integer k[64], Integer H[8], Integer xeight, Integer zero, Integer threeeightfour);
 
 /* opens and verifies commitment to a wallet
  * e.g. checks that com == commit(w;t)
@@ -309,9 +307,9 @@ Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d
  */
 Bit open_commitment();
 
-Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d);
+Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d, Integer k[64], Integer H[8], Integer xeight, Integer zero, Integer threeeightfour);
 
-Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d mask_commitment_randomness_d);
+Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d mask_commitment_randomness_d, Integer k[64], Integer H[8], Integer xeight, Integer zero, Integer threeeightfour);
 
 
 /* validates closing transactions against a wallet
@@ -331,7 +329,7 @@ Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, Commitm
 void validate_transactions(State_d new_state_d, 
   BitcoinPublicKey_d cust_escrow_pub_key_d, BitcoinPublicKey_d cust_payout_pub_key_d,
   BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, 
-  PublicKeyHash_d merch_publickey_hash_d, Integer escrow_digest[8], Integer merch_digest[8]);
+  PublicKeyHash_d merch_publickey_hash_d, Integer escrow_digest[8], Integer merch_digest[8], Integer k[64], Integer H[8], Integer xeight, Integer twofivesix, Integer zero);
 
 /* applies a mask to a pay token
  * uses a one-time-pad scheme (just xors mask with token bits)
@@ -343,7 +341,7 @@ void validate_transactions(State_d new_state_d,
  * \param[in] token : Sequence of bits representing a token
  *
  */
-Bit mask_paytoken(Integer paytoken[8], Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d paytoken_mask_commitment_randomness_d);
+Bit mask_paytoken(Integer paytoken[8], Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d paytoken_mask_commitment_randomness_d, Integer k[64], Integer H[8], Integer xeight, Integer zero, Integer threeeightfour);
 
 /* applies a mask to a token
  * uses a one-time-pad scheme (just xors mask with token bits)
@@ -358,6 +356,6 @@ Bit mask_paytoken(Integer paytoken[8], Mask_d mask, MaskCommitment_d maskcommitm
 void mask_closetoken(Integer token[8], Mask_d mask);
 
 
-void bigint_into_smallint_array(Integer target[8], Integer source);
+void bigint_into_smallint_array(Integer target[8], Integer source, Integer fullF);
 
 

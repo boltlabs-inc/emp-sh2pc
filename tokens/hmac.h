@@ -12,4 +12,4 @@ using namespace emp;
 /* Computes the HMAC signature of state under the key merch_key.  The result is paytoken.
 */
 // void HMACsign(HMACKey_d merch_key, State_d state, PayToken_d paytoken);
-void HMACsign(HMACKey_d merch_key, State_d state, Integer paytoken[8]);
+void HMACsign(HMACKey_d merch_key, State_d state, Integer paytoken[8], Integer ipad, Integer xeight, Integer threeazero, Integer opad, Integer threehundred, Integer zero, Integer k[64], Integer H[8]);

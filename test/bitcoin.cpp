@@ -194,7 +194,8 @@ void run_secure_bitcoin() {
     merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, 
     merch_pubkey_hash_d, customer_delayed_script_hash);
 
-  Integer customer_delayed_script = composeSHA256result(customer_delayed_script_hash);
+  Integer thirtytwo(256, 32, MERCH);
+  Integer customer_delayed_script = composeSHA256result(customer_delayed_script_hash, thirtytwo);
   string customer_delayed_script_hash_string = customer_delayed_script.reveal_unsigned(PUBLIC,16);
   while (customer_delayed_script_hash_string.length() < 64) {
     customer_delayed_script_hash_string = '0' + customer_delayed_script_hash_string;
@@ -212,7 +213,7 @@ void run_secure_bitcoin() {
     merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, 
     merch_pubkey_hash_d, hash_outputs);
 
-  Integer hash_o = composeSHA256result(hash_outputs);
+  Integer hash_o = composeSHA256result(hash_outputs, thirtytwo);
   string hash_outputs_string = hash_o.reveal_unsigned(PUBLIC,16);
   while (hash_outputs_string.length() < 64) {
     hash_outputs_string = '0' + hash_outputs_string;
@@ -231,14 +232,14 @@ void run_secure_bitcoin() {
     merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, 
     merch_pubkey_hash_d, escrow_digest, merch_digest);
   
-  Integer escrow_hash = composeSHA256result(escrow_digest);
+  Integer escrow_hash = composeSHA256result(escrow_digest, thirtytwo);
   string escrow_res = escrow_hash.reveal_unsigned(PUBLIC,16);
   while (escrow_res.length() < 64) {
     escrow_res = '0' + escrow_res;
   }
   boost::algorithm::to_lower(escrow_res);
 
-  Integer merch_hash = composeSHA256result(merch_digest);
+  Integer merch_hash = composeSHA256result(merch_digest, thirtytwo);
   string merch_res = merch_hash.reveal_unsigned(PUBLIC,16);
   while (merch_res.length() < 64) {
     merch_res = '0' + merch_res;
