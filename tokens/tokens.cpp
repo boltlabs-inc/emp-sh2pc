@@ -111,8 +111,9 @@ void issue_tokens(
   EcdsaSig_l* ct_escrow,
   EcdsaSig_l* ct_merch
   ) {
-
+#if defined(DEBUG)
   cout << "issuing tokens" << endl;
+#endif
 
   State_d old_state_d = distribute_State(old_state_l, CUST);
   State_d new_state_d = distribute_State(new_state_l, CUST);
@@ -211,20 +212,24 @@ void issue_tokens(
 
   Integer(8186, 0, MERCH);
 
+#if defined(DEBUG)
   cout << "distributed everything. verifying token sig" << endl;
-  // check old pay token
+#endif
+// check old pay token
 //  verify_token_sig(hmac_key_commitment_d, hmac_commitment_randomness_d, hmac_key_d, old_state_d, old_paytoken_d, ipad, xeight, threeazero, opad, threehundred, sixforty, zero, k, H);
   Bit error_signal = verify_token_sig(hmac_key_commitment_d, hmac_commitment_randomness_d, hmac_key_d, old_state_d, old_paytoken_d, ipad, xeight, threeazero, opad, threehundred, sixforty, zero, k, H);
 
-  // make sure wallets are well-formed
-  // TODO: change name (state, not wallet)
-  cout << "comparing wallets" << endl;
-  error_signal = (error_signal | compare_wallets(old_state_d, new_state_d, rlc_d, revlock_commitment_randomness_d, nonce_d, epsilon_d, k, H, xeight, zero, threeeightfour));
-//  compare_wallets(old_state_d, new_state_d, rlc_d, revlock_commitment_randomness_d, nonce_d, epsilon_d, k, H, xeight, zero, threeeightfour);
+  // make sure old/new state are well-formed
+#if defined(DEBUG)
+  cout << "comparing old to new state" << endl;
+#endif
+  error_signal = (error_signal | compare_states(old_state_d, new_state_d, rlc_d, revlock_commitment_randomness_d, nonce_d, epsilon_d, k, H, xeight, zero, threeeightfour));
+//  compare_states(old_state_d, new_state_d, rlc_d, revlock_commitment_randomness_d, nonce_d, epsilon_d, k, H, xeight, zero, threeeightfour);
 
   // constructs new close transactions and computes hash
+#if defined(DEBUG)
   cout << "hashing transactions" << endl;
-
+#endif
   Integer escrow_digest[8];
   Integer merch_digest[8];
 
@@ -235,14 +240,18 @@ void issue_tokens(
 
   // we should return into these txserialized_d or hash 
 
-  // sign new close transactions 
+  // sign new close transactions
+#if defined(DEBUG)
   cout << "signing transactions" << endl;
+#endif
 
   Integer signed_merch_tx = ecdsa_sign_hashed(merch_digest, epsd1, thirtytwo, q, q2);
   Integer signed_escrow_tx = ecdsa_sign_hashed(escrow_digest, epsd2, thirtytwo, q, q2);
 
   // sign new pay token
+#if defined(DEBUG)
   cout << "signing token" << endl;
+#endif
   PayToken_d new_paytoken_d = sign_token(new_state_d, hmac_key_d, ipad, xeight, threeazero, opad, threehundred, zero, k, H);
 
   // Transform the signed_merch_tx into the correct format --> array of 8 32bit uints
@@ -253,19 +262,27 @@ void issue_tokens(
   bigint_into_smallint_array(signed_escrow_tx_parsed.sig, signed_escrow_tx, fullF);
 
   // mask pay and close tokens
+#if defined(DEBUG)
   cout << "masking pay token" << endl;
+#endif
   error_signal = ( error_signal | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d, paytoken_mask_commitment_randomness_d, k, H, xeight, zero, threeeightfour)); // pay token
 //  mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d, paytoken_mask_commitment_randomness_d, k, H, xeight, zero, threeeightfour); // pay token
 
+#if defined(DEBUG)
   cout << "masking close merch token" << endl;
+#endif
   mask_closetoken(signed_merch_tx_parsed.sig, merch_mask_d); // close token - merchant close
 
+#if defined(DEBUG)
   cout << "masking close escrow token" << endl;
+#endif
   mask_closetoken(signed_escrow_tx_parsed.sig, escrow_mask_d); // close token - escrow close
 
   // handle errors
-  // If there has been an error, we need to destroy the token values. 
+  // If there has been an error, we need to destroy the token values.
+#if defined(DEBUG)
   cout << "handling errors" << endl;
+#endif
   for(int i=0; i<8; i++) {
     new_paytoken_d.paytoken[i] = handle_error_case(new_paytoken_d.paytoken[i], error_signal);
   }
@@ -384,11 +401,12 @@ issue_tokens(
   ct_escrow,
   ct_merch
   );
-
+#if defined(DEBUG)
   cout << "customer finished!" << endl;
-
+#endif
   if (io1 != nullptr) delete io1;
   if (io2 != nullptr) delete io2;
+  if (io3 != nullptr) delete io3;
 }
 
 void build_masked_tokens_merch(IOCallback io_callback,
@@ -486,8 +504,9 @@ issue_tokens(
   &ct_merch
   );
 
+#if defined(DEBUG)
   cout << "merchant finished!" << endl;
-
+#endif
   if (io1 != nullptr) delete io1;
   if (io2 != nullptr) delete io2;
   if (io3 != nullptr) delete io3;
@@ -553,7 +572,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
 }
 
 // make sure wallets are well-formed
-Bit compare_wallets(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d revlock_commitment_randomness_d, Nonce_d nonce_d, Balance_d epsilon_d, Integer k[64], Integer H[8], Integer xeight, Integer zero, Integer threeeightfour) {
+Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d revlock_commitment_randomness_d, Nonce_d nonce_d, Balance_d epsilon_d, Integer k[64], Integer H[8], Integer xeight, Integer zero, Integer threeeightfour) {
 
   //Make sure the fields are all correct
   Bit b; // TODO initialize to 0
