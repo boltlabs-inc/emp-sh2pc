@@ -23,12 +23,12 @@ uint ROR32(uint x, uint n) {
 }
 
 
-void initSHA256(Integer k[64], Integer H[8]) {
+void initSHA256(Integer k[64], Integer H[8], const int party) {
   for(int i=0; i<64; i++) {
-    k[i] = Integer(BITS, k_clear[i], CUST);
+    k[i] = Integer(BITS, k_clear[i], party);
   }
   for(int i=0; i<8; i++) {
-    H[i] = Integer(BITS, IV_clear[i], CUST);
+    H[i] = Integer(BITS, IV_clear[i], party);
   }
 }
 
@@ -117,7 +117,7 @@ void computeSHA256_2l(uint message[2][16], Integer result[8]) {
     }
   }
 
-  initSHA256(k, H);
+  initSHA256(k, H, CUST);
 
   for (int i=0; i<BLOCKS; i++) {
     computeInnerHashBlock(k, H, w[i]);
@@ -139,7 +139,7 @@ void computeSHA256_1d(Integer message[1][16], Integer result[8]) {
   // initialize constants and initial hash digest value
   Integer k[64];
   Integer H[8];
-  initSHA256(k, H);
+  initSHA256(k, H, CUST);
   computeSHA256_1d_noinit(message, result, k, H);
 }
 
@@ -171,7 +171,7 @@ void computeSHA256_2d(Integer message[2][16], Integer result[8]) {
   // initialize constants and initial hash digest value
   Integer k[64];
   Integer H[8];
-  initSHA256(k, H);
+  initSHA256(k, H, CUST);
   computeSHA256_2d_noinit(message, result, k, H);
 }
 
@@ -216,7 +216,7 @@ void computeSHA256_3d(Integer message[3][16], Integer result[8]) {
     }
   }
 
-  initSHA256(k, H);
+  initSHA256(k, H, CUST);
 
   for (int i=0; i<3; i++) {
     computeInnerHashBlock(k, H, w[i]);
@@ -239,7 +239,7 @@ void computeSHA256_4d(Integer message[4][16], Integer result[8]) {
     }
   }
 
-  initSHA256(k, H);
+  initSHA256(k, H, CUST);
 
   for (int i=0; i<4; i++) {
     computeInnerHashBlock(k, H, w[i]);
@@ -254,7 +254,7 @@ void computeSHA256_5d(Integer message[5][16], Integer result[8]) {
   // initialize constants and initial hash digest value
   Integer k[64];
   Integer H[8];
-  initSHA256(k, H);
+  initSHA256(k, H, CUST);
   computeSHA256_5d_noinit(message, result, k, H);
 }
 
@@ -287,7 +287,7 @@ void computeDoubleSHA256_3d(Integer message[3][16], Integer result[8]) {
   // initialize constants and initial hash digest value
   Integer k[64];
   Integer H[8];
-  initSHA256(k, H);
+  initSHA256(k, H, CUST);
   Integer xeight(32, 2147483648/*0x80000000*/, PUBLIC);
   Integer twofivesix(32, 256, PUBLIC);
   Integer zero(32, 0, PUBLIC);
@@ -341,7 +341,7 @@ void computeDoubleSHA256_4d(Integer message[4][16], Integer result[8]/*, Integer
   // initialize constants and initial hash digest value
   Integer k[64];
   Integer H[8];
-  initSHA256(k, H);
+  initSHA256(k, H, CUST);
   Integer xeight(32, 2147483648/*0x80000000*/, PUBLIC);
   Integer twofivesix(32, 256, PUBLIC);
   Integer zero(32, 0, PUBLIC);
@@ -390,7 +390,7 @@ void computeDoubleSHA256_5d(Integer message[5][16], Integer result[8]/*, Integer
   // initialize constants and initial hash digest value
   Integer k[64];
   Integer H[8];
-  initSHA256(k, H);
+  initSHA256(k, H, CUST);
   Integer xeight(32, 2147483648/*0x80000000*/, PUBLIC);
   Integer twofivesix(32, 256, PUBLIC);
   Integer zero(32, 0, PUBLIC);

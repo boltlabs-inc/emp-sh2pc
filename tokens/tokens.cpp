@@ -122,6 +122,7 @@ void issue_tokens(
   BitcoinPublicKey_d cust_payout_pub_key_d = distribute_BitcoinPublicKey(cust_payout_pub_key_l, CUST);
   CommitmentRandomness_d revlock_commitment_randomness_d = distribute_CommitmentRandomness(revlock_commitment_randomness_l, CUST);
 
+  // PUBLIC values
   Balance_d epsilon_d = distribute_Balance(epsilon_l, CUST); // IVE BEEN TREATING THIS LIKE A 32 BIT VALUE, BUT ITS 64
   HMACKeyCommitment_d hmac_key_commitment_d = distribute_HMACKeyCommitment(hmac_key_commitment_l, CUST);
   MaskCommitment_d paytoken_mask_commitment_d = distribute_MaskCommitment(paytoken_mask_commitment_l, CUST);
@@ -144,7 +145,7 @@ void issue_tokens(
 
   Integer k[64];
   Integer H[8];
-  initSHA256(k, H);
+  initSHA256(k, H, CUST);
 
   xsixthreedot = Integer(32, 1671962624 /*0x63a92000*/, CUST);
   eighteight = Integer(32, 136 /*0x00000088*/, CUST);
@@ -197,9 +198,9 @@ void issue_tokens(
   string qstr = "115792089237316195423570985008687907852837564279074904382605163141518161494337";
   Integer q(258, qstr, CUST);
 
-
   Integer zero(32, 0, CUST);
 
+  //MERCH input
   HMACKey_d hmac_key_d = distribute_HMACKey(hmac_key_l, MERCH);
   Mask_d paytoken_mask_d = distribute_Mask(paytoken_mask_l, MERCH);
   Mask_d merch_mask_d = distribute_Mask(merch_mask_l, MERCH);
@@ -210,14 +211,188 @@ void issue_tokens(
   EcdsaPartialSig_d epsd1 = distribute_EcdsaPartialSig(sig1);
   EcdsaPartialSig_d epsd2 = distribute_EcdsaPartialSig(sig2);
 
-  Integer(8186, 0, MERCH);
+  //PUBLIC values
+  Balance_d epsilon_d_merch = distribute_Balance(epsilon_l, MERCH); // IVE BEEN TREATING THIS LIKE A 32 BIT VALUE, BUT ITS 64
+  HMACKeyCommitment_d hmac_key_commitment_d_merch = distribute_HMACKeyCommitment(hmac_key_commitment_l, MERCH);
+  MaskCommitment_d paytoken_mask_commitment_d_merch = distribute_MaskCommitment(paytoken_mask_commitment_l, MERCH);
+  RevLockCommitment_d rlc_d_merch = distribute_RevLockCommitment(rlc_l, MERCH);
+  Nonce_d nonce_d_merch = distribute_Nonce(nonce_l, MERCH);
+  BitcoinPublicKey_d merch_escrow_pub_key_d_merch = distribute_BitcoinPublicKey(merch_escrow_pub_key_l, MERCH);
+  BitcoinPublicKey_d merch_dispute_key_d_merch = distribute_BitcoinPublicKey(merch_dispute_key_l, MERCH);
+  BitcoinPublicKey_d merch_payout_pub_key_d_merch = distribute_BitcoinPublicKey(merch_payout_pub_key_l, MERCH);
+  PublicKeyHash_d merch_publickey_hash_d_merch = distribute_PublicKeyHash(merch_publickey_hash_l, MERCH);
+  //Hardcoded values
+  Integer ipad_merch(32, 909522486, MERCH);
+  Integer xeight_merch(32, -2147483648, MERCH); //0x80000000;
+  Integer threeazero_merch(32, 2048, MERCH); //0x000003a0;
+  Integer opad_merch(32, 1549556828, MERCH);
+  Integer threehundred_merch(32, 768, MERCH); //0x00000300;
+  Integer sixforty_merch(32, 640, MERCH);
+  Integer fullF_merch(256, 4294967295 /* 0xffffffff */, MERCH);
+  Integer twofivesix_merch(32, 256, MERCH);
+  Integer threeeightfour_merch(32, 384, MERCH);
+  
+  Integer k_merch[64];
+  Integer H_merch[8];
+  initSHA256(k_merch, H_merch, MERCH);
+  
+  Integer xsixthreedot_merch = Integer(32, 1671962624 /*0x63a92000*/, MERCH);
+  Integer eighteight_merch = Integer(32, 136 /*0x00000088*/, MERCH);
+  Integer xtwentyone_merch = Integer(32, 553648128, MERCH);
+  Integer sixsevenzero_merch = Integer(32, 26368/*0x00006700*/, MERCH);
+  Integer twohundred_merch = Integer(32,2 /*0x000002*/, MERCH);
+  Integer xcfzerofive_merch = Integer(32, 3473211392 /*0xcf050000*/, MERCH);
+  Integer btwosevenfive_merch = Integer(32, 45685/*0x0000b275*/, MERCH);
+  Integer eightninesix_merch = Integer(32, 896, MERCH);
+  Integer sixeightac_merch = Integer(32, 26796/*0x000068ac*/, MERCH);
+  Integer xtwentytwodot_merch = Integer(32, 570433536 /*0x22002000*/, MERCH);
+  Integer sixteen_merch = Integer(32, 22 /*0x00000016*/, MERCH);
+  Integer xzerozerofourteen_merch = Integer(32, 1310720 /*0x00140000*/, MERCH);
+  Integer threesevensixa_merch = Integer(32, 17258/*0x0000376a*/, MERCH);
+  Integer xfourtyone_merch = Integer(32, 1090519040/*0x41000000*/, MERCH);
+  Integer eightthousand_merch = Integer(32,32768 /*0x00008000*/, MERCH);
+  Integer twelvehundred_merch = Integer(32, 1200, MERCH);
+  Integer xzerotwo_merch = Integer(32, 33554432 /*0x02000000*/, MERCH);
+  Integer xthreedot_merch = Integer(32, 1001467945  /*0x3bb13029*/, MERCH);
+  Integer xcdot_merch = Integer(32, 3464175445 /*0xce7b1f55*/, MERCH);
+  Integer xninedot_merch = Integer(32, 2666915655 /*0x9ef5e747*/, MERCH);
+  Integer xfdot_merch = Integer(32, 4239147935 /*0xfcac439f*/, MERCH);
+  Integer xfourteendot_merch = Integer(32,  341156588 /*0x1455a2ec*/, MERCH);
+  Integer xsevendot_merch = Integer(32, 2086603191 /*0x7c5f09b7*/, MERCH);
+  Integer xtwentytwoninedot_merch = Integer(32,  579893598 /*0x2290795e*/, MERCH);
+  Integer xsevenzerosixdot_merch = Integer(32, 1885753412  /*0x70665044*/, MERCH);
+  Integer xfoursevenfivedot_merch = Integer(32, 1196564736/*0x47522100*/, MERCH);
+  Integer fivetwoae_merch = Integer(32, 21166/*0x000052ae*/, MERCH);
+  Integer fullFthirtytwo_merch = Integer(32, 4294967295 /*0xffffffff*/, MERCH);
+  Integer xzeroone_merch = Integer(32, 16777216 /*0x01000000*/, MERCH);
+  Integer oneeighttwofour_merch = Integer(32, 1824, MERCH); // 228*8 = 1824 bits
+  Integer xseventwosixdot_merch = Integer(32, 1919111713 /* 0x72635221*/, MERCH);
+  Integer xzerozerotwentyone_merch = Integer(32, 2162688 /*0x00210000*/, MERCH);
+  Integer fiftytwo_merch = Integer(32, 82/*0x00000052*/, MERCH);
+  Integer xaedot_merch = Integer(32, 2925986511 /* 0xae6702cf */, MERCH);
+  Integer xzerofivedot_merch = Integer(32,   95581473 /* 0x05b27521 */, MERCH);
+  Integer acsixeightzerozero_merch = Integer(32, 11298816/* 0x00ac6800 */, MERCH);
+  Integer ff_merch = Integer(32, 255 /* 0x000000ff */ , MERCH);
+  Integer ffffffzerozero_merch = Integer(32, 4294967040 /*0xffffff00*/, MERCH);
+  Integer one_merch = Integer(32, 1 /*0x00000001*/, MERCH);
+  Integer eighty_merch = Integer(32, 128 /*0x00000080*/, MERCH);
+  Integer twoonesixeight_merch = Integer(32, 2168, MERCH); // 271*8 = 2168 bits
+
+  Integer xzerozeroff_merch = Integer(32, 16711680 /* 00ff0000 */, MERCH);
+  Integer ffzerozero_merch = Integer(32, 65280 /* 0000ff00 */, MERCH);
+  Integer thirtytwo_merch = Integer(256, 32, MERCH);
+  
+  Integer q2_merch(516, q2str, MERCH);
+  Integer q_merch(258, qstr, MERCH);
+
+  Integer zero_merch(32, 0, MERCH);
+
+  Integer(948, 0, MERCH); //Fix for different number of input wires between parties
+
+  //Compare public inputs + constants to be the same between CUST and MERCH
+  Bit error_signal(false);
+  for (int i=0; i<2; ++i) {
+    error_signal = error_signal | !epsilon_d.balance[i].equal(epsilon_d_merch.balance[i]);
+  }
+  for (int i=0; i<8; ++i) {
+    error_signal = error_signal | !hmac_key_commitment_d.commitment[i].equal(hmac_key_commitment_d_merch.commitment[i]);
+  }
+  for (int i=0; i<8; ++i) {
+    error_signal = error_signal | !paytoken_mask_commitment_d.commitment[i].equal(paytoken_mask_commitment_d_merch.commitment[i]);
+  }
+  for (int i=0; i<8; ++i) {
+    error_signal = error_signal | !rlc_d.commitment[i].equal(rlc_d_merch.commitment[i]);
+  }
+  for (int i=0; i<4; ++i) {
+    error_signal = error_signal | !nonce_d.nonce[i].equal(nonce_d_merch.nonce[i]);
+  }
+  for (int i=0; i<9; ++i) {
+    error_signal = error_signal | !merch_escrow_pub_key_d.key[i].equal(merch_escrow_pub_key_d_merch.key[i]);
+  }
+  for (int i=0; i<9; ++i) {
+    error_signal = error_signal | !merch_dispute_key_d.key[i].equal(merch_dispute_key_d_merch.key[i]);
+  }
+  for (int i=0; i<9; ++i) {
+    error_signal = error_signal | !merch_payout_pub_key_d.key[i].equal(merch_payout_pub_key_d_merch.key[i]);
+  }
+  for (int i=0; i<5; ++i) {
+    error_signal = error_signal | !merch_publickey_hash_d.hash[i].equal(merch_publickey_hash_d_merch.hash[i]);
+  }
+
+  error_signal = error_signal | !ipad.equal(ipad_merch);
+  error_signal = error_signal | !xeight.equal(xeight_merch);
+  error_signal = error_signal | !threeazero.equal(threeazero_merch);
+  error_signal = error_signal | !opad.equal(opad_merch);
+  error_signal = error_signal | !threehundred.equal(threehundred_merch);
+  error_signal = error_signal | !sixforty.equal(sixforty_merch);
+  error_signal = error_signal | !fullF.equal(fullF_merch);
+  error_signal = error_signal | !twofivesix.equal(twofivesix_merch);
+  error_signal = error_signal | !threeeightfour.equal(threeeightfour_merch);
+
+  for (int i=0; i<64; ++i) {
+    error_signal = error_signal | !k[i].equal(k_merch[i]);
+  }
+  for (int i=0; i<8; ++i) {
+    error_signal = error_signal | !H[i].equal(H_merch[i]);
+  }
+
+  error_signal = error_signal | !xsixthreedot.equal(xsixthreedot_merch);
+  error_signal = error_signal | !eighteight.equal(eighteight_merch);
+  error_signal = error_signal | !xtwentyone.equal(xtwentyone_merch);
+  error_signal = error_signal | !sixsevenzero.equal(sixsevenzero_merch);
+  error_signal = error_signal | !twohundred.equal(twohundred_merch);
+  error_signal = error_signal | !xcfzerofive.equal(xcfzerofive_merch);
+  error_signal = error_signal | !btwosevenfive.equal(btwosevenfive_merch);
+  error_signal = error_signal | !eightninesix.equal(eightninesix_merch);
+  error_signal = error_signal | !sixeightac.equal(sixeightac_merch);
+  error_signal = error_signal | !xtwentytwodot.equal(xtwentytwodot_merch);
+  error_signal = error_signal | !sixteen.equal(sixteen_merch);
+  error_signal = error_signal | !xzerozerofourteen.equal(xzerozerofourteen_merch);
+  error_signal = error_signal | !threesevensixa.equal(threesevensixa_merch);
+  error_signal = error_signal | !xfourtyone.equal(xfourtyone_merch);
+  error_signal = error_signal | !eightthousand.equal(eightthousand_merch);
+  error_signal = error_signal | !twelvehundred.equal(twelvehundred_merch);
+  error_signal = error_signal | !xzerotwo.equal(xzerotwo_merch);
+  error_signal = error_signal | !xthreedot.equal(xthreedot_merch);
+  error_signal = error_signal | !xcdot.equal(xcdot_merch);
+  error_signal = error_signal | !xninedot.equal(xninedot_merch);
+  error_signal = error_signal | !xfdot.equal(xfdot_merch);
+  error_signal = error_signal | !xfourteendot.equal(xfourteendot_merch);
+  error_signal = error_signal | !xsevendot.equal(xsevendot_merch);
+  error_signal = error_signal | !xtwentytwoninedot.equal(xtwentytwoninedot_merch);
+  error_signal = error_signal | !xsevenzerosixdot.equal(xsevenzerosixdot_merch);
+  error_signal = error_signal | !xfoursevenfivedot.equal(xfoursevenfivedot_merch);
+  error_signal = error_signal | !fivetwoae.equal(fivetwoae_merch);
+  error_signal = error_signal | !fullFthirtytwo.equal(fullFthirtytwo_merch);
+  error_signal = error_signal | !xzeroone.equal(xzeroone_merch);
+  error_signal = error_signal | !oneeighttwofour.equal(oneeighttwofour_merch);
+  error_signal = error_signal | !xseventwosixdot.equal(xseventwosixdot_merch);
+  error_signal = error_signal | !xzerozerotwentyone.equal(xzerozerotwentyone_merch);
+  error_signal = error_signal | !fiftytwo.equal(fiftytwo_merch);
+  error_signal = error_signal | !xaedot.equal(xaedot_merch);
+  error_signal = error_signal | !xzerofivedot.equal(xzerofivedot_merch);
+  error_signal = error_signal | !acsixeightzerozero.equal(acsixeightzerozero_merch);
+  error_signal = error_signal | !ff.equal(ff_merch);
+  error_signal = error_signal | !ffffffzerozero.equal(ffffffzerozero_merch);
+  error_signal = error_signal | !one.equal(one_merch);
+  error_signal = error_signal | !eighty.equal(eighty_merch);
+  error_signal = error_signal | !twoonesixeight.equal(twoonesixeight_merch);
+  
+  error_signal = error_signal | !xzerozeroff.equal(xzerozeroff_merch);
+  error_signal = error_signal | !ffzerozero.equal(ffzerozero_merch);
+  error_signal = error_signal | !thirtytwo.equal(thirtytwo_merch);
+
+  error_signal = error_signal | !q2.equal(q2_merch);
+  error_signal = error_signal | !q.equal(q_merch);
+  
+  error_signal = error_signal | !zero.equal(zero_merch);
 
 #if defined(DEBUG)
   cout << "distributed everything. verifying token sig" << endl;
 #endif
 // check old pay token
 //  verify_token_sig(hmac_key_commitment_d, hmac_commitment_randomness_d, hmac_key_d, old_state_d, old_paytoken_d, ipad, xeight, threeazero, opad, threehundred, sixforty, zero, k, H);
-  Bit error_signal = verify_token_sig(hmac_key_commitment_d, hmac_commitment_randomness_d, hmac_key_d, old_state_d, old_paytoken_d, ipad, xeight, threeazero, opad, threehundred, sixforty, zero, k, H);
+  error_signal = error_signal | verify_token_sig(hmac_key_commitment_d, hmac_commitment_randomness_d, hmac_key_d, old_state_d, old_paytoken_d, ipad, xeight, threeazero, opad, threehundred, sixforty, zero, k, H);
 
   // make sure old/new state are well-formed
 #if defined(DEBUG)

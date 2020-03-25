@@ -55,7 +55,7 @@ static const uint32_t IV_clear[8] = {
 };
 
 
-void initSHA256(Integer k[64], Integer H[8]); 
+void initSHA256(Integer k[64], Integer H[8], const int party=CUST);
 string get_bitstring(Integer x);
 Integer composeSHA256result(Integer result[8], Integer thirtytwo);
 
