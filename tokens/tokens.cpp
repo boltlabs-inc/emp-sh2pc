@@ -3,6 +3,7 @@
 #include "ecdsa.h"
 #include "hmac.h"
 #include "sha256.h"
+#include "constants.h"
 #include "emp-sh2pc/emp-sh2pc.h"
 #include <memory>
 
@@ -10,51 +11,6 @@
 #define CUST BOB
 
 using namespace emp;
-
-Integer xsixthreedot;
-Integer eighteight;
-Integer xtwentyone;
-Integer sixsevenzero;
-Integer twohundred;
-Integer xcfzerofive;
-Integer btwosevenfive;
-Integer eightninesix;
-Integer sixeightac;
-Integer xtwentytwodot;
-Integer sixteen;
-Integer xzerozerofourteen;
-Integer threesevensixa;
-Integer xfourtyone;
-Integer eightthousand;
-Integer twelvehundred;
-Integer xzerotwo;
-Integer xthreedot;
-Integer xcdot;
-Integer xninedot;
-Integer xfdot;
-Integer xfourteendot;
-Integer xsevendot;
-Integer xtwentytwoninedot;
-Integer xsevenzerosixdot ;
-Integer xfoursevenfivedot;
-Integer fivetwoae;
-Integer fullFthirtytwo;
-Integer xzeroone;
-Integer oneeighttwofour; // 228*8 = 1824 bits
-Integer xseventwosixdot;
-Integer xzerozerotwentyone;
-Integer fiftytwo;
-Integer xaedot;
-Integer xzerofivedot;
-Integer acsixeightzerozero;
-Integer ff;
-Integer ffffffzerozero;
-Integer one;
-Integer eighty;
-Integer twoonesixeight; // 271*8 = 2168 bits
-Integer xzerozeroff;
-Integer ffzerozero;
-Integer thirtytwo;
 
 void* get_netio_ptr(char *address, int port, int party) {
     char *address_ptr = (party == MERCH) ? nullptr : address;
@@ -133,72 +89,13 @@ void issue_tokens(
   BitcoinPublicKey_d merch_payout_pub_key_d = distribute_BitcoinPublicKey(merch_payout_pub_key_l, CUST);
   PublicKeyHash_d merch_publickey_hash_d = distribute_PublicKeyHash(merch_publickey_hash_l, CUST);
   //Hardcoded values
-  Integer ipad(32, 909522486, CUST);
-  Integer xeight(32, -2147483648, CUST); //0x80000000;
-  Integer threeazero(32, 2048, CUST); //0x000003a0;
-  Integer opad(32, 1549556828, CUST);
-  Integer threehundred(32, 768, CUST); //0x00000300;
-  Integer sixforty(32, 640, CUST);
-  Integer fullF(256, 4294967295 /* 0xffffffff */, CUST);
-  Integer twofivesix(32, 256, CUST);
-  Integer threeeightfour(32, 384, CUST);
+  Constants constants = distribute_Constants(CUST);
 
   Integer k[64];
   Integer H[8];
   initSHA256(k, H, CUST);
 
-  xsixthreedot = Integer(32, 1671962624 /*0x63a92000*/, CUST);
-  eighteight = Integer(32, 136 /*0x00000088*/, CUST);
-  xtwentyone = Integer(32, 553648128, CUST);
-  sixsevenzero = Integer(32, 26368/*0x00006700*/, CUST);
-  twohundred = Integer(32,2 /*0x000002*/, CUST);
-  xcfzerofive = Integer(32, 3473211392 /*0xcf050000*/, CUST);
-  btwosevenfive = Integer(32, 45685/*0x0000b275*/, CUST);
-  eightninesix = Integer(32, 896, CUST);
-  sixeightac = Integer(32, 26796/*0x000068ac*/, CUST);
-  xtwentytwodot = Integer(32, 570433536 /*0x22002000*/, CUST);
-  sixteen = Integer(32, 22 /*0x00000016*/, CUST);
-  xzerozerofourteen = Integer(32, 1310720 /*0x00140000*/, CUST);
-  threesevensixa = Integer(32, 17258/*0x0000376a*/, CUST);
-  xfourtyone = Integer(32, 1090519040/*0x41000000*/, CUST);
-  eightthousand = Integer(32,32768 /*0x00008000*/, CUST);
-  twelvehundred = Integer(32, 1200, CUST);
-  xzerotwo = Integer(32, 33554432 /*0x02000000*/, CUST);
-  xthreedot = Integer(32, 1001467945  /*0x3bb13029*/, CUST);
-  xcdot = Integer(32, 3464175445 /*0xce7b1f55*/, CUST);
-  xninedot = Integer(32, 2666915655 /*0x9ef5e747*/, CUST);
-  xfdot = Integer(32, 4239147935 /*0xfcac439f*/, CUST);
-  xfourteendot = Integer(32,  341156588 /*0x1455a2ec*/, CUST);
-  xsevendot = Integer(32, 2086603191 /*0x7c5f09b7*/, CUST);
-  xtwentytwoninedot = Integer(32,  579893598 /*0x2290795e*/, CUST);
-  xsevenzerosixdot  = Integer(32, 1885753412  /*0x70665044*/, CUST);
-  xfoursevenfivedot = Integer(32, 1196564736/*0x47522100*/, CUST);
-  fivetwoae = Integer(32, 21166/*0x000052ae*/, CUST);
-  fullFthirtytwo = Integer(32, 4294967295 /*0xffffffff*/, CUST);
-  xzeroone = Integer(32, 16777216 /*0x01000000*/, CUST);
-  oneeighttwofour = Integer(32, 1824, CUST); // 228*8 = 1824 bits
-  xseventwosixdot = Integer(32, 1919111713 /* 0x72635221*/, CUST);
-  xzerozerotwentyone = Integer(32, 2162688 /*0x00210000*/, CUST);
-  fiftytwo = Integer(32, 82/*0x00000052*/, CUST);
-  xaedot = Integer(32, 2925986511 /* 0xae6702cf */, CUST);
-  xzerofivedot = Integer(32,   95581473 /* 0x05b27521 */, CUST);
-  acsixeightzerozero = Integer(32, 11298816/* 0x00ac6800 */, CUST);
-  ff = Integer(32, 255 /* 0x000000ff */ , CUST);
-  ffffffzerozero = Integer(32, 4294967040 /*0xffffff00*/, CUST);
-  one = Integer(32, 1 /*0x00000001*/, CUST);
-  eighty = Integer(32, 128 /*0x00000080*/, CUST);
-  twoonesixeight = Integer(32, 2168, CUST); // 271*8 = 2168 bits
-
-  xzerozeroff = Integer(32, 16711680 /* 00ff0000 */, CUST);
-  ffzerozero = Integer(32, 65280 /* 0000ff00 */, CUST);
-  thirtytwo = Integer(256, 32, CUST);
-
-  string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
-  Integer q2(516, q2str, CUST);
-  string qstr = "115792089237316195423570985008687907852837564279074904382605163141518161494337";
-  Integer q(258, qstr, CUST);
-
-  Integer zero(32, 0, CUST);
+  Q qs = distribute_Q(CUST);
 
   //MERCH input
   HMACKey_d hmac_key_d = distribute_HMACKey(hmac_key_l, MERCH);
@@ -222,183 +119,36 @@ void issue_tokens(
   BitcoinPublicKey_d merch_payout_pub_key_d_merch = distribute_BitcoinPublicKey(merch_payout_pub_key_l, MERCH);
   PublicKeyHash_d merch_publickey_hash_d_merch = distribute_PublicKeyHash(merch_publickey_hash_l, MERCH);
   //Hardcoded values
-  Integer ipad_merch(32, 909522486, MERCH);
-  Integer xeight_merch(32, -2147483648, MERCH); //0x80000000;
-  Integer threeazero_merch(32, 2048, MERCH); //0x000003a0;
-  Integer opad_merch(32, 1549556828, MERCH);
-  Integer threehundred_merch(32, 768, MERCH); //0x00000300;
-  Integer sixforty_merch(32, 640, MERCH);
-  Integer fullF_merch(256, 4294967295 /* 0xffffffff */, MERCH);
-  Integer twofivesix_merch(32, 256, MERCH);
-  Integer threeeightfour_merch(32, 384, MERCH);
-  
+  Constants constants_merch = distribute_Constants(MERCH);
+
   Integer k_merch[64];
   Integer H_merch[8];
   initSHA256(k_merch, H_merch, MERCH);
   
-  Integer xsixthreedot_merch = Integer(32, 1671962624 /*0x63a92000*/, MERCH);
-  Integer eighteight_merch = Integer(32, 136 /*0x00000088*/, MERCH);
-  Integer xtwentyone_merch = Integer(32, 553648128, MERCH);
-  Integer sixsevenzero_merch = Integer(32, 26368/*0x00006700*/, MERCH);
-  Integer twohundred_merch = Integer(32,2 /*0x000002*/, MERCH);
-  Integer xcfzerofive_merch = Integer(32, 3473211392 /*0xcf050000*/, MERCH);
-  Integer btwosevenfive_merch = Integer(32, 45685/*0x0000b275*/, MERCH);
-  Integer eightninesix_merch = Integer(32, 896, MERCH);
-  Integer sixeightac_merch = Integer(32, 26796/*0x000068ac*/, MERCH);
-  Integer xtwentytwodot_merch = Integer(32, 570433536 /*0x22002000*/, MERCH);
-  Integer sixteen_merch = Integer(32, 22 /*0x00000016*/, MERCH);
-  Integer xzerozerofourteen_merch = Integer(32, 1310720 /*0x00140000*/, MERCH);
-  Integer threesevensixa_merch = Integer(32, 17258/*0x0000376a*/, MERCH);
-  Integer xfourtyone_merch = Integer(32, 1090519040/*0x41000000*/, MERCH);
-  Integer eightthousand_merch = Integer(32,32768 /*0x00008000*/, MERCH);
-  Integer twelvehundred_merch = Integer(32, 1200, MERCH);
-  Integer xzerotwo_merch = Integer(32, 33554432 /*0x02000000*/, MERCH);
-  Integer xthreedot_merch = Integer(32, 1001467945  /*0x3bb13029*/, MERCH);
-  Integer xcdot_merch = Integer(32, 3464175445 /*0xce7b1f55*/, MERCH);
-  Integer xninedot_merch = Integer(32, 2666915655 /*0x9ef5e747*/, MERCH);
-  Integer xfdot_merch = Integer(32, 4239147935 /*0xfcac439f*/, MERCH);
-  Integer xfourteendot_merch = Integer(32,  341156588 /*0x1455a2ec*/, MERCH);
-  Integer xsevendot_merch = Integer(32, 2086603191 /*0x7c5f09b7*/, MERCH);
-  Integer xtwentytwoninedot_merch = Integer(32,  579893598 /*0x2290795e*/, MERCH);
-  Integer xsevenzerosixdot_merch = Integer(32, 1885753412  /*0x70665044*/, MERCH);
-  Integer xfoursevenfivedot_merch = Integer(32, 1196564736/*0x47522100*/, MERCH);
-  Integer fivetwoae_merch = Integer(32, 21166/*0x000052ae*/, MERCH);
-  Integer fullFthirtytwo_merch = Integer(32, 4294967295 /*0xffffffff*/, MERCH);
-  Integer xzeroone_merch = Integer(32, 16777216 /*0x01000000*/, MERCH);
-  Integer oneeighttwofour_merch = Integer(32, 1824, MERCH); // 228*8 = 1824 bits
-  Integer xseventwosixdot_merch = Integer(32, 1919111713 /* 0x72635221*/, MERCH);
-  Integer xzerozerotwentyone_merch = Integer(32, 2162688 /*0x00210000*/, MERCH);
-  Integer fiftytwo_merch = Integer(32, 82/*0x00000052*/, MERCH);
-  Integer xaedot_merch = Integer(32, 2925986511 /* 0xae6702cf */, MERCH);
-  Integer xzerofivedot_merch = Integer(32,   95581473 /* 0x05b27521 */, MERCH);
-  Integer acsixeightzerozero_merch = Integer(32, 11298816/* 0x00ac6800 */, MERCH);
-  Integer ff_merch = Integer(32, 255 /* 0x000000ff */ , MERCH);
-  Integer ffffffzerozero_merch = Integer(32, 4294967040 /*0xffffff00*/, MERCH);
-  Integer one_merch = Integer(32, 1 /*0x00000001*/, MERCH);
-  Integer eighty_merch = Integer(32, 128 /*0x00000080*/, MERCH);
-  Integer twoonesixeight_merch = Integer(32, 2168, MERCH); // 271*8 = 2168 bits
-
-  Integer xzerozeroff_merch = Integer(32, 16711680 /* 00ff0000 */, MERCH);
-  Integer ffzerozero_merch = Integer(32, 65280 /* 0000ff00 */, MERCH);
-  Integer thirtytwo_merch = Integer(256, 32, MERCH);
-  
-  Integer q2_merch(516, q2str, MERCH);
-  Integer q_merch(258, qstr, MERCH);
-
-  Integer zero_merch(32, 0, MERCH);
+  Q qs_merch = distribute_Q(MERCH);
 
   Integer(948, 0, MERCH); //Fix for different number of input wires between parties
 
   //Compare public inputs + constants to be the same between CUST and MERCH
   Bit error_signal(false);
-  for (int i=0; i<2; ++i) {
-    error_signal = error_signal | !epsilon_d.balance[i].equal(epsilon_d_merch.balance[i]);
-  }
-  for (int i=0; i<8; ++i) {
-    error_signal = error_signal | !hmac_key_commitment_d.commitment[i].equal(hmac_key_commitment_d_merch.commitment[i]);
-  }
-  for (int i=0; i<8; ++i) {
-    error_signal = error_signal | !paytoken_mask_commitment_d.commitment[i].equal(paytoken_mask_commitment_d_merch.commitment[i]);
-  }
-  for (int i=0; i<8; ++i) {
-    error_signal = error_signal | !rlc_d.commitment[i].equal(rlc_d_merch.commitment[i]);
-  }
-  for (int i=0; i<4; ++i) {
-    error_signal = error_signal | !nonce_d.nonce[i].equal(nonce_d_merch.nonce[i]);
-  }
-  for (int i=0; i<9; ++i) {
-    error_signal = error_signal | !merch_escrow_pub_key_d.key[i].equal(merch_escrow_pub_key_d_merch.key[i]);
-  }
-  for (int i=0; i<9; ++i) {
-    error_signal = error_signal | !merch_dispute_key_d.key[i].equal(merch_dispute_key_d_merch.key[i]);
-  }
-  for (int i=0; i<9; ++i) {
-    error_signal = error_signal | !merch_payout_pub_key_d.key[i].equal(merch_payout_pub_key_d_merch.key[i]);
-  }
-  for (int i=0; i<5; ++i) {
-    error_signal = error_signal | !merch_publickey_hash_d.hash[i].equal(merch_publickey_hash_d_merch.hash[i]);
-  }
-
-  error_signal = error_signal | !ipad.equal(ipad_merch);
-  error_signal = error_signal | !xeight.equal(xeight_merch);
-  error_signal = error_signal | !threeazero.equal(threeazero_merch);
-  error_signal = error_signal | !opad.equal(opad_merch);
-  error_signal = error_signal | !threehundred.equal(threehundred_merch);
-  error_signal = error_signal | !sixforty.equal(sixforty_merch);
-  error_signal = error_signal | !fullF.equal(fullF_merch);
-  error_signal = error_signal | !twofivesix.equal(twofivesix_merch);
-  error_signal = error_signal | !threeeightfour.equal(threeeightfour_merch);
-
-  for (int i=0; i<64; ++i) {
-    error_signal = error_signal | !k[i].equal(k_merch[i]);
-  }
-  for (int i=0; i<8; ++i) {
-    error_signal = error_signal | !H[i].equal(H_merch[i]);
-  }
-
-  error_signal = error_signal | !xsixthreedot.equal(xsixthreedot_merch);
-  error_signal = error_signal | !eighteight.equal(eighteight_merch);
-  error_signal = error_signal | !xtwentyone.equal(xtwentyone_merch);
-  error_signal = error_signal | !sixsevenzero.equal(sixsevenzero_merch);
-  error_signal = error_signal | !twohundred.equal(twohundred_merch);
-  error_signal = error_signal | !xcfzerofive.equal(xcfzerofive_merch);
-  error_signal = error_signal | !btwosevenfive.equal(btwosevenfive_merch);
-  error_signal = error_signal | !eightninesix.equal(eightninesix_merch);
-  error_signal = error_signal | !sixeightac.equal(sixeightac_merch);
-  error_signal = error_signal | !xtwentytwodot.equal(xtwentytwodot_merch);
-  error_signal = error_signal | !sixteen.equal(sixteen_merch);
-  error_signal = error_signal | !xzerozerofourteen.equal(xzerozerofourteen_merch);
-  error_signal = error_signal | !threesevensixa.equal(threesevensixa_merch);
-  error_signal = error_signal | !xfourtyone.equal(xfourtyone_merch);
-  error_signal = error_signal | !eightthousand.equal(eightthousand_merch);
-  error_signal = error_signal | !twelvehundred.equal(twelvehundred_merch);
-  error_signal = error_signal | !xzerotwo.equal(xzerotwo_merch);
-  error_signal = error_signal | !xthreedot.equal(xthreedot_merch);
-  error_signal = error_signal | !xcdot.equal(xcdot_merch);
-  error_signal = error_signal | !xninedot.equal(xninedot_merch);
-  error_signal = error_signal | !xfdot.equal(xfdot_merch);
-  error_signal = error_signal | !xfourteendot.equal(xfourteendot_merch);
-  error_signal = error_signal | !xsevendot.equal(xsevendot_merch);
-  error_signal = error_signal | !xtwentytwoninedot.equal(xtwentytwoninedot_merch);
-  error_signal = error_signal | !xsevenzerosixdot.equal(xsevenzerosixdot_merch);
-  error_signal = error_signal | !xfoursevenfivedot.equal(xfoursevenfivedot_merch);
-  error_signal = error_signal | !fivetwoae.equal(fivetwoae_merch);
-  error_signal = error_signal | !fullFthirtytwo.equal(fullFthirtytwo_merch);
-  error_signal = error_signal | !xzeroone.equal(xzeroone_merch);
-  error_signal = error_signal | !oneeighttwofour.equal(oneeighttwofour_merch);
-  error_signal = error_signal | !xseventwosixdot.equal(xseventwosixdot_merch);
-  error_signal = error_signal | !xzerozerotwentyone.equal(xzerozerotwentyone_merch);
-  error_signal = error_signal | !fiftytwo.equal(fiftytwo_merch);
-  error_signal = error_signal | !xaedot.equal(xaedot_merch);
-  error_signal = error_signal | !xzerofivedot.equal(xzerofivedot_merch);
-  error_signal = error_signal | !acsixeightzerozero.equal(acsixeightzerozero_merch);
-  error_signal = error_signal | !ff.equal(ff_merch);
-  error_signal = error_signal | !ffffffzerozero.equal(ffffffzerozero_merch);
-  error_signal = error_signal | !one.equal(one_merch);
-  error_signal = error_signal | !eighty.equal(eighty_merch);
-  error_signal = error_signal | !twoonesixeight.equal(twoonesixeight_merch);
-  
-  error_signal = error_signal | !xzerozeroff.equal(xzerozeroff_merch);
-  error_signal = error_signal | !ffzerozero.equal(ffzerozero_merch);
-  error_signal = error_signal | !thirtytwo.equal(thirtytwo_merch);
-
-  error_signal = error_signal | !q2.equal(q2_merch);
-  error_signal = error_signal | !q.equal(q_merch);
-  
-  error_signal = error_signal | !zero.equal(zero_merch);
+  error_signal = error_signal | compare_public_input(epsilon_d, hmac_key_commitment_d, paytoken_mask_commitment_d, rlc_d, nonce_d, merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, merch_publickey_hash_d,
+                                    epsilon_d_merch, hmac_key_commitment_d_merch, paytoken_mask_commitment_d_merch, rlc_d_merch, nonce_d_merch, merch_escrow_pub_key_d_merch, merch_dispute_key_d_merch, merch_payout_pub_key_d_merch, merch_publickey_hash_d_merch);
+  error_signal = error_signal | constants_not_equal(constants, constants_merch);
+  error_signal = error_signal | q_not_equal(qs, qs_merch);
+  error_signal = error_signal | compare_k_H(k, H, k_merch, H_merch);
 
 #if defined(DEBUG)
   cout << "distributed everything. verifying token sig" << endl;
 #endif
 // check old pay token
 //  verify_token_sig(hmac_key_commitment_d, hmac_commitment_randomness_d, hmac_key_d, old_state_d, old_paytoken_d, ipad, xeight, threeazero, opad, threehundred, sixforty, zero, k, H);
-  error_signal = error_signal | verify_token_sig(hmac_key_commitment_d, hmac_commitment_randomness_d, hmac_key_d, old_state_d, old_paytoken_d, ipad, xeight, threeazero, opad, threehundred, sixforty, zero, k, H);
+  error_signal = error_signal | verify_token_sig(hmac_key_commitment_d, hmac_commitment_randomness_d, hmac_key_d, old_state_d, old_paytoken_d, constants, k, H);
 
   // make sure old/new state are well-formed
 #if defined(DEBUG)
   cout << "comparing old to new state" << endl;
 #endif
-  error_signal = (error_signal | compare_states(old_state_d, new_state_d, rlc_d, revlock_commitment_randomness_d, nonce_d, epsilon_d, k, H, xeight, zero, threeeightfour));
+  error_signal = (error_signal | compare_states(old_state_d, new_state_d, rlc_d, revlock_commitment_randomness_d, nonce_d, epsilon_d, k, H, constants));
 //  compare_states(old_state_d, new_state_d, rlc_d, revlock_commitment_randomness_d, nonce_d, epsilon_d, k, H, xeight, zero, threeeightfour);
 
   // constructs new close transactions and computes hash
@@ -411,7 +161,7 @@ void issue_tokens(
   validate_transactions(new_state_d,
     cust_escrow_pub_key_d, cust_payout_pub_key_d,
     merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d,
-    merch_publickey_hash_d, escrow_digest, merch_digest, k, H, xeight, twofivesix, zero);
+    merch_publickey_hash_d, escrow_digest, merch_digest, k, H, constants);
 
   // we should return into these txserialized_d or hash 
 
@@ -420,27 +170,27 @@ void issue_tokens(
   cout << "signing transactions" << endl;
 #endif
 
-  Integer signed_merch_tx = ecdsa_sign_hashed(merch_digest, epsd1, thirtytwo, q, q2);
-  Integer signed_escrow_tx = ecdsa_sign_hashed(escrow_digest, epsd2, thirtytwo, q, q2);
+  Integer signed_merch_tx = ecdsa_sign_hashed(merch_digest, epsd1, constants.thirtytwo, qs);
+  Integer signed_escrow_tx = ecdsa_sign_hashed(escrow_digest, epsd2, constants.thirtytwo, qs);
 
   // sign new pay token
 #if defined(DEBUG)
   cout << "signing token" << endl;
 #endif
-  PayToken_d new_paytoken_d = sign_token(new_state_d, hmac_key_d, ipad, xeight, threeazero, opad, threehundred, zero, k, H);
+  PayToken_d new_paytoken_d = sign_token(new_state_d, hmac_key_d, constants, k, H);
 
   // Transform the signed_merch_tx into the correct format --> array of 8 32bit uints
   EcdsaSig_d signed_merch_tx_parsed;
   EcdsaSig_d signed_escrow_tx_parsed;
 
-  bigint_into_smallint_array(signed_merch_tx_parsed.sig, signed_merch_tx, fullF);
-  bigint_into_smallint_array(signed_escrow_tx_parsed.sig, signed_escrow_tx, fullF);
+  bigint_into_smallint_array(signed_merch_tx_parsed.sig, signed_merch_tx, constants.fullF);
+  bigint_into_smallint_array(signed_escrow_tx_parsed.sig, signed_escrow_tx, constants.fullF);
 
   // mask pay and close tokens
 #if defined(DEBUG)
   cout << "masking pay token" << endl;
 #endif
-  error_signal = ( error_signal | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d, paytoken_mask_commitment_randomness_d, k, H, xeight, zero, threeeightfour)); // pay token
+  error_signal = ( error_signal | mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d, paytoken_mask_commitment_randomness_d, k, H, constants)); // pay token
 //  mask_paytoken(new_paytoken_d.paytoken, paytoken_mask_d, paytoken_mask_commitment_d, paytoken_mask_commitment_randomness_d, k, H, xeight, zero, threeeightfour); // pay token
 
 #if defined(DEBUG)
@@ -687,13 +437,13 @@ issue_tokens(
   if (io3 != nullptr) delete io3;
 }
 
-PayToken_d sign_token(State_d state, HMACKey_d key, Integer ipad, Integer xeight, Integer threeazero, Integer opad, Integer threehundred, Integer zero, Integer k[64], Integer H[8]) {
+PayToken_d sign_token(State_d state, HMACKey_d key, Constants constants, Integer k[64], Integer H[8]) {
   PayToken_d paytoken;
-  HMACsign(key, state, paytoken.paytoken, ipad, xeight, threeazero, opad, threehundred, zero, k, H);
+  HMACsign(key, state, paytoken.paytoken, constants, k, H);
   return paytoken;
 }
 
-Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac_commitment_randomness_d, HMACKey_d opening, State_d old_state, PayToken_d old_paytoken, Integer ipad, Integer xeight, Integer threeazero, Integer opad, Integer threehundred, Integer sixforty, Integer zero, Integer k[64], Integer H[8]) {
+Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac_commitment_randomness_d, HMACKey_d opening, State_d old_state, PayToken_d old_paytoken, Constants constants, Integer k[64], Integer H[8]) {
 
   // check that the opening is valid 
   Integer message[2][16];
@@ -708,21 +458,21 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
   message[1][2] = hmac_commitment_randomness_d.randomness[2];
   message[1][3] = hmac_commitment_randomness_d.randomness[3];
 //  message[1][4] = Integer(32, -2147483648, PUBLIC); //0x80000000;
-  message[1][4] = xeight; //0x80000000;
-  message[1][5] = zero; //0x00000000;
-  message[1][6] = zero; //0x00000000;
-  message[1][7] = zero; //0x00000000;
-  message[1][8] = zero; //0x00000000;
-  message[1][9] = zero; //0x00000000;
-  message[1][10] = zero; //0x00000000;
-  message[1][11] = zero; //0x00000000;
-  message[1][12] = zero; //0x00000000;
-  message[1][13] = zero; //0x00000000;
+  message[1][4] = constants.xeight; //0x80000000;
+  message[1][5] = constants.zero; //0x00000000;
+  message[1][6] = constants.zero; //0x00000000;
+  message[1][7] = constants.zero; //0x00000000;
+  message[1][8] = constants.zero; //0x00000000;
+  message[1][9] = constants.zero; //0x00000000;
+  message[1][10] = constants.zero; //0x00000000;
+  message[1][11] = constants.zero; //0x00000000;
+  message[1][12] = constants.zero; //0x00000000;
+  message[1][13] = constants.zero; //0x00000000;
 
   // Message length 
-  message[1][14] = zero; //0x00000000;
+  message[1][14] = constants.zero; //0x00000000;
 //  message[1][15] = Integer(32, 640, PUBLIC);
-  message[1][15] = sixforty;
+  message[1][15] = constants.sixforty;
 
   Integer hashresult[8];
 
@@ -737,7 +487,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
 
   // // Sign the old state again to compare
   PayToken_d recomputed_paytoken;
-  HMACsign(opening, old_state, recomputed_paytoken.paytoken, ipad, xeight, threeazero, opad, threehundred, zero, k, H);
+  HMACsign(opening, old_state, recomputed_paytoken.paytoken, constants, k, H);
 
   for(int i=0; i<8; i++) {
     Bit not_equal = !(recomputed_paytoken.paytoken[i].equal(old_paytoken.paytoken[i]));
@@ -747,7 +497,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
 }
 
 // make sure wallets are well-formed
-Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d revlock_commitment_randomness_d, Nonce_d nonce_d, Balance_d epsilon_d, Integer k[64], Integer H[8], Integer xeight, Integer zero, Integer threeeightfour) {
+Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d revlock_commitment_randomness_d, Nonce_d nonce_d, Balance_d epsilon_d, Integer k[64], Integer H[8], Constants constants) {
 
   //Make sure the fields are all correct
   Bit b; // TODO initialize to 0
@@ -782,7 +532,7 @@ Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d
   // check that the rlc is a commitment to the rl in old_state
 
   // TODO add the randomness to this commitment
-  b = (b | verify_revlock_commitment(old_state_d.rl, rlc_d, revlock_commitment_randomness_d, k, H, xeight, zero, threeeightfour));
+  b = (b | verify_revlock_commitment(old_state_d.rl, rlc_d, revlock_commitment_randomness_d, k, H, constants));
 
   Integer epsilon_combined = combine_balance(epsilon_d);
   Integer old_balance_merch_combined = combine_balance(old_state_d.balance_merch);
@@ -796,7 +546,7 @@ Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d
 
   // ZERO CHECK
   // make sure theres enough funds for the amount we have payed
-  Integer zero64 = zero.resize(64, false);
+  Integer zero64 = constants.zero.resize(64, false);
 
   b = (b | (!(old_balance_merch_combined + epsilon_combined).geq(zero64)));
   b = (b | (!(old_balance_cust_combined - epsilon_combined).geq(zero64)));
@@ -810,7 +560,7 @@ Bit open_commitment() {
   return b;
 }
 
-Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d, Integer k[64], Integer H[8], Integer xeight, Integer zero, Integer threeeightfour) {
+Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d, Integer k[64], Integer H[8], Constants constants) {
   Bit b;  // TODO initialize to 0
 
   Integer message[1][16];
@@ -824,12 +574,12 @@ Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, Commitm
   message[0][10] = rl_rand_d.randomness[2];
   message[0][11] = rl_rand_d.randomness[3];
 //  message[0][12] = Integer(32, -2147483648, PUBLIC); //0x80000000;
-  message[0][12] = xeight; //0x80000000;
-  message[0][13] = zero; //0x00000000;
+  message[0][12] = constants.xeight; //0x80000000;
+  message[0][13] = constants.zero; //0x00000000;
 
   // Message length 
-  message[0][14] = zero; //0x00000000;
-  message[0][15] = threeeightfour; // 256 bit RL
+  message[0][14] = constants.zero; //0x00000000;
+  message[0][15] = constants.threeeightfour; // 256 bit RL
 //  message[0][15] = Integer(32, 384, PUBLIC); // 256 bit RL
 
   Integer hashresult[8];
@@ -843,7 +593,7 @@ Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, Commitm
   return b;
 }
 
-Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d mask_commitment_randomness_d, Integer k[64], Integer H[8], Integer xeight, Integer zero, Integer threeeightfour) {
+Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d mask_commitment_randomness_d, Integer k[64], Integer H[8], Constants constants) {
   Bit b;  // TODO initialize to 0
 
   Integer message[1][16];
@@ -857,12 +607,12 @@ Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, Commitm
   message[0][10] = mask_commitment_randomness_d.randomness[2];
   message[0][11] = mask_commitment_randomness_d.randomness[3];
 //  message[0][12] = Integer(32, -2147483648, PUBLIC); //0x80000000;
-  message[0][12] = xeight; //0x80000000;
-  message[0][13] = zero; //0x00000000;
+  message[0][12] = constants.xeight; //0x80000000;
+  message[0][13] = constants.zero; //0x00000000;
 
   // Message length 
-  message[0][14] = zero; //0x00000000;
-  message[0][15] = threeeightfour;
+  message[0][14] = constants.zero; //0x00000000;
+  message[0][15] = constants.threeeightfour;
 
   Integer hashresult[8];
 
@@ -879,13 +629,13 @@ Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, Commitm
 void validate_transactions(State_d new_state_d,
   BitcoinPublicKey_d cust_escrow_pub_key_d, BitcoinPublicKey_d cust_payout_pub_key_d,
   BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, 
-  PublicKeyHash_d merch_publickey_hash_d, Integer escrow_digest[8], Integer merch_digest[8], Integer k[64], Integer H[8], Integer xeight, Integer twofivesix, Integer zero)
+  PublicKeyHash_d merch_publickey_hash_d, Integer escrow_digest[8], Integer merch_digest[8], Integer k[64], Integer H[8], Constants constants)
 {
   // 112 bytes --> 896
   Integer customer_delayed_script_hash_preimage[2][16];
 
   // OPCODE || 1 byte of Rev Lock  0x63a82000  1671962624
-  customer_delayed_script_hash_preimage[0][0] = xsixthreedot | /* First byte of revlock*/(new_state_d.rl.revlock[0] >> 24);
+  customer_delayed_script_hash_preimage[0][0] = constants.xsixthreedot | /* First byte of revlock*/(new_state_d.rl.revlock[0] >> 24);
 //  customer_delayed_script_hash_preimage[0][0] = Integer(32, 1671962624 /*0x63a92000*/, PUBLIC) | /* First byte of revlock*/(new_state_d.rl.revlock[0] >> 24);
 
   // 31 remaining bytes of Rev Lock
@@ -896,10 +646,10 @@ void validate_transactions(State_d new_state_d,
   customer_delayed_script_hash_preimage[0][5] = (new_state_d.rl.revlock[4] << 8) | (new_state_d.rl.revlock[5] >> 24);
   customer_delayed_script_hash_preimage[0][6] = (new_state_d.rl.revlock[5] << 8) | (new_state_d.rl.revlock[6] >> 24);
   customer_delayed_script_hash_preimage[0][7] = (new_state_d.rl.revlock[6] << 8) | (new_state_d.rl.revlock[7] >> 24);
-  customer_delayed_script_hash_preimage[0][8] = (new_state_d.rl.revlock[7] << 8) | eighteight;
+  customer_delayed_script_hash_preimage[0][8] = (new_state_d.rl.revlock[7] << 8) | constants.eighteight;
 //  customer_delayed_script_hash_preimage[0][8] = (new_state_d.rl.revlock[7] << 8) | Integer(32, 136 /*0x00000088*/, PUBLIC);
 
-  customer_delayed_script_hash_preimage[0][9]  = xtwentyone | merch_dispute_key_d.key[0] >> 8; //0x21000000 // taking 3 bytes from the key
+  customer_delayed_script_hash_preimage[0][9]  = constants.xtwentyone | merch_dispute_key_d.key[0] >> 8; //0x21000000 // taking 3 bytes from the key
 //  customer_delayed_script_hash_preimage[0][9]  = Integer(32, 553648128, PUBLIC) | merch_dispute_key_d.key[0] >> 8; //0x21000000 // taking 3 bytes from the key
   customer_delayed_script_hash_preimage[0][10] = (merch_dispute_key_d.key[0] << 24) | (merch_dispute_key_d.key[1] >> 8); // byte 4-7
   customer_delayed_script_hash_preimage[0][11] = (merch_dispute_key_d.key[1] << 24) | (merch_dispute_key_d.key[2] >> 8); // byte 8-11
@@ -908,13 +658,13 @@ void validate_transactions(State_d new_state_d,
   customer_delayed_script_hash_preimage[0][14] = (merch_dispute_key_d.key[4] << 24) | (merch_dispute_key_d.key[5] >> 8); // bytes 20-23
   customer_delayed_script_hash_preimage[0][15] = (merch_dispute_key_d.key[5] << 24) | (merch_dispute_key_d.key[6] >> 8); // bytes 24-27
   customer_delayed_script_hash_preimage[1][0]  = (merch_dispute_key_d.key[6] << 24) | (merch_dispute_key_d.key[7] >> 8); // bytes 28-31
-  customer_delayed_script_hash_preimage[1][1]  = (merch_dispute_key_d.key[7] << 24) | (merch_dispute_key_d.key[8] >> 8) | sixsevenzero | twohundred; // bytes 32-33 // 0x67
+  customer_delayed_script_hash_preimage[1][1]  = (merch_dispute_key_d.key[7] << 24) | (merch_dispute_key_d.key[8] >> 8) | constants.sixsevenzero | constants.twohundred; // bytes 32-33 // 0x67
 //  customer_delayed_script_hash_preimage[1][1]  = (merch_dispute_key_d.key[7] << 24) | (merch_dispute_key_d.key[8] >> 8) | Integer(32, 26368/*0x00006700*/, PUBLIC) | Integer(32,2 /*0x000002*/, PUBLIC); // bytes 32-33 // 0x67
 
   // This previous last byte and the following to bytes is the delay.  We should talk about how long we want them to be
-  customer_delayed_script_hash_preimage[1][2]  = xcfzerofive | btwosevenfive;
+  customer_delayed_script_hash_preimage[1][2]  = constants.xcfzerofive | constants.btwosevenfive;
 //  customer_delayed_script_hash_preimage[1][2]  = Integer(32, 3473211392 /*0xcf050000*/, PUBLIC) | Integer(32, 45685/*0x0000b275*/, PUBLIC);
-  customer_delayed_script_hash_preimage[1][3]  = xtwentyone  | (cust_payout_pub_key_d.key[0] >> 8);
+  customer_delayed_script_hash_preimage[1][3]  = constants.xtwentyone  | (cust_payout_pub_key_d.key[0] >> 8);
 //  customer_delayed_script_hash_preimage[1][3]  = Integer(32, 553648128 /*0x21000000*/, PUBLIC)  | (cust_payout_pub_key_d.key[0] >> 8);
   customer_delayed_script_hash_preimage[1][4]  = (cust_payout_pub_key_d.key[0] << 24) | (cust_payout_pub_key_d.key[1] >> 8);
   customer_delayed_script_hash_preimage[1][5]  = (cust_payout_pub_key_d.key[1] << 24) | (cust_payout_pub_key_d.key[2] >> 8);
@@ -923,14 +673,14 @@ void validate_transactions(State_d new_state_d,
   customer_delayed_script_hash_preimage[1][8]  = (cust_payout_pub_key_d.key[4] << 24) | (cust_payout_pub_key_d.key[5] >> 8);
   customer_delayed_script_hash_preimage[1][9]  = (cust_payout_pub_key_d.key[5] << 24) | (cust_payout_pub_key_d.key[6] >> 8);
   customer_delayed_script_hash_preimage[1][10] = (cust_payout_pub_key_d.key[6] << 24) | (cust_payout_pub_key_d.key[7] >> 8);
-  customer_delayed_script_hash_preimage[1][11] = (cust_payout_pub_key_d.key[7] << 24) | (cust_payout_pub_key_d.key[8] >> 8) | sixeightac;
+  customer_delayed_script_hash_preimage[1][11] = (cust_payout_pub_key_d.key[7] << 24) | (cust_payout_pub_key_d.key[8] >> 8) | constants.sixeightac;
 //  customer_delayed_script_hash_preimage[1][11] = (cust_payout_pub_key_d.key[7] << 24) | (cust_payout_pub_key_d.key[8] >> 8) | Integer(32, 26796/*0x000068ac*/, PUBLIC);
 
-  customer_delayed_script_hash_preimage[1][12] = xeight;
+  customer_delayed_script_hash_preimage[1][12] = constants.xeight;
 //  customer_delayed_script_hash_preimage[1][12] = Integer(32, -2147483648/*0x80000000*/, PUBLIC);
-  customer_delayed_script_hash_preimage[1][13] = zero; //0x00000000;
-  customer_delayed_script_hash_preimage[1][14] = zero; //0x00000000;
-  customer_delayed_script_hash_preimage[1][15] = eightninesix;
+  customer_delayed_script_hash_preimage[1][13] = constants.zero; //0x00000000;
+  customer_delayed_script_hash_preimage[1][14] = constants.zero; //0x00000000;
+  customer_delayed_script_hash_preimage[1][15] = constants.eightninesix;
 //  customer_delayed_script_hash_preimage[1][15] = Integer(32, 896, PUBLIC);
 
   Integer customer_delayed_script_hash[8];
@@ -943,13 +693,13 @@ void validate_transactions(State_d new_state_d,
   // 150 bytes
   Integer hash_outputs_preimage[3][16];
 
-  Balance_d little_endian_balance_cust = convert_to_little_endian(new_state_d.balance_cust, xzerozeroff, ffzerozero);
-  Balance_d little_endian_balance_merch = convert_to_little_endian(new_state_d.balance_merch, xzerozeroff, ffzerozero);
+  Balance_d little_endian_balance_cust = convert_to_little_endian(new_state_d.balance_cust, constants);
+  Balance_d little_endian_balance_merch = convert_to_little_endian(new_state_d.balance_merch, constants);
 
   hash_outputs_preimage[0][0]  = little_endian_balance_cust.balance[0];// first bytes of customer balance // FIX ENDIANNESS
   hash_outputs_preimage[0][1]  = little_endian_balance_cust.balance[1];// second bytes of customer blanace // FIX ENDIANNESS
 
-  hash_outputs_preimage[0][2]  = xtwentytwodot | (customer_delayed_script_hash[0] >> 24); // OPCODE and the first byte of the prev hash output
+  hash_outputs_preimage[0][2]  = constants.xtwentytwodot | (customer_delayed_script_hash[0] >> 24); // OPCODE and the first byte of the prev hash output
 //  hash_outputs_preimage[0][2]  = Integer(32, 570433536 /*0x22002000*/, PUBLIC) | (customer_delayed_script_hash[0] >> 24); // OPCODE and the first byte of the prev hash output
   hash_outputs_preimage[0][3]  = (customer_delayed_script_hash[0] << 8) | (customer_delayed_script_hash[1] >> 24); // end of byte 1 and first byte of 2...
   hash_outputs_preimage[0][4]  = (customer_delayed_script_hash[1] << 8) | (customer_delayed_script_hash[2] >> 24);
@@ -960,19 +710,19 @@ void validate_transactions(State_d new_state_d,
   hash_outputs_preimage[0][9]  = (customer_delayed_script_hash[6] << 8) | (customer_delayed_script_hash[7] >> 24);
   hash_outputs_preimage[0][10] = (customer_delayed_script_hash[7] << 8) |  (little_endian_balance_merch.balance[0] >> 24);/*first byte of merch balance >> 24*/;
   hash_outputs_preimage[0][11] =  (little_endian_balance_merch.balance[0] << 8) | (little_endian_balance_merch.balance[1] >> 24);
-  hash_outputs_preimage[0][12] =  (little_endian_balance_merch.balance[1] << 8) | sixteen;
+  hash_outputs_preimage[0][12] =  (little_endian_balance_merch.balance[1] << 8) | constants.sixteen;
 //  hash_outputs_preimage[0][12] =  (little_endian_balance_merch.balance[1] << 8) | Integer(32, 22 /*0x00000016*/, PUBLIC);
-  hash_outputs_preimage[0][13] = xzerozerofourteen | (merch_publickey_hash_d.hash[0] >> 16);
+  hash_outputs_preimage[0][13] = constants.xzerozerofourteen | (merch_publickey_hash_d.hash[0] >> 16);
 //  hash_outputs_preimage[0][13] = Integer(32, 1310720 /*0x00140000*/, PUBLIC) | (merch_publickey_hash_d.hash[0] >> 16);
   hash_outputs_preimage[0][14] = (merch_publickey_hash_d.hash[0] << 16) | (merch_publickey_hash_d.hash[1] >> 16);
   hash_outputs_preimage[0][15] = (merch_publickey_hash_d.hash[1] << 16) | (merch_publickey_hash_d.hash[2] >> 16);
   hash_outputs_preimage[1][0]  = (merch_publickey_hash_d.hash[2] << 16) | (merch_publickey_hash_d.hash[3] >> 16);
   hash_outputs_preimage[1][1]  = (merch_publickey_hash_d.hash[3] << 16) | (merch_publickey_hash_d.hash[4] >> 16);
-  hash_outputs_preimage[1][2]  = (merch_publickey_hash_d.hash[4] << 16) | zero; //Two bytes of the OP_Return Amount
-  hash_outputs_preimage[1][3]  = zero; // middle 4 bytes of OP_RETURN amount
-  hash_outputs_preimage[1][4]  = threesevensixa; // OPRETURN FORMATTING
+  hash_outputs_preimage[1][2]  = (merch_publickey_hash_d.hash[4] << 16) | constants.zero; //Two bytes of the OP_Return Amount
+  hash_outputs_preimage[1][3]  = constants.zero; // middle 4 bytes of OP_RETURN amount
+  hash_outputs_preimage[1][4]  = constants.threesevensixa; // OPRETURN FORMATTING
 //  hash_outputs_preimage[1][4]  = Integer(32, 17258/*0x0000376a*/,PUBLIC); // OPRETURN FORMATTING
-  hash_outputs_preimage[1][5] = xfourtyone /*last byte of opreturn formatting */ | (new_state_d.rl.revlock[0] >> 8);
+  hash_outputs_preimage[1][5] = constants.xfourtyone /*last byte of opreturn formatting */ | (new_state_d.rl.revlock[0] >> 8);
 //  hash_outputs_preimage[1][5] = Integer(32, 1090519040/*0x41000000*/,PUBLIC)/*last byte of opreturn formatting */ | (new_state_d.rl.revlock[0] >> 8);
 
   hash_outputs_preimage[1][6]  = (new_state_d.rl.revlock[0] << 24) | (new_state_d.rl.revlock[1] >> 8); 
@@ -990,31 +740,31 @@ void validate_transactions(State_d new_state_d,
   hash_outputs_preimage[2][2]  = (cust_payout_pub_key_d.key[4] << 24) | (cust_payout_pub_key_d.key[5] >> 8); //21
   hash_outputs_preimage[2][3]  = (cust_payout_pub_key_d.key[5] << 24) | (cust_payout_pub_key_d.key[6] >> 8); //25
   hash_outputs_preimage[2][4]  = (cust_payout_pub_key_d.key[6] << 24) | (cust_payout_pub_key_d.key[7] >> 8); //29
-  hash_outputs_preimage[2][5]  = (cust_payout_pub_key_d.key[7] << 24) | (cust_payout_pub_key_d.key[8] >> 8) | eightthousand; //33
+  hash_outputs_preimage[2][5]  = (cust_payout_pub_key_d.key[7] << 24) | (cust_payout_pub_key_d.key[8] >> 8) | constants.eightthousand; //33
 //  hash_outputs_preimage[2][5]  = (cust_payout_pub_key_d.key[7] << 24) | (cust_payout_pub_key_d.key[8] >> 8) | Integer(32,32768 /*0x00008000*/, PUBLIC); //33
 
-  hash_outputs_preimage[2][6]  = zero;
-  hash_outputs_preimage[2][7]  = zero;
-  hash_outputs_preimage[2][8]  = zero;
-  hash_outputs_preimage[2][9]  = zero;
-  hash_outputs_preimage[2][10] = zero;
-  hash_outputs_preimage[2][11] = zero;
-  hash_outputs_preimage[2][12] = zero;
-  hash_outputs_preimage[2][13] = zero;
-  hash_outputs_preimage[2][14] = zero; //0x00000000;
-  hash_outputs_preimage[2][15] = twelvehundred;
+  hash_outputs_preimage[2][6]  = constants.zero;
+  hash_outputs_preimage[2][7]  = constants.zero;
+  hash_outputs_preimage[2][8]  = constants.zero;
+  hash_outputs_preimage[2][9]  = constants.zero;
+  hash_outputs_preimage[2][10] = constants.zero;
+  hash_outputs_preimage[2][11] = constants.zero;
+  hash_outputs_preimage[2][12] = constants.zero;
+  hash_outputs_preimage[2][13] = constants.zero;
+  hash_outputs_preimage[2][14] = constants.zero; //0x00000000;
+  hash_outputs_preimage[2][15] = constants.twelvehundred;
 //  hash_outputs_preimage[2][15] = Integer(32, 1200, PUBLIC);
 
   Integer hash_outputs[8];
 
 
-  computeDoubleSHA256_3d_noinit(hash_outputs_preimage, hash_outputs, k, H, xeight, twofivesix, zero);
+  computeDoubleSHA256_3d_noinit(hash_outputs_preimage, hash_outputs, k, H, constants);
 
 
   // The total preimage is 228 bytes
   Integer total_preimage_escrow[4][16];
 
-  total_preimage_escrow[0][0] = xzerotwo;
+  total_preimage_escrow[0][0] = constants.xzerotwo;
 //  total_preimage_escrow[0][0] = Integer(32, 33554432 /*0x02000000*/, PUBLIC);
   total_preimage_escrow[0][1] = new_state_d.HashPrevOuts_escrow.txid[0];
   total_preimage_escrow[0][2] = new_state_d.HashPrevOuts_escrow.txid[1];
@@ -1025,14 +775,14 @@ void validate_transactions(State_d new_state_d,
   total_preimage_escrow[0][7] = new_state_d.HashPrevOuts_escrow.txid[6];
   total_preimage_escrow[0][8] = new_state_d.HashPrevOuts_escrow.txid[7];
 
-  total_preimage_escrow[0][9]  =  xthreedot;
-  total_preimage_escrow[0][10] =  xcdot;
-  total_preimage_escrow[0][11] =  xninedot;
-  total_preimage_escrow[0][12] =  xfdot;
-  total_preimage_escrow[0][13] =  xfourteendot;
-  total_preimage_escrow[0][14] =  xsevendot;
-  total_preimage_escrow[0][15] =  xtwentytwoninedot;
-  total_preimage_escrow[1][0]  =  xsevenzerosixdot;
+  total_preimage_escrow[0][9]  =  constants.xthreedot;
+  total_preimage_escrow[0][10] =  constants.xcdot;
+  total_preimage_escrow[0][11] =  constants.xninedot;
+  total_preimage_escrow[0][12] =  constants.xfdot;
+  total_preimage_escrow[0][13] =  constants.xfourteendot;
+  total_preimage_escrow[0][14] =  constants.xsevendot;
+  total_preimage_escrow[0][15] =  constants.xtwentytwoninedot;
+  total_preimage_escrow[1][0]  =  constants.xsevenzerosixdot;
 // total_preimage_escrow[0][9]  =  Integer(32, 1001467945  /*0x3bb13029*/, PUBLIC);
 //  total_preimage_escrow[0][10] =  Integer(32, 3464175445 /*0xce7b1f55*/, PUBLIC);
 //  total_preimage_escrow[0][11] =  Integer(32, 2666915655 /*0x9ef5e747*/, PUBLIC);
@@ -1051,9 +801,9 @@ void validate_transactions(State_d new_state_d,
   total_preimage_escrow[1][7] = new_state_d.txid_escrow.txid[6];
   total_preimage_escrow[1][8] = new_state_d.txid_escrow.txid[7];
 
-  total_preimage_escrow[1][9] = zero;
+  total_preimage_escrow[1][9] = constants.zero;
 
-  total_preimage_escrow[1][10]  = xfoursevenfivedot | (merch_escrow_pub_key_d.key[0] >> 24);
+  total_preimage_escrow[1][10]  = constants.xfoursevenfivedot | (merch_escrow_pub_key_d.key[0] >> 24);
 //  total_preimage_escrow[1][10]  = Integer(32, 1196564736/*0x47522100*/, PUBLIC) | (merch_escrow_pub_key_d.key[0] >> 24);
   total_preimage_escrow[1][11] = (merch_escrow_pub_key_d.key[0] << 8) | (merch_escrow_pub_key_d.key[1] >> 24);
   total_preimage_escrow[1][12] = (merch_escrow_pub_key_d.key[1] << 8) | (merch_escrow_pub_key_d.key[2] >> 24);
@@ -1063,7 +813,7 @@ void validate_transactions(State_d new_state_d,
   total_preimage_escrow[2][0] = (merch_escrow_pub_key_d.key[5] << 8) | (merch_escrow_pub_key_d.key[6] >> 24);
   total_preimage_escrow[2][1]  = (merch_escrow_pub_key_d.key[6] << 8) | (merch_escrow_pub_key_d.key[7] >> 24);
   total_preimage_escrow[2][2]  = (merch_escrow_pub_key_d.key[7] << 8) | (merch_escrow_pub_key_d.key[8] >> 24);
-  total_preimage_escrow[2][3]  = xtwentyone | (cust_escrow_pub_key_d.key[0] >> 8);  // first three bytes of the cust public key
+  total_preimage_escrow[2][3]  = constants.xtwentyone | (cust_escrow_pub_key_d.key[0] >> 8);  // first three bytes of the cust public key
 //  total_preimage_escrow[2][3]  = Integer(32, 553648128 /*0x21000000*/, PUBLIC) | (cust_escrow_pub_key_d.key[0] >> 8);  // first three bytes of the cust public key
   // 30 more bytes of key
   total_preimage_escrow[2][4]  = (cust_escrow_pub_key_d.key[0] << 24)| (cust_escrow_pub_key_d.key[1] >> 8);
@@ -1073,15 +823,15 @@ void validate_transactions(State_d new_state_d,
   total_preimage_escrow[2][8]  = (cust_escrow_pub_key_d.key[4] << 24)| (cust_escrow_pub_key_d.key[5] >> 8);
   total_preimage_escrow[2][9]  = (cust_escrow_pub_key_d.key[5] << 24)| (cust_escrow_pub_key_d.key[6] >> 8);
   total_preimage_escrow[2][10]  = (cust_escrow_pub_key_d.key[6] << 24)| (cust_escrow_pub_key_d.key[7] >> 8);
-  total_preimage_escrow[2][11] = (cust_escrow_pub_key_d.key[7] << 24)| (cust_escrow_pub_key_d.key[8] >> 8) | fivetwoae;
+  total_preimage_escrow[2][11] = (cust_escrow_pub_key_d.key[7] << 24)| (cust_escrow_pub_key_d.key[8] >> 8) | constants.fivetwoae;
 //  total_preimage_escrow[2][11] = (cust_escrow_pub_key_d.key[7] << 24)| (cust_escrow_pub_key_d.key[8] >> 8) | Integer(32, 21166/*0x000052ae*/, PUBLIC);
 
-  Balance_d big_endian_total_amount = sum_balances(new_state_d.balance_cust, new_state_d.balance_merch, zero);
-  Balance_d little_endian_total_amount = convert_to_little_endian(big_endian_total_amount, xzerozeroff, ffzerozero);
+  Balance_d big_endian_total_amount = sum_balances(new_state_d.balance_cust, new_state_d.balance_merch, constants.zero);
+  Balance_d little_endian_total_amount = convert_to_little_endian(big_endian_total_amount, constants);
   total_preimage_escrow[2][12] = little_endian_total_amount.balance[0];
   total_preimage_escrow[2][13] = little_endian_total_amount.balance[1];
 
-  total_preimage_escrow[2][14] = fullFthirtytwo;
+  total_preimage_escrow[2][14] = constants.fullFthirtytwo;
 //  total_preimage_escrow[2][14] = Integer(32, 4294967295 /*0xffffffff*/, PUBLIC);
 
   total_preimage_escrow[2][15] = hash_outputs[0];
@@ -1093,28 +843,28 @@ void validate_transactions(State_d new_state_d,
   total_preimage_escrow[3][5]  = hash_outputs[6];
   total_preimage_escrow[3][6]  = hash_outputs[7];
 
-  total_preimage_escrow[3][7]  = zero;
-  total_preimage_escrow[3][8]  = xzeroone;
+  total_preimage_escrow[3][7]  = constants.zero;
+  total_preimage_escrow[3][8]  = constants.xzeroone;
 //  total_preimage_escrow[3][8]  = Integer(32, 16777216 /*0x01000000*/, PUBLIC);
 
-  total_preimage_escrow[3][9]   = xeight;
+  total_preimage_escrow[3][9]   = constants.xeight;
 //  total_preimage_escrow[3][9]   = Integer(32, -2147483648/*0x80000000*/, PUBLIC);
-  total_preimage_escrow[3][10]  = zero;
-  total_preimage_escrow[3][11]  = zero;
-  total_preimage_escrow[3][12]  = zero;
-  total_preimage_escrow[3][13]  = zero;
-  total_preimage_escrow[3][14]  = zero; //0x00000000;
-  total_preimage_escrow[3][15]  = oneeighttwofour; // 228*8 = 1824 bits
+  total_preimage_escrow[3][10]  = constants.zero;
+  total_preimage_escrow[3][11]  = constants.zero;
+  total_preimage_escrow[3][12]  = constants.zero;
+  total_preimage_escrow[3][13]  = constants.zero;
+  total_preimage_escrow[3][14]  = constants.zero; //0x00000000;
+  total_preimage_escrow[3][15]  = constants.oneeighttwofour; // 228*8 = 1824 bits
 //  total_preimage_escrow[3][15]  = Integer(32, 1824, PUBLIC); // 228*8 = 1824 bits
 
 
   // Integer escrow_digest[8];
-  computeDoubleSHA256_4d_noinit(total_preimage_escrow, escrow_digest, k, H, xeight, twofivesix, zero);
+  computeDoubleSHA256_4d_noinit(total_preimage_escrow, escrow_digest, k, H, constants);
 
     // The total preimage is 228 bytes
   Integer total_preimage_merch[5][16];
 
-  total_preimage_merch[0][0] = xzerotwo;
+  total_preimage_merch[0][0] = constants.xzerotwo;
 //  total_preimage_merch[0][0] = Integer(32, 33554432 /*0x02000000*/, PUBLIC);
   total_preimage_merch[0][1] = new_state_d.HashPrevOuts_merch.txid[0];
   total_preimage_merch[0][2] = new_state_d.HashPrevOuts_merch.txid[1];
@@ -1125,14 +875,14 @@ void validate_transactions(State_d new_state_d,
   total_preimage_merch[0][7] = new_state_d.HashPrevOuts_merch.txid[6];
   total_preimage_merch[0][8] = new_state_d.HashPrevOuts_merch.txid[7];
 
-  total_preimage_merch[0][9]  =  xthreedot;
-  total_preimage_merch[0][10] =  xcdot;
-  total_preimage_merch[0][11] =  xninedot;
-  total_preimage_merch[0][12] =  xfdot;
-  total_preimage_merch[0][13] =  xfourteendot;
-  total_preimage_merch[0][14] =  xsevendot;
-  total_preimage_merch[0][15] =  xtwentytwoninedot;
-  total_preimage_merch[1][0]  =  xsevenzerosixdot;
+  total_preimage_merch[0][9]  =  constants.xthreedot;
+  total_preimage_merch[0][10] =  constants.xcdot;
+  total_preimage_merch[0][11] =  constants.xninedot;
+  total_preimage_merch[0][12] =  constants.xfdot;
+  total_preimage_merch[0][13] =  constants.xfourteendot;
+  total_preimage_merch[0][14] =  constants.xsevendot;
+  total_preimage_merch[0][15] =  constants.xtwentytwoninedot;
+  total_preimage_merch[1][0]  =  constants.xsevenzerosixdot;
   // total_preimage_escrow[0][9]  =  Integer(32, 1001467945  /*0x3bb13029*/, PUBLIC);
   //  total_preimage_escrow[0][10] =  Integer(32, 3464175445 /*0xce7b1f55*/, PUBLIC);
   //  total_preimage_escrow[0][11] =  Integer(32, 2666915655 /*0x9ef5e747*/, PUBLIC);
@@ -1151,10 +901,10 @@ void validate_transactions(State_d new_state_d,
   total_preimage_merch[1][7] = new_state_d.txid_merch.txid[6];
   total_preimage_merch[1][8] = new_state_d.txid_merch.txid[7];
 
-  total_preimage_merch[1][9] = zero;
+  total_preimage_merch[1][9] = constants.zero;
 
   // The script
-  total_preimage_merch[1][10] = xseventwosixdot;
+  total_preimage_merch[1][10] = constants.xseventwosixdot;
 //  total_preimage_merch[1][10] = Integer(32, 1919111713 /* 0x72635221*/, PUBLIC);
 
   total_preimage_merch[1][11] = merch_escrow_pub_key_d.key[0];
@@ -1165,7 +915,7 @@ void validate_transactions(State_d new_state_d,
   total_preimage_merch[2][0]  = merch_escrow_pub_key_d.key[5];
   total_preimage_merch[2][1]  = merch_escrow_pub_key_d.key[6];
   total_preimage_merch[2][2]  = merch_escrow_pub_key_d.key[7];
-  total_preimage_merch[2][3]  = merch_escrow_pub_key_d.key[8] | xzerozerotwentyone | (cust_escrow_pub_key_d.key[0] >> 16);
+  total_preimage_merch[2][3]  = merch_escrow_pub_key_d.key[8] | constants.xzerozerotwentyone | (cust_escrow_pub_key_d.key[0] >> 16);
 //  total_preimage_merch[2][3]  = merch_escrow_pub_key_d.key[8] | Integer(32, 2162688 /*0x00210000*/, PUBLIC) | (cust_escrow_pub_key_d.key[0] >> 16);
 
   // 31 more bytes of key
@@ -1176,12 +926,12 @@ void validate_transactions(State_d new_state_d,
   total_preimage_merch[2][8]  = (cust_escrow_pub_key_d.key[4] << 16)| (cust_escrow_pub_key_d.key[5] >> 16);
   total_preimage_merch[2][9]  = (cust_escrow_pub_key_d.key[5] << 16)| (cust_escrow_pub_key_d.key[6] >> 16);
   total_preimage_merch[2][10] = (cust_escrow_pub_key_d.key[6] << 16)| (cust_escrow_pub_key_d.key[7] >> 16);
-  total_preimage_merch[2][11] = (cust_escrow_pub_key_d.key[7] << 16)| (cust_escrow_pub_key_d.key[8] >> 16) | fiftytwo;
+  total_preimage_merch[2][11] = (cust_escrow_pub_key_d.key[7] << 16)| (cust_escrow_pub_key_d.key[8] >> 16) | constants.fiftytwo;
 //  total_preimage_merch[2][11] = (cust_escrow_pub_key_d.key[7] << 16)| (cust_escrow_pub_key_d.key[8] >> 16) | Integer(32, 82/*0x00000052*/, PUBLIC);
 
-  total_preimage_merch[2][12] = xaedot;
+  total_preimage_merch[2][12] = constants.xaedot;
 //  total_preimage_merch[2][12] = Integer(32, 2925986511 /* 0xae6702cf */, PUBLIC);
-  total_preimage_merch[2][13] = xzerofivedot;
+  total_preimage_merch[2][13] = constants.xzerofivedot;
 //  total_preimage_merch[2][13] = Integer(32,   95581473 /* 0x05b27521 */, PUBLIC);
 
   /* merch-payout-key*/
@@ -1193,14 +943,14 @@ void validate_transactions(State_d new_state_d,
   total_preimage_merch[3][3]  = merch_payout_pub_key_d.key[5];
   total_preimage_merch[3][4]  = merch_payout_pub_key_d.key[6];
   total_preimage_merch[3][5]  = merch_payout_pub_key_d.key[7]; // FIRST 3 bytes of the amount
-  total_preimage_merch[3][6]  = merch_payout_pub_key_d.key[8] | acsixeightzerozero | (little_endian_total_amount.balance[0]>>24);
+  total_preimage_merch[3][6]  = merch_payout_pub_key_d.key[8] | constants.acsixeightzerozero | (little_endian_total_amount.balance[0]>>24);
 //  total_preimage_merch[3][6]  = merch_payout_pub_key_d.key[8] | Integer(32, 11298816/* 0x00ac6800 */, PUBLIC) | (little_endian_total_amount.balance[0]>>24);
 
   total_preimage_merch[3][7] = (little_endian_total_amount.balance[0] << 8) | (little_endian_total_amount.balance[1] >> 24);
 
-  total_preimage_merch[3][8] = (little_endian_total_amount.balance[1] << 8) | ff;
+  total_preimage_merch[3][8] = (little_endian_total_amount.balance[1] << 8) | constants.ff;
 //  total_preimage_merch[3][8] = (little_endian_total_amount.balance[1] << 8) | Integer (32, 255 /* 0x000000ff */ , PUBLIC);
-  total_preimage_merch[3][9] = ffffffzerozero | (hash_outputs[0] >> 24);
+  total_preimage_merch[3][9] = constants.ffffffzerozero | (hash_outputs[0] >> 24);
 //  total_preimage_merch[3][9] = Integer(32, 4294967040 /*0xffffff00*/, PUBLIC) | (hash_outputs[0] >> 24);
 
   total_preimage_merch[3][10] =  (hash_outputs[0] << 8) | (hash_outputs[1] >> 24);
@@ -1210,28 +960,28 @@ void validate_transactions(State_d new_state_d,
   total_preimage_merch[3][14] =  (hash_outputs[4] << 8) | (hash_outputs[5] >> 24);
   total_preimage_merch[3][15] =  (hash_outputs[5] << 8) | (hash_outputs[6] >> 24);
   total_preimage_merch[4][0]  =  (hash_outputs[6] << 8) | (hash_outputs[7] >> 24);
-  total_preimage_merch[4][1]  =  (hash_outputs[7] << 8) | zero;
+  total_preimage_merch[4][1]  =  (hash_outputs[7] << 8) | constants.zero;
 
-  total_preimage_merch[4][2]  = one;
+  total_preimage_merch[4][2]  = constants.one;
 //  total_preimage_merch[4][2]  = Integer(32, 1 /*0x00000001*/, PUBLIC);
-  total_preimage_merch[4][3]  = eighty;
+  total_preimage_merch[4][3]  = constants.eighty;
 //  total_preimage_merch[4][3]  = Integer(32, 128 /*0x00000080*/, PUBLIC);
 
-  total_preimage_merch[4][4]   = zero;
-  total_preimage_merch[4][5]   = zero;
-  total_preimage_merch[4][6]   = zero;
-  total_preimage_merch[4][7]   = zero;
-  total_preimage_merch[4][8]   = zero;
-  total_preimage_merch[4][9]   = zero;
-  total_preimage_merch[4][10]  = zero;
-  total_preimage_merch[4][11]  = zero;
-  total_preimage_merch[4][12]  = zero;
-  total_preimage_merch[4][13]  = zero;
-  total_preimage_merch[4][14]  = zero;//0x00000000;
-  total_preimage_merch[4][15]  = twoonesixeight; // 271*8 = 2168 bits
+  total_preimage_merch[4][4]   = constants.zero;
+  total_preimage_merch[4][5]   = constants.zero;
+  total_preimage_merch[4][6]   = constants.zero;
+  total_preimage_merch[4][7]   = constants.zero;
+  total_preimage_merch[4][8]   = constants.zero;
+  total_preimage_merch[4][9]   = constants.zero;
+  total_preimage_merch[4][10]  = constants.zero;
+  total_preimage_merch[4][11]  = constants.zero;
+  total_preimage_merch[4][12]  = constants.zero;
+  total_preimage_merch[4][13]  = constants.zero;
+  total_preimage_merch[4][14]  = constants.zero;//0x00000000;
+  total_preimage_merch[4][15]  = constants.twoonesixeight; // 271*8 = 2168 bits
 //  total_preimage_merch[4][15]  = Integer(32, 2168, PUBLIC); // 271*8 = 2168 bits
 
-  computeDoubleSHA256_5d_noinit(total_preimage_merch, merch_digest, k, H, xeight, twofivesix, zero);
+  computeDoubleSHA256_5d_noinit(total_preimage_merch, merch_digest, k, H, constants);
 
   // dump_buffer("hash_outputs_preimage0=", hash_outputs_preimage[0]);
   // dump_buffer("hash_outputs_preimage1=", hash_outputs_preimage[1]);
@@ -1254,13 +1004,13 @@ void validate_transactions(State_d new_state_d,
 }
 
 // mask pay and close tokens
-Bit mask_paytoken(Integer paytoken[8], Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d paytoken_mask_commitment_randomness_d, Integer k[64], Integer H[8], Integer xeight, Integer zero, Integer threeeightfour) {
+Bit mask_paytoken(Integer paytoken[8], Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d paytoken_mask_commitment_randomness_d, Integer k[64], Integer H[8], Constants constants) {
 
   // The pay token is 256 bits long.
   // Thus the mask is 256 bits long.
   // First we check to see if the mask was correct
 
-  Bit b = verify_mask_commitment(mask, maskcommitment, paytoken_mask_commitment_randomness_d, k, H, xeight, zero, threeeightfour);
+  Bit b = verify_mask_commitment(mask, maskcommitment, paytoken_mask_commitment_randomness_d, k, H, constants);
 
   for(int i=0; i<8; i++) {
     paytoken[i] = paytoken[i] ^ mask.mask[i];

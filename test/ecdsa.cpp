@@ -14,6 +14,7 @@
 #include "emp-sh2pc/emp-sh2pc.h"
 #include "tokens/ecdsa.h"
 #include "tokens/test-e2e.h"
+#include "tokens/constants.h"
 using namespace emp;
 using namespace std;
 
@@ -135,11 +136,8 @@ void test_hardcoded_vector() {
   EcdsaPartialSig_d psd = distribute_EcdsaPartialSig(psl);
 
   // compute and parse result
-  string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
-  Integer q2(516, q2str, PUBLIC);
-  string qstr = "115792089237316195423570985008687907852837564279074904382605163141518161494337";
-  Integer q(258, qstr, PUBLIC);
-  string actual = ecdsa_sign_hashed(e, psd, q, q2).reveal_unsigned(PUBLIC);
+  Q qs = distribute_Q(PUBLIC);
+  string actual = ecdsa_sign_hashed(e, psd, qs).reveal_unsigned(PUBLIC);
   string myfull = r + actual;
   actual = change_base(actual, 10, 16);
   while (actual.length() < 64) {
@@ -199,11 +197,8 @@ void test_negative_digest() {
   string digest = "fcfbbeec974c9394b6d3c85a84f3c227e1712af52201d8fdcc1c3d1ebc9ebf8b";
   Integer dig(257, change_base(digest,16,10), PUBLIC);
 
-  string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
-  Integer q2(516, q2str, PUBLIC);
-  string qstr = "115792089237316195423570985008687907852837564279074904382605163141518161494337";
-  Integer q(258, qstr, PUBLIC);
-  Integer sig = ecdsa_sign_hashed(dig,psd, q, q2);
+  Q qs = distribute_Q(PUBLIC);
+  Integer sig = ecdsa_sign_hashed(dig,psd, qs);
   string actual_sig = change_base(sig.reveal<string>(PUBLIC), 10,16);
 
   assert(actual_sig.compare(expected_sig) == 0);

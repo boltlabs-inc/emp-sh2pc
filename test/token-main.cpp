@@ -1,7 +1,8 @@
 #include <typeinfo>
-#include "ecdsa.h"
-#include "sha256.h"
-#include "tokens.h"
+#include "tokens/ecdsa.h"
+#include "tokens/sha256.h"
+#include "tokens/tokens.h"
+#include "tokens/constants.h"
 #include "emp-sh2pc/emp-sh2pc.h"
 
 using namespace std;
@@ -23,8 +24,8 @@ void *io_callback(void *conn, int party) {
 }
 
 void test_circ() {
-    uint32_t in1;
-    uint32_t in3;
+    uint32_t in1 = 0;
+    uint32_t in3 = 0;
     Integer test1[3];
     test1[0] = Integer(32, in1, BOB);
     test1[1] = Integer(32, in1, BOB);
@@ -47,12 +48,9 @@ void test_ecdsa_sign(EcdsaPartialSig_l psl, string hashedmsg) {
     EcdsaPartialSig_d psd = distribute_EcdsaPartialSig(psl);
     Integer msg(256, hashedmsg, MERCH);
     Integer fullF(256, 4294967295 /* 0xffffffff */, MERCH);
-    string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
-    Integer q2(516, q2str, MERCH);
-    string qstr = "115792089237316195423570985008687907852837564279074904382605163141518161494337";
-    Integer q(258, qstr, MERCH);
+    Q qs = distribute_Q(MERCH);
     Integer target[8];
-    Integer signature = ecdsa_sign_hashed(msg, psd, q, q2);
+    Integer signature = ecdsa_sign_hashed(msg, psd, qs);
     bigint_into_smallint_array(target, signature, fullF);
 
 //    signature.reveal<uint32_t>(CUST);

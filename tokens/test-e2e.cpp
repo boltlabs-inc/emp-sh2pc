@@ -1,6 +1,7 @@
 #include "test-e2e.h"
 #include "ecdsa.h"
 #include "tokens-misc.h"
+#include "constants.h"
 
 #include<iostream>
 using namespace std;
@@ -28,11 +29,8 @@ void test_ecdsa_e2e(EcdsaPartialSig_l psl, char *hashedmsg, uint32_t party, uint
   // compute and parse result
   Integer target[8];
   Integer fullF(256, 4294967295 /* 0xffffffff */, MERCH);
-  string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
-  Integer q2(516, q2str, MERCH);
-  string qstr = "115792089237316195423570985008687907852837564279074904382605163141518161494337";
-  Integer q(258, qstr, MERCH);
-  bigint_into_smallint_array(target, ecdsa_sign_hashed(msg, psd, q, q2), fullF);
+  Q qs = distribute_Q(MERCH);
+  bigint_into_smallint_array(target, ecdsa_sign_hashed(msg, psd, qs), fullF);
 
   for(int i=0; i<8; i++) {
     digest[i] = target[i].reveal<uint32_t>();

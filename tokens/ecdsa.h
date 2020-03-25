@@ -2,6 +2,7 @@
 #include "emp-sh2pc/emp-sh2pc.h"
 #include "tokens.h"
 #include "tokens-misc.h"
+#include "constants.h"
 
 
 using namespace emp;
@@ -31,6 +32,6 @@ Integer ecdsa_sign(Integer msg[2][16], EcdsaPartialSig_d partialsig, Integer thi
 // ecdsa-signs a hashed private message
 // Hash digest can be encoded as a single 256-bit digest or as a set of 8 32-bit integers.
 // returns a signature (same caveat as above)
-Integer ecdsa_sign_hashed(Integer broken_digest[8], EcdsaPartialSig_d partialsig, Integer thirtytwo, Integer q, Integer q2);
-Integer ecdsa_sign_hashed(Integer digest, EcdsaPartialSig_d partialsig, Integer q, Integer q2);
+Integer ecdsa_sign_hashed(Integer broken_digest[8], EcdsaPartialSig_d partialsig, Integer thirtytwo, Q qs);
+Integer ecdsa_sign_hashed(Integer digest, EcdsaPartialSig_d partialsig, Q qs);
 

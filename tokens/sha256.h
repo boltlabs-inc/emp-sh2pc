@@ -1,5 +1,6 @@
 #pragma once
 #include "emp-sh2pc/emp-sh2pc.h"
+#include "constants.h"
 using namespace emp;
 
 #define MERCH ALICE
@@ -83,9 +84,9 @@ void computeSHA256_5d(Integer message[5][16], Integer result[8]);
 void computeSHA256_5d_noinit(Integer message[5][16], Integer result[8], Integer k[64], Integer H[8]);
 
 void computeDoubleSHA256_3d(Integer message[3][16], Integer result[8]);
-void computeDoubleSHA256_3d_noinit(Integer message[3][16], Integer result[8], Integer k[64], Integer H[8], Integer xeight, Integer twofivesix, Integer zero);
+void computeDoubleSHA256_3d_noinit(Integer message[3][16], Integer result[8], Integer k[64], Integer H[8], Constants constants);
 void computeDoubleSHA256_4d(Integer message[4][16], Integer result[8]);
-void computeDoubleSHA256_4d_noinit(Integer message[4][16], Integer result[8], Integer k[64], Integer H[8], Integer xeight, Integer twofivesix, Integer zero);
+void computeDoubleSHA256_4d_noinit(Integer message[4][16], Integer result[8], Integer k[64], Integer H[8], Constants constants);
 void computeDoubleSHA256_5d(Integer message[5][16], Integer result[8]);
-void computeDoubleSHA256_5d_noinit(Integer message[5][16], Integer result[8], Integer k[64], Integer H[8], Integer xeight, Integer twofivesix, Integer zero);
+void computeDoubleSHA256_5d_noinit(Integer message[5][16], Integer result[8], Integer k[64], Integer H[8], Constants constants);
 

@@ -51,13 +51,15 @@ string get_ECDSA_params() {
 
 // sets sign of signature according to bitcoin specification.
 // if s > q/2, set s = q-s.
-Integer set_signature_sign(Integer signature, Integer q, Integer q2) {
+Integer set_signature_sign(Integer signature, Q qs) {
   // q2 = ceil( q/2 ), where q is the secp256k1 point order
   assert(signature.size() == size);
 //  string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
 //  Integer q2(size, q2str, PUBLIC);
 //  Integer q (size, get_ECDSA_params(), PUBLIC);
-  Bit flip = signature.geq(q2);
+  Bit flip = signature.geq(qs.q2);
+  Integer q = qs.q;
+  q.resize(516,true);
   Integer flipsig = q - signature;
   signature = signature.select(flip, flipsig);
   return signature;
@@ -69,11 +71,8 @@ Integer ecdsa_sign(Integer message[2][16], EcdsaPartialSig_d partialsig, Integer
 
   computeSHA256_2d(message, result);
   Integer hash = composeSHA256result(result, thirtytwo);
-  string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
-  Integer q2(size, q2str, MERCH);
-  string qstr = "115792089237316195423570985008687907852837564279074904382605163141518161494337";
-  Integer q(258, qstr, MERCH);
-  return ecdsa_sign_hashed(hash, partialsig, q, q2);
+  Q qs = distribute_Q(MERCH);
+  return ecdsa_sign_hashed(hash, partialsig, qs);
 }
 
 // ecdsa-signs a message based on the given parameters
@@ -94,34 +93,32 @@ Integer ecdsa_sign(char msg[1024], EcdsaPartialSig_l pubsig, Integer thirtytwo) 
   Integer result[8];
   computeSHA256_2l(parsed_msg, result);
   Integer hash = composeSHA256result(result, thirtytwo);
-  string q2str = "57896044618658097711785492504343953926418782139537452191302581570759080747169";
-  Integer q2(size, q2str, MERCH);
-  string qstr = "115792089237316195423570985008687907852837564279074904382605163141518161494337";
-  Integer q(258, qstr, MERCH);
-  return ecdsa_sign_hashed(hash, partialsig, q, q2);
+  Q qs = distribute_Q(MERCH);
+  return ecdsa_sign_hashed(hash, partialsig, qs);
 }
 
-Integer ecdsa_sign_hashed(Integer broken_digest[8], EcdsaPartialSig_d partialsig, Integer thirtytwo, Integer q, Integer q2) {
+Integer ecdsa_sign_hashed(Integer broken_digest[8], EcdsaPartialSig_d partialsig, Integer thirtytwo, Q qs) {
   Integer digest = composeSHA256result(broken_digest, thirtytwo);
-  return ecdsa_sign_hashed(digest, partialsig, q, q2);
+  return ecdsa_sign_hashed(digest, partialsig, qs);
 }
 
-Integer ecdsa_sign_hashed(Integer digest, EcdsaPartialSig_d partialsig, Integer q, Integer q2) {
+Integer ecdsa_sign_hashed(Integer digest, EcdsaPartialSig_d partialsig, Q qs) {
   // retrieve shared/fixed q
 //  Integer q(258, get_ECDSA_params(), PUBLIC);
 
   digest.resize(258, false);
-  digest = digest % q;
+  digest = digest % qs.q;
 
   Integer s = digest + partialsig.r;
-  s = s % q;
+  s = s % qs.q;
 
   s.resize(516,true);
+  Integer q = qs.q;
   q.resize(516,true);
   s = partialsig.k_inv * s;
   s = s % q;
 
-  s = set_signature_sign(s, q, q2);
+  s = set_signature_sign(s, qs);
   s.resize(256,true);
   return s;
 }

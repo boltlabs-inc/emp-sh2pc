@@ -377,12 +377,12 @@ void localize_EcdsaSig(EcdsaSig_l* target, EcdsaSig_d EcdsaSig, const int party)
 }
 
 
-Balance_d convert_to_little_endian(Balance_d big_endian_balance, Integer xzerozeroff, Integer ffzerozero) {
+Balance_d convert_to_little_endian(Balance_d big_endian_balance, Constants constants) {
   Balance_d little_endian_balance;
 
-  Integer mask_second_leftmost_byte = xzerozeroff;
+  Integer mask_second_leftmost_byte = constants.xzerozeroff;
 //  Integer mask_second_leftmost_byte(32, 16711680 /* 00ff0000 */, PUBLIC);
-  Integer mask_second_rightmost_byte = ffzerozero;
+  Integer mask_second_rightmost_byte = constants.ffzerozero;
 //  Integer mask_second_rightmost_byte(32, 65280 /* 0000ff00 */, PUBLIC);
 
   little_endian_balance.balance[0] = ((big_endian_balance.balance[1]) << 24)
@@ -398,12 +398,12 @@ Balance_d convert_to_little_endian(Balance_d big_endian_balance, Integer xzeroze
   return little_endian_balance;
 
 }
-Balance_d convert_to_big_endian(Balance_d little_endian_balance, Integer xzerozeroff, Integer ffzerozero) {
+Balance_d convert_to_big_endian(Balance_d little_endian_balance, Constants constants) {
   Balance_d big_endian_balance;
 
-  Integer mask_second_leftmost_byte = xzerozeroff;
+  Integer mask_second_leftmost_byte = constants.xzerozeroff;
 //  Integer mask_second_leftmost_byte(32, 16711680 /* 00ff0000 */, PUBLIC);
-  Integer mask_second_rightmost_byte = ffzerozero;
+  Integer mask_second_rightmost_byte = constants.ffzerozero;
 //  Integer mask_second_rightmost_byte(32, 65280 /* 0000ff00 */, PUBLIC);
 
   big_endian_balance.balance[0] = ((little_endian_balance.balance[1]) << 24)
@@ -503,6 +503,50 @@ Integer combine_balance(Balance_d balance) {
   balance.balance[1].resize(64);
   balance.balance[0] = balance.balance[0] << 32;
   return balance.balance[0] | balance.balance[1];
+}
+
+Bit compare_k_H(Integer k[64], Integer H[8], Integer k_merch[64], Integer H_merch[8]) {
+  Bit error_signal(false);
+  for (int i=0; i<64; ++i) {
+    error_signal = error_signal | !k[i].equal(k_merch[i]);
+  }
+  for (int i=0; i<8; ++i) {
+    error_signal = error_signal | !H[i].equal(H_merch[i]);
+  }
+  return error_signal;
+}
+
+Bit compare_public_input(Balance_d epsilon_d, HMACKeyCommitment_d hmac_key_commitment_d, MaskCommitment_d paytoken_mask_commitment_d, RevLockCommitment_d rlc_d, Nonce_d nonce_d, BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, PublicKeyHash_d merch_publickey_hash_d,
+                                        Balance_d epsilon_d_merch, HMACKeyCommitment_d hmac_key_commitment_d_merch, MaskCommitment_d paytoken_mask_commitment_d_merch, RevLockCommitment_d rlc_d_merch, Nonce_d nonce_d_merch, BitcoinPublicKey_d merch_escrow_pub_key_d_merch, BitcoinPublicKey_d merch_dispute_key_d_merch, BitcoinPublicKey_d merch_payout_pub_key_d_merch, PublicKeyHash_d merch_publickey_hash_d_merch) {
+  Bit error_signal(false);
+  for (int i=0; i<2; ++i) {
+    error_signal = error_signal | !epsilon_d.balance[i].equal(epsilon_d_merch.balance[i]);
+  }
+  for (int i=0; i<8; ++i) {
+    error_signal = error_signal | !hmac_key_commitment_d.commitment[i].equal(hmac_key_commitment_d_merch.commitment[i]);
+  }
+  for (int i=0; i<8; ++i) {
+    error_signal = error_signal | !paytoken_mask_commitment_d.commitment[i].equal(paytoken_mask_commitment_d_merch.commitment[i]);
+  }
+  for (int i=0; i<8; ++i) {
+    error_signal = error_signal | !rlc_d.commitment[i].equal(rlc_d_merch.commitment[i]);
+  }
+  for (int i=0; i<4; ++i) {
+    error_signal = error_signal | !nonce_d.nonce[i].equal(nonce_d_merch.nonce[i]);
+  }
+  for (int i=0; i<9; ++i) {
+    error_signal = error_signal | !merch_escrow_pub_key_d.key[i].equal(merch_escrow_pub_key_d_merch.key[i]);
+  }
+  for (int i=0; i<9; ++i) {
+    error_signal = error_signal | !merch_dispute_key_d.key[i].equal(merch_dispute_key_d_merch.key[i]);
+  }
+  for (int i=0; i<9; ++i) {
+    error_signal = error_signal | !merch_payout_pub_key_d.key[i].equal(merch_payout_pub_key_d_merch.key[i]);
+  }
+  for (int i=0; i<5; ++i) {
+    error_signal = error_signal | !merch_publickey_hash_d.hash[i].equal(merch_publickey_hash_d_merch.hash[i]);
+  }
+  return error_signal;
 }
 
 

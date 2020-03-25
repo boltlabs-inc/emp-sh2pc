@@ -288,14 +288,12 @@ void computeDoubleSHA256_3d(Integer message[3][16], Integer result[8]) {
   Integer k[64];
   Integer H[8];
   initSHA256(k, H, CUST);
-  Integer xeight(32, 2147483648/*0x80000000*/, PUBLIC);
-  Integer twofivesix(32, 256, PUBLIC);
-  Integer zero(32, 0, PUBLIC);
+  Constants constants = distribute_Constants(PUBLIC);
 
-  computeDoubleSHA256_3d_noinit(message, result, k, H, xeight, twofivesix, zero);
+  computeDoubleSHA256_3d_noinit(message, result, k, H, constants);
 }
 
-void computeDoubleSHA256_3d_noinit(Integer message[3][16], Integer result[8], Integer k[64], Integer H[8], Integer xeight, Integer twofivesix, Integer zero) {
+void computeDoubleSHA256_3d_noinit(Integer message[3][16], Integer result[8], Integer k[64], Integer H[8], Constants constants) {
   Integer H2[8];
   for(int i = 0; i < 8; i++) {
       H2[i] = H[i];
@@ -325,12 +323,12 @@ void computeDoubleSHA256_3d_noinit(Integer message[3][16], Integer result[8], In
   }
 
 //  newmessage[0][8] = Integer(32, 2147483648/*0x80000000*/, PUBLIC);
-  newmessage[0][8] = xeight;
+  newmessage[0][8] = constants.xeight;
   for(int i=9; i<15; i++) {
-    newmessage[0][i] = zero;
+    newmessage[0][i] = constants.zero;
   }
 //  newmessage[0][15] = Integer(32, 256, PUBLIC);
-  newmessage[0][15] = twofivesix;
+  newmessage[0][15] = constants.twofivesix;
 
   computeSHA256_1d_noinit(newmessage, result, k, H);
 }
@@ -342,14 +340,12 @@ void computeDoubleSHA256_4d(Integer message[4][16], Integer result[8]/*, Integer
   Integer k[64];
   Integer H[8];
   initSHA256(k, H, CUST);
-  Integer xeight(32, 2147483648/*0x80000000*/, PUBLIC);
-  Integer twofivesix(32, 256, PUBLIC);
-  Integer zero(32, 0, PUBLIC);
+  Constants constants = distribute_Constants(PUBLIC);
 
-  computeDoubleSHA256_4d_noinit(message, result, k, H, xeight, twofivesix, zero);
+  computeDoubleSHA256_4d_noinit(message, result, k, H, constants);
 }
 
-void computeDoubleSHA256_4d_noinit(Integer message[4][16], Integer result[8], Integer k[64], Integer H[8], Integer xeight, Integer twofivesix, Integer zero) {
+void computeDoubleSHA256_4d_noinit(Integer message[4][16], Integer result[8], Integer k[64], Integer H[8], Constants constants) {
   Integer H2[8];
   for(int i = 0; i < 8; i++) {
       H2[i] = H[i];
@@ -375,12 +371,12 @@ void computeDoubleSHA256_4d_noinit(Integer message[4][16], Integer result[8], In
   }
 
 //  newmessage[0][8] = Integer(32, 2147483648/*0x80000000*/, PUBLIC);
-  newmessage[0][8] = xeight;
+  newmessage[0][8] = constants.xeight;
   for(int i=9; i<15; i++) {
-    newmessage[0][i] = zero;
+    newmessage[0][i] = constants.zero;
   }
 //  newmessage[0][15] = Integer(32, 256, PUBLIC);
-  newmessage[0][15] = twofivesix;
+  newmessage[0][15] = constants.twofivesix;
 
   computeSHA256_1d_noinit(newmessage, result, k, H);
 }
@@ -391,14 +387,12 @@ void computeDoubleSHA256_5d(Integer message[5][16], Integer result[8]/*, Integer
   Integer k[64];
   Integer H[8];
   initSHA256(k, H, CUST);
-  Integer xeight(32, 2147483648/*0x80000000*/, PUBLIC);
-  Integer twofivesix(32, 256, PUBLIC);
-  Integer zero(32, 0, PUBLIC);
+  Constants constants = distribute_Constants(PUBLIC);
 
-  computeDoubleSHA256_5d_noinit(message, result, k, H, xeight, twofivesix, zero);
+  computeDoubleSHA256_5d_noinit(message, result, k, H, constants);
 }
 
-void computeDoubleSHA256_5d_noinit(Integer message[5][16], Integer result[8], Integer k[64], Integer H[8], Integer xeight, Integer twofivesix, Integer zero) {
+void computeDoubleSHA256_5d_noinit(Integer message[5][16], Integer result[8], Integer k[64], Integer H[8], Constants constants) {
   Integer H2[8];
   for(int i = 0; i < 8; i++) {
       H2[i] = H[i];
@@ -424,12 +418,12 @@ void computeDoubleSHA256_5d_noinit(Integer message[5][16], Integer result[8], In
   }
 
 //  newmessage[0][8] = Integer(32, 2147483648/*0x80000000*/, PUBLIC);
-  newmessage[0][8] = xeight;
+  newmessage[0][8] = constants.xeight;
   for(int i=9; i<15; i++) {
-    newmessage[0][i] = zero;
+    newmessage[0][i] = constants.zero;
   }
 //  newmessage[0][15] = Integer(32, 256, PUBLIC);
-  newmessage[0][15] = twofivesix;
+  newmessage[0][15] = constants.twofivesix;
 
   computeSHA256_1d_noinit(newmessage, result, k, H);
 }

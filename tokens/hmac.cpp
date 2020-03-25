@@ -11,7 +11,7 @@ using namespace std;
  * We are computing SHA256(  ( key ^ ipad ) || state )
  * This requires 4 SHA256 rounds (state is ~928 bits and key^ipad is 512bits)
  */
-void innerhash(HMACKey_d key, State_d state, Integer innerhashresult[8], Integer ipad, Integer xeight, Integer threeazero, Integer zero, Integer k[64], Integer H[8]) {
+void innerhash(HMACKey_d key, State_d state, Integer innerhashresult[8], Constants constants, Integer k[64], Integer H[8]) {
 
   // Preparing the buffer for the hash input
 //  Integer ipad1(32, 909522486, PUBLIC);
@@ -20,7 +20,7 @@ void innerhash(HMACKey_d key, State_d state, Integer innerhashresult[8], Integer
 
   // XORing the key with inner pad
   for(int i=0; i<16; i++) {
-    message[0][i] = key.key[i] ^ ipad;
+    message[0][i] = key.key[i] ^ constants.ipad;
   }
 
   // Packing the state structure 
@@ -88,22 +88,22 @@ void innerhash(HMACKey_d key, State_d state, Integer innerhashresult[8], Integer
   // a single 1 bit, followed by 0's
   // The state is 1536 bits long.  Key block is 512.  Total is 2048 bits
 //  message[4][0] = Integer(32, -2147483648, PUBLIC); //0x80000000;
-  message[4][0] = xeight; //0x80000000;
-  message[4][1] = zero; //0x00000000;
-  message[4][2] = zero; //0x00000000;
-  message[4][3] = zero; //0x00000000;
-  message[4][4] = zero; //0x00000000;
-  message[4][5] = zero; //0x00000000;
-  message[4][6] = zero; //0x00000000;
-  message[4][7] = zero; //0x00000000;
-  message[4][8] = zero; //0x00000000;
-  message[4][9] = zero; //0x00000000;
-  message[4][10] = zero; //0x00000000;
-  message[4][11] = zero; //0x00000000;
-  message[4][12] = zero; //0x00000000;
-  message[4][13] = zero; //0x00000000;
-  message[4][14] = zero; //0x00000000;
-  message[4][15] = threeazero; //0x000003a0;
+  message[4][0] = constants.xeight; //0x80000000;
+  message[4][1] = constants.zero; //0x00000000;
+  message[4][2] = constants.zero; //0x00000000;
+  message[4][3] = constants.zero; //0x00000000;
+  message[4][4] = constants.zero; //0x00000000;
+  message[4][5] = constants.zero; //0x00000000;
+  message[4][6] = constants.zero; //0x00000000;
+  message[4][7] = constants.zero; //0x00000000;
+  message[4][8] = constants.zero; //0x00000000;
+  message[4][9] = constants.zero; //0x00000000;
+  message[4][10] = constants.zero; //0x00000000;
+  message[4][11] = constants.zero; //0x00000000;
+  message[4][12] = constants.zero; //0x00000000;
+  message[4][13] = constants.zero; //0x00000000;
+  message[4][14] = constants.zero; //0x00000000;
+  message[4][15] = constants.threeazero; //0x000003a0;
 //  message[4][15] = Integer(32, 2048, PUBLIC); //0x000003a0;
 
   computeSHA256_5d_noinit(message, innerhashresult, k, H);
@@ -113,7 +113,7 @@ void innerhash(HMACKey_d key, State_d state, Integer innerhashresult[8], Integer
  * the resulting hash is returned in outerhashresult
  * We are computing SHA256( ( key ^ opad ) || innerhashresult )
  */
-void outerhash(HMACKey_d key, Integer innerhashresult[8], Integer outerhashresult[8], Integer opad, Integer xeight, Integer threehundred, Integer zero, Integer k[64], Integer H[8]) {
+void outerhash(HMACKey_d key, Integer innerhashresult[8], Integer outerhashresult[8], Constants constants, Integer k[64], Integer H[8]) {
 
   // Preparing the buffer for the hash input
 //  Integer opad(32, 1549556828, PUBLIC);
@@ -123,7 +123,7 @@ void outerhash(HMACKey_d key, Integer innerhashresult[8], Integer outerhashresul
   // XORing the key with inner pad
   
   for(int i=0; i<16; i++) {
-    message[0][i] = key.key[i] ^ opad;
+    message[0][i] = key.key[i] ^ constants.opad;
   }
   
   for(int i=0; i<8; i++) {
@@ -132,16 +132,16 @@ void outerhash(HMACKey_d key, Integer innerhashresult[8], Integer outerhashresul
   
   //padding and length bits
 //  message[1][8]  = Integer(32, -2147483648, PUBLIC); //= 0x80000000;
-  message[1][8]  = xeight; //= 0x80000000;
-  message[1][9]  = zero; //0x00000000;
-  message[1][10] = zero; //0x00000000;
-  message[1][11] = zero; //0x00000000;
-  message[1][12] = zero; //0x00000000;
-  message[1][13] = zero; //0x00000000;
+  message[1][8]  = constants.xeight; //= 0x80000000;
+  message[1][9]  = constants.zero; //0x00000000;
+  message[1][10] = constants.zero; //0x00000000;
+  message[1][11] = constants.zero; //0x00000000;
+  message[1][12] = constants.zero; //0x00000000;
+  message[1][13] = constants.zero; //0x00000000;
   
   // 64 bit big-endian representaiton of 768
-  message[1][14] = zero; //0x00000000;
-  message[1][15] = threehundred; //0x00000300;
+  message[1][14] = constants.zero; //0x00000000;
+  message[1][15] = constants.threehundred; //0x00000300;
 //  message[1][15] = Integer(32, 768, PUBLIC); //0x00000300;
 
   // TODO: We need a version of SHA256 that can take this as input
@@ -149,11 +149,11 @@ void outerhash(HMACKey_d key, Integer innerhashresult[8], Integer outerhashresul
 } 
   
   
-void HMACsign(HMACKey_d merch_key, State_d state, Integer paytoken[8], Integer ipad, Integer xeight, Integer threeazero, Integer opad, Integer threehundred, Integer zero, Integer k[64], Integer H[8]) {
+void HMACsign(HMACKey_d merch_key, State_d state, Integer paytoken[8], Constants constants, Integer k[64], Integer H[8]) {
   
   Integer innerhashresult[8];
   
-  innerhash(merch_key, state, innerhashresult, ipad, xeight, threeazero, zero, k, H);
+  innerhash(merch_key, state, innerhashresult, constants, k, H);
   
-  outerhash(merch_key, innerhashresult, paytoken, opad, xeight, threehundred, zero, k, H);
+  outerhash(merch_key, innerhashresult, paytoken, constants, k, H);
 }
