@@ -31,6 +31,12 @@ void* get_gonetio_ptr(void *raw_stream_fd, int party) {
     return static_cast<void *>(io_ptr);
 }
 
+void* load_circuit_file(const char *filename) {
+  cout << "Loading circuit file for SH2PC: " << string(filename) << endl;
+  setup_plain_prot(true, filename);
+  return nullptr;
+}
+
 // TODO: add more meaningful fail / error states
 // TODO: rename to update_state
 void issue_tokens(

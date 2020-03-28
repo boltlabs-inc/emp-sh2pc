@@ -29,6 +29,9 @@ void* get_unixnetio_ptr(char *socket_path, int party);
 /* Returns a pointer to a GoNetIO ptr */
 void* get_gonetio_ptr(void *raw_stream_fd, int party);
 
+/* Returns a pointer to a CircitFile. Caller is responsible for freeing the memory */
+void* load_circuit_file(const char *path);
+
 /*
  * describes an API for calling MPC functions 
  * 
