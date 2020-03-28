@@ -239,7 +239,7 @@ int main(int argc, char** argv) {
 	merch_dispute_key_l.key[i] = 0;
 	merch_payout_pub_key_l.key[i] = 0;
   }
-  
+  void *cf_ptr = NULL;
 
   // Initialized single-party vars and call functions
   if (party == MERCH) {
@@ -253,7 +253,7 @@ int main(int argc, char** argv) {
     CommitmentRandomness_l hmac_rand;
     CommitmentRandomness_l pay_token_rand;
 
-	build_masked_tokens_merch(io_callback, nc,
+	build_masked_tokens_merch(io_callback, nc, cf_ptr,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
       merch_dispute_key_l, merch_publickey_hash,
       merch_payout_pub_key_l, nonce_l,
@@ -268,7 +268,7 @@ int main(int argc, char** argv) {
     EcdsaSig_l ct_escrow;
     EcdsaSig_l ct_merch;
 
-    build_masked_tokens_cust(io_callback, nc,
+    build_masked_tokens_cust(io_callback, nc, cf_ptr,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
           merch_dispute_key_l, merch_publickey_hash,
           merch_payout_pub_key_l, nonce_l,
