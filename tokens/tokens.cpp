@@ -233,6 +233,8 @@ void issue_tokens(
  */
 void build_masked_tokens_cust(IOCallback io_callback,
   struct Conn_l conn,
+  void *circuit_file,
+  
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
 
@@ -336,6 +338,7 @@ issue_tokens(
 
 void build_masked_tokens_merch(IOCallback io_callback,
   struct Conn_l conn,
+  void *circuit_file,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
 

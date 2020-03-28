@@ -215,6 +215,7 @@ struct State_l {
 void build_masked_tokens_cust(
   IOCallback io_callback,
   struct Conn_l conn,
+  void *circuit_file,
 
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, 
@@ -277,6 +278,8 @@ void build_masked_tokens_cust(
 void build_masked_tokens_merch(
   IOCallback io_callback,
   struct Conn_l conn,
+  void *circuit_file,
+
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, 
   struct MaskCommitment_l paymask_com,
