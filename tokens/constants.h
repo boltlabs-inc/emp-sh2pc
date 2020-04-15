@@ -15,8 +15,8 @@ struct Constants {
     Integer twofivesix;
     Integer threeeightfour;
 
-    Integer k[64];
-    Integer H[8];
+    //Integer k[64];
+    //Integer H[8];
     Integer xsixthreedot;
     Integer eighteight;
     Integer xtwentyone;

@@ -16,7 +16,6 @@ using namespace std;
 #include "cryptopp/hex.h"
 #include "cryptopp/hmac.h"
 #include "cryptopp/sha.h"
-#include "cryptopp/sha3.h"
 #include "cryptopp/secblock.h"
 #define byte unsigned char
 

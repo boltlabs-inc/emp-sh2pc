@@ -23,7 +23,6 @@ using namespace std;
 #include "cryptopp/filters.h"
 #include "cryptopp/hex.h"
 #include "cryptopp/sha.h"
-#include "cryptopp/sha3.h"
 #define byte unsigned char
 
 // boost header to compare strings
