@@ -122,6 +122,9 @@ struct State_d {
   Txid_d txid_escrow;
   Txid_d HashPrevOuts_merch;
   Txid_d HashPrevOuts_escrow;
+  Balance_d min_fee;
+  Balance_d max_fee;
+  Balance_d fee_mc;
 };
 
 /* Commitment stuff
@@ -360,5 +363,5 @@ void mask_closetoken(Integer token[8], Mask_d mask);
 void bigint_into_smallint_array(Integer target[8], Integer source, Integer fullF);
 
 Bit compare_k_H(Integer k[64], Integer H[8], Integer k_merch[64], Integer H_merch[8]);
-Bit compare_public_input(Balance_d epsilon_d, HMACKeyCommitment_d hmac_key_commitment_d, MaskCommitment_d paytoken_mask_commitment_d, RevLockCommitment_d rlc_d, Nonce_d nonce_d, BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, PublicKeyHash_d merch_publickey_hash_d,
-                                        Balance_d epsilon_d_merch, HMACKeyCommitment_d hmac_key_commitment_d_merch, MaskCommitment_d paytoken_mask_commitment_d_merch, RevLockCommitment_d rlc_d_merch, Nonce_d nonce_d_merch, BitcoinPublicKey_d merch_escrow_pub_key_d_merch, BitcoinPublicKey_d merch_dispute_key_d_merch, BitcoinPublicKey_d merch_payout_pub_key_d_merch, PublicKeyHash_d merch_publickey_hash_d_merch);
+Bit compare_public_input(Balance_d epsilon_d, HMACKeyCommitment_d hmac_key_commitment_d, MaskCommitment_d paytoken_mask_commitment_d, RevLockCommitment_d rlc_d, Nonce_d nonce_d, Balance_d val_cpfp_d, BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, PublicKeyHash_d merch_publickey_hash_d,
+                                        Balance_d epsilon_d_merch, HMACKeyCommitment_d hmac_key_commitment_d_merch, MaskCommitment_d paytoken_mask_commitment_d_merch, RevLockCommitment_d rlc_d_merch, Nonce_d nonce_d_merch, Balance_d val_cpfp_d_merch, BitcoinPublicKey_d merch_escrow_pub_key_d_merch, BitcoinPublicKey_d merch_dispute_key_d_merch, BitcoinPublicKey_d merch_payout_pub_key_d_merch, PublicKeyHash_d merch_publickey_hash_d_merch);

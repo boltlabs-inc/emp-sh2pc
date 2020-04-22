@@ -43,6 +43,7 @@ void issue_tokens(
 /* CUSTOMER INPUTS */
   State_l old_state_l,
   State_l new_state_l,
+  Balance_l fee_cc,
   PayToken_l old_paytoken_l,
   BitcoinPublicKey_l cust_escrow_pub_key_l,
   BitcoinPublicKey_l cust_payout_pub_key_l,
@@ -64,6 +65,7 @@ void issue_tokens(
   MaskCommitment_l paytoken_mask_commitment_l,
   RevLockCommitment_l rlc_l,
   Nonce_l nonce_l,
+  Balance_l val_cpfp,
   BitcoinPublicKey_l merch_escrow_pub_key_l,
   BitcoinPublicKey_l merch_dispute_key_l, 
   BitcoinPublicKey_l merch_payout_pub_key_l,
@@ -79,6 +81,7 @@ void issue_tokens(
 
   State_d old_state_d = distribute_State(old_state_l, CUST);
   State_d new_state_d = distribute_State(new_state_l, CUST);
+  Balance_d fee_cc_d = distribute_Balance(fee_cc, CUST);
   PayToken_d old_paytoken_d = distribute_PayToken(old_paytoken_l, CUST);
   BitcoinPublicKey_d cust_escrow_pub_key_d = distribute_BitcoinPublicKey(cust_escrow_pub_key_l, CUST);
   BitcoinPublicKey_d cust_payout_pub_key_d = distribute_BitcoinPublicKey(cust_payout_pub_key_l, CUST);
@@ -90,6 +93,7 @@ void issue_tokens(
   MaskCommitment_d paytoken_mask_commitment_d = distribute_MaskCommitment(paytoken_mask_commitment_l, CUST);
   RevLockCommitment_d rlc_d = distribute_RevLockCommitment(rlc_l, CUST);
   Nonce_d nonce_d = distribute_Nonce(nonce_l, CUST);
+  Balance_d val_cpfp_d = distribute_Balance(val_cpfp, CUST);
   BitcoinPublicKey_d merch_escrow_pub_key_d = distribute_BitcoinPublicKey(merch_escrow_pub_key_l, CUST);
   BitcoinPublicKey_d merch_dispute_key_d = distribute_BitcoinPublicKey(merch_dispute_key_l, CUST);
   BitcoinPublicKey_d merch_payout_pub_key_d = distribute_BitcoinPublicKey(merch_payout_pub_key_l, CUST);
@@ -120,6 +124,7 @@ void issue_tokens(
   MaskCommitment_d paytoken_mask_commitment_d_merch = distribute_MaskCommitment(paytoken_mask_commitment_l, MERCH);
   RevLockCommitment_d rlc_d_merch = distribute_RevLockCommitment(rlc_l, MERCH);
   Nonce_d nonce_d_merch = distribute_Nonce(nonce_l, MERCH);
+  Balance_d val_cpfp_d_merch = distribute_Balance(val_cpfp, MERCH);
   BitcoinPublicKey_d merch_escrow_pub_key_d_merch = distribute_BitcoinPublicKey(merch_escrow_pub_key_l, MERCH);
   BitcoinPublicKey_d merch_dispute_key_d_merch = distribute_BitcoinPublicKey(merch_dispute_key_l, MERCH);
   BitcoinPublicKey_d merch_payout_pub_key_d_merch = distribute_BitcoinPublicKey(merch_payout_pub_key_l, MERCH);
@@ -133,12 +138,12 @@ void issue_tokens(
   
   Q qs_merch = distribute_Q(MERCH);
 
-  Integer(948, 0, MERCH); //Fix for different number of input wires between parties
+  Integer(1396, 0, MERCH); //Fix for different number of input wires between parties
 
   //Compare public inputs + constants to be the same between CUST and MERCH
   Bit error_signal(false);
-  error_signal = error_signal | compare_public_input(epsilon_d, hmac_key_commitment_d, paytoken_mask_commitment_d, rlc_d, nonce_d, merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, merch_publickey_hash_d,
-                                    epsilon_d_merch, hmac_key_commitment_d_merch, paytoken_mask_commitment_d_merch, rlc_d_merch, nonce_d_merch, merch_escrow_pub_key_d_merch, merch_dispute_key_d_merch, merch_payout_pub_key_d_merch, merch_publickey_hash_d_merch);
+  error_signal = error_signal | compare_public_input(epsilon_d, hmac_key_commitment_d, paytoken_mask_commitment_d, rlc_d, nonce_d, val_cpfp_d, merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, merch_publickey_hash_d,
+                                    epsilon_d_merch, hmac_key_commitment_d_merch, paytoken_mask_commitment_d_merch, rlc_d_merch, nonce_d_merch, val_cpfp_d_merch, merch_escrow_pub_key_d_merch, merch_dispute_key_d_merch, merch_payout_pub_key_d_merch, merch_publickey_hash_d_merch);
   error_signal = error_signal | constants_not_equal(constants, constants_merch);
   error_signal = error_signal | q_not_equal(qs, qs_merch);
   error_signal = error_signal | compare_k_H(k, H, k_merch, H_merch);
@@ -251,10 +256,12 @@ void build_masked_tokens_cust(IOCallback io_callback,
   struct PublicKeyHash_l merch_publickey_hash,
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
+  struct Balance_l val_cpfp,
 
   struct CommitmentRandomness_l revlock_commitment_randomness_l,
   struct State_l w_new,
   struct State_l w_old,
+  struct Balance_l fee_cc,
   struct PayToken_l pt_old,
   struct BitcoinPublicKey_l cust_escrow_pub_key_l,
   struct BitcoinPublicKey_l cust_payout_pub_key_l,
@@ -304,6 +311,7 @@ issue_tokens(
 /* CUSTOMER INPUTS */
   w_old,
   w_new,
+  fee_cc,
   pt_old,
   cust_escrow_pub_key_l,
   cust_payout_pub_key_l,
@@ -325,6 +333,7 @@ issue_tokens(
   paymask_com,
   rlc_l,
   nonce_l,
+  val_cpfp,
   merch_escrow_pub_key_l,
   merch_dispute_key_l, 
   merch_payout_pub_key_l,
@@ -355,6 +364,7 @@ void build_masked_tokens_merch(IOCallback io_callback,
   struct PublicKeyHash_l merch_publickey_hash,
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
+  struct Balance_l val_cpfp,
 
   struct HMACKey_l hmac_key,
   struct Mask_l merch_mask_l,
@@ -394,6 +404,7 @@ void build_masked_tokens_merch(IOCallback io_callback,
 
   State_l old_state_l;
   State_l new_state_l;
+  Balance_l fee_cc;
   PayToken_l old_paytoken_l;
   BitcoinPublicKey_l cust_escrow_pub_key_l;
   BitcoinPublicKey_l cust_payout_pub_key_l;
@@ -407,6 +418,7 @@ issue_tokens(
 /* CUSTOMER INPUTS */
   old_state_l,
   new_state_l,
+  fee_cc,
   old_paytoken_l,
   cust_escrow_pub_key_l,
   cust_payout_pub_key_l,
@@ -428,6 +440,7 @@ issue_tokens(
   paymask_com,
   rlc_l,
   nonce_l,
+  val_cpfp,
   merch_escrow_pub_key_l,
   merch_dispute_key_l,
   merch_payout_pub_key_l, 

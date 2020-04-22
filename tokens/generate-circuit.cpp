@@ -17,6 +17,7 @@ int main(int argc, char** argv) {
 
     State_l old_state_l;
     State_l new_state_l;
+    Balance_l fee_cc;
     PayToken_l old_paytoken_l;
     BitcoinPublicKey_l cust_escrow_pub_key_l;
     BitcoinPublicKey_l cust_payout_pub_key_l;
@@ -35,10 +36,12 @@ int main(int argc, char** argv) {
     PublicKeyHash_l merch_publickey_hash;
     BitcoinPublicKey_l merch_payout_pub_key_l;
     Nonce_l nonce_l;
+    Balance_l val_cpfp;
 
     issue_tokens(/* CUSTOMER INPUTS */
                    old_state_l,
                    new_state_l,
+                   fee_cc,
                    old_paytoken_l,
                    cust_escrow_pub_key_l,
                    cust_payout_pub_key_l,
@@ -60,6 +63,7 @@ int main(int argc, char** argv) {
                    paymask_com,
                    rlc_l,
                    nonce_l,
+                   val_cpfp,
                    merch_escrow_pub_key_l,
                    merch_dispute_key_l,
                    merch_payout_pub_key_l,

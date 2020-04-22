@@ -155,6 +155,10 @@ State_d distribute_State(State_l state, const int party) {
   to_return.HashPrevOuts_merch = distribute_Txid(state.HashPrevOuts_merch, party);
   to_return.HashPrevOuts_escrow = distribute_Txid(state.HashPrevOuts_escrow, party);
 
+  to_return.min_fee = distribute_Balance(state.min_fee, party);
+  to_return.max_fee = distribute_Balance(state.max_fee, party);
+  to_return.fee_mc = distribute_Balance(state.fee_mc, party);
+
   return to_return;
 }
 
@@ -516,8 +520,8 @@ Bit compare_k_H(Integer k[64], Integer H[8], Integer k_merch[64], Integer H_merc
   return error_signal;
 }
 
-Bit compare_public_input(Balance_d epsilon_d, HMACKeyCommitment_d hmac_key_commitment_d, MaskCommitment_d paytoken_mask_commitment_d, RevLockCommitment_d rlc_d, Nonce_d nonce_d, BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, PublicKeyHash_d merch_publickey_hash_d,
-                                        Balance_d epsilon_d_merch, HMACKeyCommitment_d hmac_key_commitment_d_merch, MaskCommitment_d paytoken_mask_commitment_d_merch, RevLockCommitment_d rlc_d_merch, Nonce_d nonce_d_merch, BitcoinPublicKey_d merch_escrow_pub_key_d_merch, BitcoinPublicKey_d merch_dispute_key_d_merch, BitcoinPublicKey_d merch_payout_pub_key_d_merch, PublicKeyHash_d merch_publickey_hash_d_merch) {
+Bit compare_public_input(Balance_d epsilon_d, HMACKeyCommitment_d hmac_key_commitment_d, MaskCommitment_d paytoken_mask_commitment_d, RevLockCommitment_d rlc_d, Nonce_d nonce_d, Balance_d val_cpfp_d, BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, PublicKeyHash_d merch_publickey_hash_d,
+                                        Balance_d epsilon_d_merch, HMACKeyCommitment_d hmac_key_commitment_d_merch, MaskCommitment_d paytoken_mask_commitment_d_merch, RevLockCommitment_d rlc_d_merch, Nonce_d nonce_d_merch, Balance_d val_cpfp_d_merch, BitcoinPublicKey_d merch_escrow_pub_key_d_merch, BitcoinPublicKey_d merch_dispute_key_d_merch, BitcoinPublicKey_d merch_payout_pub_key_d_merch, PublicKeyHash_d merch_publickey_hash_d_merch) {
   Bit error_signal(false);
   for (int i=0; i<2; ++i) {
     error_signal = error_signal | !epsilon_d.balance[i].equal(epsilon_d_merch.balance[i]);
@@ -533,6 +537,9 @@ Bit compare_public_input(Balance_d epsilon_d, HMACKeyCommitment_d hmac_key_commi
   }
   for (int i=0; i<4; ++i) {
     error_signal = error_signal | !nonce_d.nonce[i].equal(nonce_d_merch.nonce[i]);
+  }
+  for (int i=0; i<2; ++i) {
+    error_signal = error_signal | !val_cpfp_d.balance[i].equal(val_cpfp_d_merch.balance[i]);
   }
   for (int i=0; i<9; ++i) {
     error_signal = error_signal | !merch_escrow_pub_key_d.key[i].equal(merch_escrow_pub_key_d_merch.key[i]);

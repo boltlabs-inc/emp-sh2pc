@@ -180,6 +180,9 @@ struct State_l {
   struct Txid_l txid_escrow;
   struct Txid_l HashPrevOuts_merch;
   struct Txid_l HashPrevOuts_escrow;
+  struct Balance_l min_fee;
+  struct Balance_l max_fee;
+  struct Balance_l fee_mc;
 };
 
 /* customer's token generation function
@@ -199,6 +202,7 @@ struct State_l {
  * \param[in] merch_publickey_hash : (shared) merchant public key, hashed for bitcoin transaction
  * \param[in] merch_payout_pub_key : (shared) merchant public key for payouts
  * \param[in] nonce                : (shared) random nonce used to uniquely identify state
+ * \param[in] val_cpfp             : (shared) child pays for parent amount
  *
  * \param[in] revlock_commitment_randomness 
  *                      : (private) randomness used to commit to revlock 
@@ -229,10 +233,12 @@ void build_masked_tokens_cust(
   struct PublicKeyHash_l merch_publickey_hash,
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
+  struct Balance_l val_cpfp,
 
   struct CommitmentRandomness_l revlock_commitment_randomness_l,
   struct State_l w_new,
   struct State_l w_old,
+  struct Balance_l fee_cc,
   struct PayToken_l pt_old,
   struct BitcoinPublicKey_l cust_escrow_pub_key_l,
   struct BitcoinPublicKey_l cust_payout_pub_key_l,
@@ -267,6 +273,7 @@ void build_masked_tokens_cust(
  * \param[in] merch_publickey_hash : (shared) merchant public key, hashed for bitcoin transaction
  * \param[in] merch_payout_pub_key : (shared) merchant public key for payouts
  * \param[in] nonce                : (shared) random nonce used to uniquely identify state
+ * \param[in] val_cpfp             : (shared) child pays for parent amount
  *
  * \param[in] hmac_key      : (private) The key used to make HMACs (e.g. ? and ?)
  * \param[in] merch_mask    : (private) Random mask for merchant close transaction
@@ -292,6 +299,7 @@ void build_masked_tokens_merch(
   struct PublicKeyHash_l merch_publickey_hash, // TODO: what is this?
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
+  struct Balance_l val_cpfp,
 
   struct HMACKey_l hmac_key,
   struct Mask_l merch_mask_l,
@@ -307,6 +315,7 @@ void issue_tokens(
 /* CUSTOMER INPUTS */
   State_l old_state_l,
   State_l new_state_l,
+  Balance_l fee_cc,
   PayToken_l old_paytoken_l,
   BitcoinPublicKey_l cust_escrow_pub_key_l,
   BitcoinPublicKey_l cust_payout_pub_key_l,
@@ -328,6 +337,7 @@ void issue_tokens(
   MaskCommitment_l paytoken_mask_commitment_l,
   RevLockCommitment_l rlc_l,
   Nonce_l nonce_l,
+  Balance_l val_cpfp,
   BitcoinPublicKey_l merch_escrow_pub_key_l,
   BitcoinPublicKey_l merch_dispute_key_l,
   BitcoinPublicKey_l merch_payout_pub_key_l,

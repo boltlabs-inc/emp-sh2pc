@@ -137,6 +137,7 @@ int main(int argc, char** argv) {
 
         State_l old_state_l;
         State_l new_state_l;
+        Balance_l fee_cc;
         PayToken_l old_paytoken_l;
         BitcoinPublicKey_l cust_escrow_pub_key_l;
         BitcoinPublicKey_l cust_payout_pub_key_l;
@@ -155,10 +156,12 @@ int main(int argc, char** argv) {
         PublicKeyHash_l merch_publickey_hash;
         BitcoinPublicKey_l merch_payout_pub_key_l;
         Nonce_l nonce_l;
+        Balance_l val_cpfp;
 
         issue_tokens(/* CUSTOMER INPUTS */
                        old_state_l,
                        new_state_l,
+                       fee_cc,
                        old_paytoken_l,
                        cust_escrow_pub_key_l,
                        cust_payout_pub_key_l,
@@ -180,6 +183,7 @@ int main(int argc, char** argv) {
                        paymask_com,
                        rlc_l,
                        nonce_l,
+                       val_cpfp,
                        merch_escrow_pub_key_l,
                        merch_dispute_key_l,
                        merch_payout_pub_key_l,
@@ -219,6 +223,7 @@ int main(int argc, char** argv) {
   PublicKeyHash_l merch_publickey_hash;
   BitcoinPublicKey_l merch_payout_pub_key_l;
   Nonce_l nonce_l;
+  Balance_l val_cpfp;
 
   // Initialize shared vars
   amt.balance[0] = 1000;
@@ -256,10 +261,11 @@ int main(int argc, char** argv) {
 	build_masked_tokens_merch(io_callback, nc, cf_ptr,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
       merch_dispute_key_l, merch_publickey_hash,
-      merch_payout_pub_key_l, nonce_l,
+      merch_payout_pub_key_l, nonce_l, val_cpfp,
       hmac_key, mask, mask, mask, hmac_rand, pay_token_rand, sig, sig);
   } else {
     State_l w;
+    Balance_l fee_cc;
     PayToken_l pt_old;
     CommitmentRandomness_l rl_rand;
     BitcoinPublicKey_l cust_escrow_pub_key_l;
@@ -271,8 +277,8 @@ int main(int argc, char** argv) {
     build_masked_tokens_cust(io_callback, nc, cf_ptr,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
           merch_dispute_key_l, merch_publickey_hash,
-          merch_payout_pub_key_l, nonce_l,
-	  rl_rand, w, w, pt_old, cust_escrow_pub_key_l, cust_payout_pub_key_l,
+          merch_payout_pub_key_l, nonce_l, val_cpfp,
+	  rl_rand, w, w, fee_cc, pt_old, cust_escrow_pub_key_l, cust_payout_pub_key_l,
 	  &pt_return, &ct_escrow, &ct_merch);
   }
 
