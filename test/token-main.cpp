@@ -145,6 +145,7 @@ int main(int argc, char** argv) {
         EcdsaSig_l ct_escrow;
         EcdsaSig_l ct_merch;
         CommitmentRandomness_l revlock_commitment_randomness_l;
+        PublicKeyHash_l cust_publickey_hash_l;
 
         Balance_l epsilon_l;
         RevLockCommitment_l rlc_l;
@@ -166,7 +167,7 @@ int main(int argc, char** argv) {
                        cust_escrow_pub_key_l,
                        cust_payout_pub_key_l,
                        revlock_commitment_randomness_l,
-
+                       cust_publickey_hash_l,
                      /* MERCHANT INPUTS */
                        hmac_key_l,
                        paytoken_mask_l,
@@ -273,12 +274,13 @@ int main(int argc, char** argv) {
     PayToken_l pt_return;
     EcdsaSig_l ct_escrow;
     EcdsaSig_l ct_merch;
+    PublicKeyHash_l cust_publickey_hash_l;
 
     build_masked_tokens_cust(io_callback, nc, cf_ptr,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
           merch_dispute_key_l, merch_publickey_hash,
           merch_payout_pub_key_l, nonce_l, val_cpfp,
-	  rl_rand, w, w, fee_cc, pt_old, cust_escrow_pub_key_l, cust_payout_pub_key_l,
+	  rl_rand, w, w, fee_cc, pt_old, cust_escrow_pub_key_l, cust_payout_pub_key_l, cust_publickey_hash_l,
 	  &pt_return, &ct_escrow, &ct_merch);
   }
 

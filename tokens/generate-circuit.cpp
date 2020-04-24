@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
     EcdsaSig_l ct_escrow;
     EcdsaSig_l ct_merch;
     CommitmentRandomness_l revlock_commitment_randomness_l;
+    PublicKeyHash_l cust_publickey_hash_l;
 
     Balance_l epsilon_l;
     RevLockCommitment_l rlc_l;
@@ -46,7 +47,7 @@ int main(int argc, char** argv) {
                    cust_escrow_pub_key_l,
                    cust_payout_pub_key_l,
                    revlock_commitment_randomness_l,
-
+                   cust_publickey_hash_l,
                  /* MERCHANT INPUTS */
                    hmac_key_l,
                    paytoken_mask_l,

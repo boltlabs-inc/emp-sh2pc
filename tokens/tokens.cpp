@@ -48,6 +48,7 @@ void issue_tokens(
   BitcoinPublicKey_l cust_escrow_pub_key_l,
   BitcoinPublicKey_l cust_payout_pub_key_l,
   CommitmentRandomness_l revlock_commitment_randomness_l,
+  PublicKeyHash_l cust_publickey_hash_l,
 /* MERCHANT INPUTS */
   HMACKey_l hmac_key_l,
   Mask_l paytoken_mask_l,
@@ -86,6 +87,7 @@ void issue_tokens(
   BitcoinPublicKey_d cust_escrow_pub_key_d = distribute_BitcoinPublicKey(cust_escrow_pub_key_l, CUST);
   BitcoinPublicKey_d cust_payout_pub_key_d = distribute_BitcoinPublicKey(cust_payout_pub_key_l, CUST);
   CommitmentRandomness_d revlock_commitment_randomness_d = distribute_CommitmentRandomness(revlock_commitment_randomness_l, CUST);
+  PublicKeyHash_d cust_publickey_hash_d = distribute_PublicKeyHash(cust_publickey_hash_l, CUST);
 
   // PUBLIC values
   Balance_d epsilon_d = distribute_Balance(epsilon_l, CUST); // IVE BEEN TREATING THIS LIKE A 32 BIT VALUE, BUT ITS 64
@@ -138,7 +140,7 @@ void issue_tokens(
   
   Q qs_merch = distribute_Q(MERCH);
 
-  Integer(1396, 0, MERCH); //Fix for different number of input wires between parties
+  Integer(1556, 0, MERCH); //Fix for different number of input wires between parties
 
   //Compare public inputs + constants to be the same between CUST and MERCH
   Bit error_signal(false);
@@ -265,6 +267,7 @@ void build_masked_tokens_cust(IOCallback io_callback,
   struct PayToken_l pt_old,
   struct BitcoinPublicKey_l cust_escrow_pub_key_l,
   struct BitcoinPublicKey_l cust_payout_pub_key_l,
+  struct PublicKeyHash_l cust_publickey_hash_l,
 
   struct PayToken_l* pt_return,
   struct EcdsaSig_l* ct_escrow,
@@ -316,7 +319,7 @@ issue_tokens(
   cust_escrow_pub_key_l,
   cust_payout_pub_key_l,
   revlock_commitment_randomness_l,
-
+  cust_publickey_hash_l,
 /* MERCHANT INPUTS */
   hmac_key_l,
   paytoken_mask_l,
@@ -412,6 +415,7 @@ void build_masked_tokens_merch(IOCallback io_callback,
   EcdsaSig_l ct_escrow;
   EcdsaSig_l ct_merch;
   CommitmentRandomness_l revlock_commitment_randomness_l;
+  PublicKeyHash_l cust_publickey_hash_l;
 
 
 issue_tokens(
@@ -423,7 +427,7 @@ issue_tokens(
   cust_escrow_pub_key_l,
   cust_payout_pub_key_l,
   revlock_commitment_randomness_l,
-
+  cust_publickey_hash_l,
 /* MERCHANT INPUTS */
   hmac_key,
   paytoken_mask_l,
