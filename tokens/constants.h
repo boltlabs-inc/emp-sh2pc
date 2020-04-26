@@ -7,13 +7,14 @@ typedef struct Constants Constants;
 struct Constants {
     Integer ipad;
     Integer xeight; //0x80000000;
-    Integer threeazero; //0x000003a0;
+    Integer hmacinnerhashlength;
     Integer opad;
-    Integer threehundred; //0x00000300;
-    Integer sixforty;
+    Integer hmacouterhashlength;
+    Integer hmackeycommitmentpreimagelength;
     Integer fullF;
-    Integer twofivesix;
-    Integer threeeightfour;
+    Integer doubleshapreimagelength;
+    Integer revlockcommitmentpreimagelength;
+    Integer maskcommitmentpreimagelength;
 
     //Integer k[64];
     //Integer H[8];
@@ -24,15 +25,14 @@ struct Constants {
     Integer twohundred;
     Integer xcfzerofive;
     Integer btwosevenfive;
-    Integer eightninesix;
+    Integer customerdelayerscriptpreimagelength;
     Integer sixeightac;
     Integer xtwentytwodot;
     Integer sixteen;
     Integer xzerozerofourteen;
     Integer threesevensixa;
     Integer xfourtyone;
-    Integer eightthousand;
-    Integer twelvehundred;
+    Integer xeightthirdbyte;
     Integer xzerotwo;
     Integer xthreedot;
     Integer xcdot;
@@ -46,7 +46,7 @@ struct Constants {
     Integer fivetwoae;
     Integer fullFthirtytwo;
     Integer xzeroone;
-    Integer oneeighttwofour; // 228*8 = 1824 bits
+    Integer escrowpreimagelength; // 228*8 = 1824 bits
     Integer xseventwosixdot;
     Integer xzerozerotwentyone;
     Integer fiftytwo;
@@ -56,13 +56,14 @@ struct Constants {
     Integer ff;
     Integer ffffffzerozero;
     Integer one;
-    Integer eighty;
-    Integer twoonesixeight; // 271*8 = 2168 bits
+    Integer xeightfourthbyte;
+    Integer merchpreimagelength; // 271*8 = 2168 bits
     Integer xzerozeroff;
     Integer ffzerozero;
     Integer thirtytwo;
     
     Integer zero;
+    Integer dustlimit;
 };
 
 typedef struct Q Q;
