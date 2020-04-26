@@ -63,6 +63,7 @@ Constants distribute_Constants(const int party) {
 
       // Selection masks
       .fullF =Integer(256, 4294967295 /* 0xffffffff */, party),
+      .fullFsixtyfour =Integer(64, 4294967295, party),
       .fullFthirtytwo =Integer(32, 4294967295 /*0xffffffff*/, party),
       .xzerozeroff =Integer(32, 16711680 /* 00ff0000 */, party),
       .ff =Integer(32, 255 /* 0x000000ff */ , party),
@@ -129,6 +130,7 @@ Bit constants_not_equal(const Constants& lhs, const Constants& rhs) {
   error_signal = error_signal | !lhs.xsixteenzerozero.equal(rhs.xsixteenzerozero);
   error_signal = error_signal | !lhs.xfourteenzerozero.equal(rhs.xfourteenzerozero);
   error_signal = error_signal | !lhs.fullF.equal(rhs.fullF);
+  error_signal = error_signal | !lhs.fullFsixtyfour.equal(rhs.fullFsixtyfour);
   error_signal = error_signal | !lhs.fullFthirtytwo.equal(rhs.fullFthirtytwo);
   error_signal = error_signal | !lhs.xzerozeroff.equal(rhs.xzerozeroff);
   error_signal = error_signal | !lhs.ff.equal(rhs.ff);

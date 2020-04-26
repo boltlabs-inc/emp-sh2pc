@@ -206,6 +206,7 @@ CommitmentRandomness_l localize_CommitmentRandomness(CommitmentRandomness_d rand
 Balance_d sum_balances(Balance_d lhs, Balance_d rhs, Integer zero);
 
 Integer combine_balance(Balance_d balance);
+Balance_d split_integer_to_balance(Integer integer, Integer mask);
 
 BitcoinPublicKey_d distribute_BitcoinPublicKey(BitcoinPublicKey_l pubKey, const int party);
 BitcoinPublicKey_l localize_BitcoinPublicKey(BitcoinPublicKey_d pubKey, const int party);
@@ -333,7 +334,7 @@ Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, Commitm
 void validate_transactions(State_d new_state_d, 
   BitcoinPublicKey_d cust_escrow_pub_key_d, BitcoinPublicKey_d cust_payout_pub_key_d, PublicKeyHash_d cust_child_publickey_hash_d,
   BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, 
-  PublicKeyHash_d merch_publickey_hash_d, Integer escrow_digest[8], Integer merch_digest[8], Integer k[64], Integer H[8], Balance_d val_cfcp_d, Constants constants);
+  PublicKeyHash_d merch_publickey_hash_d, Integer escrow_digest[8], Integer merch_digest[8], Balance_d fee_cc_d, Integer k[64], Integer H[8], Balance_d val_cfcp_d, Constants constants);
 
 /* applies a mask to a pay token
  * uses a one-time-pad scheme (just xors mask with token bits)

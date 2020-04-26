@@ -58,6 +58,7 @@ struct Constants {
     Integer xfourteenzerozero;
 
     Integer fullF;
+    Integer fullFsixtyfour;
     Integer fullFthirtytwo;
     Integer xzerozeroff;
     Integer ff;
