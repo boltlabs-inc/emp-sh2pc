@@ -160,7 +160,7 @@ void issue_tokens(
 #if defined(DEBUG)
   cout << "comparing old to new state" << endl;
 #endif
-  error_signal = (error_signal | compare_states(old_state_d, new_state_d, rlc_d, revlock_commitment_randomness_d, nonce_d, epsilon_d, fee_cc_d, k, H, constants));
+  error_signal = (error_signal | compare_states(old_state_d, new_state_d, rlc_d, revlock_commitment_randomness_d, nonce_d, epsilon_d, fee_cc_d, val_cpfp_d, k, H, constants));
 
   // constructs new close transactions and computes hash
 #if defined(DEBUG)
@@ -481,7 +481,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
   message[1][2] = hmac_commitment_randomness_d.randomness[2];
   message[1][3] = hmac_commitment_randomness_d.randomness[3];
 //  message[1][4] = Integer(32, -2147483648, PUBLIC); //0x80000000;
-  message[1][4] = constants.xeight; //0x80000000;
+  message[1][4] = constants.xeightfirstbyte; //0x80000000;
   message[1][5] = constants.zero; //0x00000000;
   message[1][6] = constants.zero; //0x00000000;
   message[1][7] = constants.zero; //0x00000000;
@@ -520,7 +520,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
 }
 
 // make sure wallets are well-formed
-Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d revlock_commitment_randomness_d, Nonce_d nonce_d, Balance_d epsilon_d, Balance_d fee_cc_d, Integer k[64], Integer H[8], Constants constants) {
+Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d revlock_commitment_randomness_d, Nonce_d nonce_d, Balance_d epsilon_d, Balance_d fee_cc_d, Balance_d val_cpfp_d, Integer k[64], Integer H[8], Constants constants) {
 
   //Make sure the fields are all correct
   Bit b; // TODO initialize to 0
@@ -554,18 +554,21 @@ Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d
   // check that the rlc is a commitment to the rl in old_state
   b = (b | verify_revlock_commitment(old_state_d.rl, rlc_d, revlock_commitment_randomness_d, k, H, constants));
 
-  // check that the min and max fee haven't not changed
+  // check that the min and max fee haven't not changed.  Also check fee_mc stayed the same
   b = (b | (!old_state_d.min_fee.balance[0].equal(new_state_d.min_fee.balance[0])));
   b = (b | (!old_state_d.min_fee.balance[1].equal(new_state_d.min_fee.balance[1])));
   b = (b | (!old_state_d.max_fee.balance[0].equal(new_state_d.max_fee.balance[0])));
   b = (b | (!old_state_d.max_fee.balance[1].equal(new_state_d.max_fee.balance[1])));
+  b = (b | (!old_state_d.fee_mc.balance[0].equal(new_state_d.fee_mc.balance[0])));
+  b = (b | (!old_state_d.fee_mc.balance[1].equal(new_state_d.fee_mc.balance[1])));
 
   // check that the new fee selected by the customer is in the right range
   Integer current_fee_combined = combine_balance(fee_cc_d);
   Integer min_fee_combined = combine_balance(old_state_d.min_fee);
   Integer max_fee_combined = combine_balance(old_state_d.max_fee);
+  Integer fee_mc_combined = combine_balance(old_state_d.fee_mc);
 
-  b = (b | (!current_fee_combined.leq(max_fee_combined)));
+  b = (b | (!max_fee_combined.geq(current_fee_combined)));
   b = (b | (!current_fee_combined.geq(min_fee_combined)));
 
   // Make sure that balances have been correctly updated
@@ -575,14 +578,17 @@ Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d
   Integer new_balance_merch_combined = combine_balance(new_state_d.balance_merch);
   Integer new_balance_cust_combined = combine_balance(new_state_d.balance_cust);
 
+  Integer fee_cc_combined = combine_balance(fee_cc_d);
+  Integer val_cpfp_combined = combine_balance(val_cpfp_d);
+
   b = (b | (!new_balance_merch_combined.equal(old_balance_merch_combined + epsilon_combined)));
   b = (b | (!new_balance_cust_combined.equal(old_balance_cust_combined - epsilon_combined)));
 
   // Dustlimit checks
   // make sure theres enough funds for the amount we have payed
   // We want to make sure we never go below the dust limit on either payout
-  b = (b | (!(old_balance_merch_combined + epsilon_combined).geq(constants.dustlimit)));
-  b = (b | (!(old_balance_cust_combined - epsilon_combined).geq(constants.dustlimit)));
+  b = (b | (!(old_balance_merch_combined + epsilon_combined).geq(constants.dustlimit + fee_mc_combined + val_cpfp_combined)));
+  b = (b | (!(old_balance_cust_combined - epsilon_combined).geq(constants.dustlimit + fee_cc_combined + val_cpfp_combined)));
 
   return b;
 }
@@ -607,7 +613,7 @@ Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, Commitm
   message[0][10] = rl_rand_d.randomness[2];
   message[0][11] = rl_rand_d.randomness[3];
 //  message[0][12] = Integer(32, -2147483648, PUBLIC); //0x80000000;
-  message[0][12] = constants.xeight; //0x80000000;
+  message[0][12] = constants.xeightfirstbyte; //0x80000000;
   message[0][13] = constants.zero; //0x00000000;
 
   // Message length 
@@ -640,7 +646,7 @@ Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, Commitm
   message[0][10] = mask_commitment_randomness_d.randomness[2];
   message[0][11] = mask_commitment_randomness_d.randomness[3];
 //  message[0][12] = Integer(32, -2147483648, PUBLIC); //0x80000000;
-  message[0][12] = constants.xeight; //0x80000000;
+  message[0][12] = constants.xeightfirstbyte; //0x80000000;
   message[0][13] = constants.zero; //0x00000000;
 
   // Message length 
@@ -662,7 +668,7 @@ Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, Commitm
 void validate_transactions(State_d new_state_d,
   BitcoinPublicKey_d cust_escrow_pub_key_d, BitcoinPublicKey_d cust_payout_pub_key_d, PublicKeyHash_d cust_child_publickey_hash_d,
   BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, 
-  PublicKeyHash_d merch_publickey_hash_d, Integer escrow_digest[8], Integer merch_digest[8], Integer k[64], Integer H[8], Balance_d val_cfcp_d, Constants constants)
+  PublicKeyHash_d merch_publickey_hash_d, Integer escrow_digest[8], Integer merch_digest[8], Integer k[64], Integer H[8], Balance_d val_cpfp_d, Constants constants)
 {
   // 112 bytes --> 896
   Integer customer_delayed_script_hash_preimage[2][16];
@@ -709,7 +715,7 @@ void validate_transactions(State_d new_state_d,
   customer_delayed_script_hash_preimage[1][11] = (cust_payout_pub_key_d.key[7] << 24) | (cust_payout_pub_key_d.key[8] >> 8) | constants.sixeightac;
 //  customer_delayed_script_hash_preimage[1][11] = (cust_payout_pub_key_d.key[7] << 24) | (cust_payout_pub_key_d.key[8] >> 8) | Integer(32, 26796/*0x000068ac*/, PUBLIC);
 
-  customer_delayed_script_hash_preimage[1][12] = constants.xeight;
+  customer_delayed_script_hash_preimage[1][12] = constants.xeightfirstbyte;
 //  customer_delayed_script_hash_preimage[1][12] = Integer(32, -2147483648/*0x80000000*/, PUBLIC);
   customer_delayed_script_hash_preimage[1][13] = constants.zero; //0x00000000;
   customer_delayed_script_hash_preimage[1][14] = constants.zero; //0x00000000;
@@ -789,7 +795,7 @@ void validate_transactions(State_d new_state_d,
 
   hash_outputs_preimage[2][13] =  (cust_child_publickey_hash_d.hash[4] << 24) | constants.xeightsecondbyte;
   hash_outputs_preimage[2][14] = constants.zero; //0x00000000;
-  hash_outputs_preimage[2][15] = constants.onethouseandfourhundredfourtyeight; // TODO change to 1448
+  hash_outputs_preimage[2][15] = constants.hashoutputspreimagelength;
 
   Integer hash_outputs[8];
 
@@ -883,7 +889,7 @@ void validate_transactions(State_d new_state_d,
   total_preimage_escrow[3][8]  = constants.xzeroone;
 //  total_preimage_escrow[3][8]  = Integer(32, 16777216 /*0x01000000*/, PUBLIC);
 
-  total_preimage_escrow[3][9]   = constants.xeight;
+  total_preimage_escrow[3][9]   = constants.xeightfirstbyte;
 //  total_preimage_escrow[3][9]   = Integer(32, -2147483648/*0x80000000*/, PUBLIC);
   total_preimage_escrow[3][10]  = constants.zero;
   total_preimage_escrow[3][11]  = constants.zero;

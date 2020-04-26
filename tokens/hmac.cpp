@@ -90,7 +90,7 @@ void innerhash(HMACKey_d key, State_d state, Integer innerhashresult[8], Constan
 
   // a single 1 bit, followed by 0's
   // The state is 1728 bits long.  Key block is 512.  Total is 2240 bits
-  message[4][6] = constants.xeight; //0x80000000;
+  message[4][6] = constants.xeightfirstbyte; //0x80000000;
   message[4][7] = constants.zero;
   message[4][8] = constants.zero;
   message[4][9] = constants.zero;
@@ -123,7 +123,7 @@ void outerhash(HMACKey_d key, Integer innerhashresult[8], Integer outerhashresul
   }
   
   //padding and length bits
-  message[1][8]  = constants.xeight; //= 0x80000000;
+  message[1][8]  = constants.xeightfirstbyte; //= 0x80000000;
   message[1][9]  = constants.zero;
   message[1][10] = constants.zero;
   message[1][11] = constants.zero;

@@ -24,6 +24,7 @@ Constants distribute_Constants(const int party) {
       .customerdelayerscriptpreimagelength =Integer(32, 896, party),
       .escrowtransactionpreimagelength =Integer(32, 1824, party),
       .merchtransactionpreimagelength =Integer(32, 2168, party),
+      .hashoutputspreimagelength =Integer(32, 1448, party),
 
 
       // Constants for transactions
@@ -79,64 +80,65 @@ Constants distribute_Constants(const int party) {
 Bit constants_not_equal(const Constants& lhs, const Constants& rhs) {
 	Bit error_signal(false);
 
-	error_signal = error_signal | !lhs.ipad.equal(rhs.ipad);
-    error_signal = error_signal | !lhs.xeight.equal(rhs.xeight);
-    error_signal = error_signal | !lhs.hmacinnerhashlength.equal(rhs.hmacinnerhashlength);
-    error_signal = error_signal | !lhs.opad.equal(rhs.opad);
-    error_signal = error_signal | !lhs.hmacouterhashlength.equal(rhs.hmacouterhashlength);
-    error_signal = error_signal | !lhs.hmackeycommitmentpreimagelength.equal(rhs.hmackeycommitmentpreimagelength);
-    error_signal = error_signal | !lhs.fullF.equal(rhs.fullF);
-    error_signal = error_signal | !lhs.doubleshapreimagelength.equal(rhs.doubleshapreimagelength);
-    error_signal = error_signal | !lhs.revlockcommitmentpreimagelength.equal(rhs.revlockcommitmentpreimagelength);
-    error_signal = error_signal | !lhs.maskcommitmentpreimagelength.equal(rhs.maskcommitmentpreimagelength);
-
-    error_signal = error_signal | !lhs.xsixthreedot.equal(rhs.xsixthreedot);
-    error_signal = error_signal | !lhs.eighteight.equal(rhs.eighteight);
-    error_signal = error_signal | !lhs.xtwentyone.equal(rhs.xtwentyone);
-    error_signal = error_signal | !lhs.sixsevenzero.equal(rhs.sixsevenzero);
-    error_signal = error_signal | !lhs.twohundred.equal(rhs.twohundred);
-    error_signal = error_signal | !lhs.xcfzerofive.equal(rhs.xcfzerofive);
-    error_signal = error_signal | !lhs.btwosevenfive.equal(rhs.btwosevenfive);
-    error_signal = error_signal | !lhs.customerdelayerscriptpreimagelength.equal(rhs.customerdelayerscriptpreimagelength);
-    error_signal = error_signal | !lhs.sixeightac.equal(rhs.sixeightac);
-    error_signal = error_signal | !lhs.xtwentytwodot.equal(rhs.xtwentytwodot);
-    error_signal = error_signal | !lhs.sixteen.equal(rhs.sixteen);
-    error_signal = error_signal | !lhs.xzerozerofourteen.equal(rhs.xzerozerofourteen);
-    error_signal = error_signal | !lhs.threesevensixa.equal(rhs.threesevensixa);
-    error_signal = error_signal | !lhs.xfourtyone.equal(rhs.xfourtyone);
-    error_signal = error_signal | !lhs.xeightthirdbyte.equal(rhs.xeightthirdbyte);
-    error_signal = error_signal | !lhs.xzerotwo.equal(rhs.xzerotwo);
-    error_signal = error_signal | !lhs.xthreedot.equal(rhs.xthreedot);
-    error_signal = error_signal | !lhs.xcdot.equal(rhs.xcdot);
-    error_signal = error_signal | !lhs.xninedot.equal(rhs.xninedot);
-    error_signal = error_signal | !lhs.xfdot.equal(rhs.xfdot);
-    error_signal = error_signal | !lhs.xfourteendot.equal(rhs.xfourteendot);
-    error_signal = error_signal | !lhs.xsevendot.equal(rhs.xsevendot);
-    error_signal = error_signal | !lhs.xtwentytwoninedot.equal(rhs.xtwentytwoninedot);
-    error_signal = error_signal | !lhs.xsevenzerosixdot.equal(rhs.xsevenzerosixdot);
-    error_signal = error_signal | !lhs.xfoursevenfivedot.equal(rhs.xfoursevenfivedot);
-    error_signal = error_signal | !lhs.fivetwoae.equal(rhs.fivetwoae);
-    error_signal = error_signal | !lhs.fullFthirtytwo.equal(rhs.fullFthirtytwo);
-    error_signal = error_signal | !lhs.xzeroone.equal(rhs.xzeroone);
-    error_signal = error_signal | !lhs.escrowtransactionpreimagelength.equal(rhs.escrowtransactionpreimagelength);
-    error_signal = error_signal | !lhs.xseventwosixdot.equal(rhs.xseventwosixdot);
-    error_signal = error_signal | !lhs.xzerozerotwentyone.equal(rhs.xzerozerotwentyone);
-    error_signal = error_signal | !lhs.fiftytwo.equal(rhs.fiftytwo);
-    error_signal = error_signal | !lhs.xaedot.equal(rhs.xaedot);
-    error_signal = error_signal | !lhs.xzerofivedot.equal(rhs.xzerofivedot);
-    error_signal = error_signal | !lhs.acsixeightzerozero.equal(rhs.acsixeightzerozero);
-    error_signal = error_signal | !lhs.ff.equal(rhs.ff);
-    error_signal = error_signal | !lhs.ffffffzerozero.equal(rhs.ffffffzerozero);
-    error_signal = error_signal | !lhs.one.equal(rhs.one);
-    error_signal = error_signal | !lhs.xeightfourthbyte.equal(rhs.xeightfourthbyte);
-    error_signal = error_signal | !lhs.merchtransactionpreimagelength.equal(rhs.merchtransactionpreimagelength);
-
-    error_signal = error_signal | !lhs.xzerozeroff.equal(rhs.xzerozeroff);
-    error_signal = error_signal | !lhs.ffzerozero.equal(rhs.ffzerozero);
-    error_signal = error_signal | !lhs.thirtytwo.equal(rhs.thirtytwo);
-
-    error_signal = error_signal | !lhs.zero.equal(rhs.zero);
-    error_signal = error_signal | !lhs.dustlimit.equal(rhs.dustlimit);
+  error_signal = error_signal | !lhs.ipad.equal(rhs.ipad);
+  error_signal = error_signal | !lhs.opad.equal(rhs.opad);
+  error_signal = error_signal | !lhs.xeightfirstbyte.equal(rhs.xeightfirstbyte);
+  error_signal = error_signal | !lhs.xeightsecondbyte.equal(rhs.xeightsecondbyte);
+  error_signal = error_signal | !lhs.xeightthirdbyte.equal(rhs.xeightthirdbyte);
+  error_signal = error_signal | !lhs.xeightfourthbyte.equal(rhs.xeightfourthbyte);
+  error_signal = error_signal | !lhs.hmacinnerhashlength.equal(rhs.hmacinnerhashlength);
+  error_signal = error_signal | !lhs.hmacouterhashlength.equal(rhs.hmacouterhashlength);
+  error_signal = error_signal | !lhs.hmackeycommitmentpreimagelength.equal(rhs.hmackeycommitmentpreimagelength);
+  error_signal = error_signal | !lhs.doubleshapreimagelength.equal(rhs.doubleshapreimagelength);
+  error_signal = error_signal | !lhs.revlockcommitmentpreimagelength.equal(rhs.revlockcommitmentpreimagelength);
+  error_signal = error_signal | !lhs.maskcommitmentpreimagelength.equal(rhs.maskcommitmentpreimagelength);
+  error_signal = error_signal | !lhs.customerdelayerscriptpreimagelength.equal(rhs.customerdelayerscriptpreimagelength);
+  error_signal = error_signal | !lhs.escrowtransactionpreimagelength.equal(rhs.escrowtransactionpreimagelength);
+  error_signal = error_signal | !lhs.merchtransactionpreimagelength.equal(rhs.merchtransactionpreimagelength);
+  error_signal = error_signal | !lhs.hashoutputspreimagelength.equal(rhs.hashoutputspreimagelength);
+  error_signal = error_signal | !lhs.xsixthreedot.equal(rhs.xsixthreedot);
+  error_signal = error_signal | !lhs.eighteight.equal(rhs.eighteight);
+  error_signal = error_signal | !lhs.xtwentyone.equal(rhs.xtwentyone);
+  error_signal = error_signal | !lhs.sixsevenzero.equal(rhs.sixsevenzero);
+  error_signal = error_signal | !lhs.xcfzerofive.equal(rhs.xcfzerofive);
+  error_signal = error_signal | !lhs.btwosevenfive.equal(rhs.btwosevenfive);
+  error_signal = error_signal | !lhs.sixeightac.equal(rhs.sixeightac);
+  error_signal = error_signal | !lhs.xtwentytwodot.equal(rhs.xtwentytwodot);
+  error_signal = error_signal | !lhs.sixteen.equal(rhs.sixteen);
+  error_signal = error_signal | !lhs.xzerozerofourteen.equal(rhs.xzerozerofourteen);
+  error_signal = error_signal | !lhs.threesevensixa.equal(rhs.threesevensixa);
+  error_signal = error_signal | !lhs.xfourtyone.equal(rhs.xfourtyone);
+  error_signal = error_signal | !lhs.xzerotwo.equal(rhs.xzerotwo);
+  error_signal = error_signal | !lhs.xthreedot.equal(rhs.xthreedot);
+  error_signal = error_signal | !lhs.xcdot.equal(rhs.xcdot);
+  error_signal = error_signal | !lhs.xninedot.equal(rhs.xninedot);
+  error_signal = error_signal | !lhs.xfdot.equal(rhs.xfdot);
+  error_signal = error_signal | !lhs.xfourteendot.equal(rhs.xfourteendot);
+  error_signal = error_signal | !lhs.xsevendot.equal(rhs.xsevendot);
+  error_signal = error_signal | !lhs.xtwentytwoninedot.equal(rhs.xtwentytwoninedot);
+  error_signal = error_signal | !lhs.xsevenzerosixdot .equal(rhs.xsevenzerosixdot );
+  error_signal = error_signal | !lhs.xfoursevenfivedot.equal(rhs.xfoursevenfivedot);
+  error_signal = error_signal | !lhs.fivetwoae.equal(rhs.fivetwoae);
+  error_signal = error_signal | !lhs.xzeroone.equal(rhs.xzeroone);
+  error_signal = error_signal | !lhs.xseventwosixdot.equal(rhs.xseventwosixdot);
+  error_signal = error_signal | !lhs.xzerozerotwentyone.equal(rhs.xzerozerotwentyone);
+  error_signal = error_signal | !lhs.fiftytwo.equal(rhs.fiftytwo);
+  error_signal = error_signal | !lhs.xaedot.equal(rhs.xaedot);
+  error_signal = error_signal | !lhs.xzerofivedot.equal(rhs.xzerofivedot);
+  error_signal = error_signal | !lhs.acsixeightzerozero.equal(rhs.acsixeightzerozero);
+  error_signal = error_signal | !lhs.xsixteenzerozero.equal(rhs.xsixteenzerozero);
+  error_signal = error_signal | !lhs.xfourteenzerozero.equal(rhs.xfourteenzerozero);
+  error_signal = error_signal | !lhs.fullF.equal(rhs.fullF);
+  error_signal = error_signal | !lhs.fullFthirtytwo.equal(rhs.fullFthirtytwo);
+  error_signal = error_signal | !lhs.xzerozeroff.equal(rhs.xzerozeroff);
+  error_signal = error_signal | !lhs.ff.equal(rhs.ff);
+  error_signal = error_signal | !lhs.ffffffzerozero.equal(rhs.ffffffzerozero);
+  error_signal = error_signal | !lhs.ffzerozero.equal(rhs.ffzerozero);
+  error_signal = error_signal | !lhs.thirtytwo.equal(rhs.thirtytwo);
+  error_signal = error_signal | !lhs.zero.equal(rhs.zero);
+  error_signal = error_signal | !lhs.one.equal(rhs.one);
+  error_signal = error_signal | !lhs.twohundred.equal(rhs.twohundred);
+  error_signal = error_signal | !lhs.dustlimit.equal(rhs.dustlimit);
 	return error_signal;
 }
 
