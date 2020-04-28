@@ -948,7 +948,7 @@ void validate_transactions(State_d new_state_d,
   total_preimage_escrow[2][10]  = (cust_escrow_pub_key_d.key[6] << 24)| (cust_escrow_pub_key_d.key[7] >> 8);
   total_preimage_escrow[2][11] = (cust_escrow_pub_key_d.key[7] << 24)| (cust_escrow_pub_key_d.key[8] >> 8) | constants.fivetwoae /*0x000052ae*/;
 
-  Balance_d big_endian_total_amount = split_integer_to_balance(hash_outputs_escrow_cust_balance + hash_outputs_escrow_merch_balance + val_cpfp_combined, constants.fullFsixtyfour);
+  Balance_d big_endian_total_amount = split_integer_to_balance(cust_balance_in_state_combined + merch_balance_in_state_combined, constants.fullFsixtyfour);
   Balance_d little_endian_total_amount = convert_to_little_endian(big_endian_total_amount, constants);
   total_preimage_escrow[2][12] = little_endian_total_amount.balance[0];
   total_preimage_escrow[2][13] = little_endian_total_amount.balance[1];
@@ -1038,7 +1038,7 @@ void validate_transactions(State_d new_state_d,
   total_preimage_merch[2][12] = constants.xaedot; /*0xae6702cf*/
   total_preimage_merch[2][13] = constants.xzerofivedot; /*0x05b27521*/
 
-  Balance_d big_endian_total_amount_merch = split_integer_to_balance(hash_outputs_merch_cust_balance + hash_outputs_merch_merch_balance + val_cpfp_combined, constants.fullFsixtyfour);
+  Balance_d big_endian_total_amount_merch = split_integer_to_balance(cust_balance_in_state_combined + merch_balance_in_state_combined, constants.fullFsixtyfour);
   Balance_d little_endian_total_amount_merch = convert_to_little_endian(big_endian_total_amount_merch, constants);
 
   /* merch-payout-key*/
