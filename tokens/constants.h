@@ -6,33 +6,36 @@ using namespace emp;
 typedef struct Constants Constants;
 struct Constants {
     Integer ipad;
-    Integer xeight; //0x80000000;
-    Integer threeazero; //0x000003a0;
     Integer opad;
-    Integer threehundred; //0x00000300;
-    Integer sixforty;
-    Integer fullF;
-    Integer twofivesix;
-    Integer threeeightfour;
 
-    //Integer k[64];
-    //Integer H[8];
+    Integer xeightfirstbyte;
+    Integer xeightsecondbyte;
+    Integer xeightthirdbyte;
+    Integer xeightfourthbyte;
+
+    Integer hmacinnerhashlength;
+    Integer hmacouterhashlength;
+    Integer hmackeycommitmentpreimagelength;
+    Integer doubleshapreimagelength;
+    Integer revlockcommitmentpreimagelength;
+    Integer maskcommitmentpreimagelength;
+    Integer customerdelayerscriptpreimagelength;
+    Integer escrowtransactionpreimagelength;
+    Integer merchtransactionpreimagelength;
+    Integer hashoutputspreimagelength;
+
     Integer xsixthreedot;
     Integer eighteight;
     Integer xtwentyone;
     Integer sixsevenzero;
-    Integer twohundred;
     Integer xcfzerofive;
     Integer btwosevenfive;
-    Integer eightninesix;
     Integer sixeightac;
     Integer xtwentytwodot;
     Integer sixteen;
     Integer xzerozerofourteen;
     Integer threesevensixa;
     Integer xfourtyone;
-    Integer eightthousand;
-    Integer twelvehundred;
     Integer xzerotwo;
     Integer xthreedot;
     Integer xcdot;
@@ -44,25 +47,29 @@ struct Constants {
     Integer xsevenzerosixdot ;
     Integer xfoursevenfivedot;
     Integer fivetwoae;
-    Integer fullFthirtytwo;
     Integer xzeroone;
-    Integer oneeighttwofour; // 228*8 = 1824 bits
     Integer xseventwosixdot;
     Integer xzerozerotwentyone;
     Integer fiftytwo;
     Integer xaedot;
     Integer xzerofivedot;
     Integer acsixeightzerozero;
+    Integer xsixteenzerozero;
+    Integer xfourteenzerozero;
+
+    Integer fullF;
+    Integer fullFsixtyfour;
+    Integer fullFthirtytwo;
+    Integer xzerozeroff;
     Integer ff;
     Integer ffffffzerozero;
-    Integer one;
-    Integer eighty;
-    Integer twoonesixeight; // 271*8 = 2168 bits
-    Integer xzerozeroff;
     Integer ffzerozero;
+
     Integer thirtytwo;
-    
     Integer zero;
+    Integer one;
+    Integer twohundred;
+    Integer dustlimit;
 };
 
 typedef struct Q Q;

@@ -509,6 +509,22 @@ Integer combine_balance(Balance_d balance) {
   return balance.balance[0] | balance.balance[1];
 }
 
+Balance_d split_integer_to_balance(Integer integer, Integer fullF) {
+
+  Balance_d to_return;
+  Integer mask = fullF;
+
+  to_return.balance[1] = mask & integer;
+  to_return.balance[1] = to_return.balance[1].resize(32);
+
+  mask = mask << 32;
+  to_return.balance[0] = mask & integer;
+  to_return.balance[0] = to_return.balance[0] >> 32;
+  to_return.balance[0] = to_return.balance[0].resize(32);
+
+  return to_return;
+}
+
 Bit compare_k_H(Integer k[64], Integer H[8], Integer k_merch[64], Integer H_merch[8]) {
   Bit error_signal(false);
   for (int i=0; i<64; ++i) {

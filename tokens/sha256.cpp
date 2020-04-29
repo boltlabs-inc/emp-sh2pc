@@ -323,18 +323,18 @@ void computeDoubleSHA256_3d_noinit(Integer message[3][16], Integer result[8], In
   }
 
 //  newmessage[0][8] = Integer(32, 2147483648/*0x80000000*/, PUBLIC);
-  newmessage[0][8] = constants.xeight;
+  newmessage[0][8] = constants.xeightfirstbyte;
   for(int i=9; i<15; i++) {
     newmessage[0][i] = constants.zero;
   }
 //  newmessage[0][15] = Integer(32, 256, PUBLIC);
-  newmessage[0][15] = constants.twofivesix;
+  newmessage[0][15] = constants.doubleshapreimagelength;
 
   computeSHA256_1d_noinit(newmessage, result, k, H);
 }
 
 
-void computeDoubleSHA256_4d(Integer message[4][16], Integer result[8]/*, Integer xeight, Integer twofivesix*/) {
+void computeDoubleSHA256_4d(Integer message[4][16], Integer result[8]/*, Integer xeightfirstbyte, Integer doubleshapreimagelength*/) {
 
   // initialize constants and initial hash digest value
   Integer k[64];
@@ -371,17 +371,17 @@ void computeDoubleSHA256_4d_noinit(Integer message[4][16], Integer result[8], In
   }
 
 //  newmessage[0][8] = Integer(32, 2147483648/*0x80000000*/, PUBLIC);
-  newmessage[0][8] = constants.xeight;
+  newmessage[0][8] = constants.xeightfirstbyte;
   for(int i=9; i<15; i++) {
     newmessage[0][i] = constants.zero;
   }
 //  newmessage[0][15] = Integer(32, 256, PUBLIC);
-  newmessage[0][15] = constants.twofivesix;
+  newmessage[0][15] = constants.doubleshapreimagelength;
 
   computeSHA256_1d_noinit(newmessage, result, k, H);
 }
 
-void computeDoubleSHA256_5d(Integer message[5][16], Integer result[8]/*, Integer xeight, Integer twofivesix*/) {
+void computeDoubleSHA256_5d(Integer message[5][16], Integer result[8]/*, Integer xeightfirstbyte, Integer doubleshapreimagelength*/) {
 
   // initialize constants and initial hash digest value
   Integer k[64];
@@ -418,12 +418,12 @@ void computeDoubleSHA256_5d_noinit(Integer message[5][16], Integer result[8], In
   }
 
 //  newmessage[0][8] = Integer(32, 2147483648/*0x80000000*/, PUBLIC);
-  newmessage[0][8] = constants.xeight;
+  newmessage[0][8] = constants.xeightfirstbyte;
   for(int i=9; i<15; i++) {
     newmessage[0][i] = constants.zero;
   }
 //  newmessage[0][15] = Integer(32, 256, PUBLIC);
-  newmessage[0][15] = constants.twofivesix;
+  newmessage[0][15] = constants.doubleshapreimagelength;
 
   computeSHA256_1d_noinit(newmessage, result, k, H);
 }
