@@ -366,3 +366,13 @@ void bigint_into_smallint_array(Integer target[8], Integer source, Integer fullF
 Bit compare_k_H(Integer k[64], Integer H[8], Integer k_merch[64], Integer H_merch[8]);
 Bit compare_public_input(Balance_d epsilon_d, HMACKeyCommitment_d hmac_key_commitment_d, MaskCommitment_d paytoken_mask_commitment_d, RevLockCommitment_d rlc_d, Nonce_d nonce_d, Balance_d val_cpfp_d, BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, PublicKeyHash_d merch_publickey_hash_d,
                                         Balance_d epsilon_d_merch, HMACKeyCommitment_d hmac_key_commitment_d_merch, MaskCommitment_d paytoken_mask_commitment_d_merch, RevLockCommitment_d rlc_d_merch, Nonce_d nonce_d_merch, Balance_d val_cpfp_d_merch, BitcoinPublicKey_d merch_escrow_pub_key_d_merch, BitcoinPublicKey_d merch_dispute_key_d_merch, BitcoinPublicKey_d merch_payout_pub_key_d_merch, PublicKeyHash_d merch_publickey_hash_d_merch);
+
+void build_customer_delayed_script_hash_preimage(Integer outputbuffer[2][16], RevLock_d rl, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d cust_payout_pub_key_d, Constants constants);
+
+void  build_hash_outputs_escrow_preimage(Integer outputbuffer[3][16], Balance_d hash_outputs_escrow_little_endian_balance_cust, Integer customer_delayed_script_hash[8], Balance_d hash_outputs_escrow_little_endian_balance_merch, PublicKeyHash_d merch_publickey_hash_d, RevLock_d rl_d, BitcoinPublicKey_d cust_payout_pub_key_d, Balance_d val_cpfp_little_endian, PublicKeyHash_d cust_child_publickey_hash_d, Constants constants);
+
+void  build_hash_outputs_merch_preimage(Integer outputbuffer[3][16], Balance_d hash_outputs_merch_little_endian_balance_cust, Integer customer_delayed_script_hash[8], Balance_d hash_outputs_merch_little_endian_balance_merch, PublicKeyHash_d merch_publickey_hash_d,  RevLock_d rl_d, BitcoinPublicKey_d cust_payout_pub_key_d, Balance_d val_cpfp_little_endian, PublicKeyHash_d cust_child_publickey_hash_d, Constants constants);
+
+void build_total_escrow_preimage(Integer outputbuffer[4][16], Txid_d HashPrevOuts_escrow, Txid_d txid_escrow, BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d cust_escrow_pub_key_d, Balance_d little_endian_total_amount, Integer hash_outputs_escrow[8], Constants constants);
+
+void build_total_merch_preimage(Integer outputbuffer[5][16], Txid_d HashPrevOuts_merch, Txid_d txid_merch, BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d cust_escrow_pub_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, Balance_d little_endian_total_amount_merch, Integer hash_outputs_merch[8], Constants constants);
