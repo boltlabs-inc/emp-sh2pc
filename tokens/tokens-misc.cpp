@@ -423,32 +423,6 @@ Balance_d convert_to_big_endian(Balance_d little_endian_balance, Constants const
   return big_endian_balance;
 }
 
-Balance_d sum_balances(Balance_d lhs, Balance_d rhs, Integer zero) {
-  Balance_d to_return;
-
-  Integer result = zero.resize(64, false);
-
-  lhs.balance[0].resize(64, true);
-  lhs.balance[1].resize(64, true);
-
-  Integer lhs_composed = lhs.balance[1];
-  lhs_composed = (lhs_composed<<32) | lhs.balance[0];
-
-  rhs.balance[0].resize(64, true);
-  rhs.balance[1].resize(64, true);
-
-  Integer rhs_composed = rhs.balance[1];
-  rhs_composed = (rhs_composed<<32) | rhs.balance[0];
-
-  result = rhs_composed + lhs_composed;
-  Integer result_dup(result);
-
-  to_return.balance[0] = result.resize(32);
-  to_return.balance[1] = (result_dup>>32).resize(32);
-
-  return to_return;
-}
-
 Integer handle_error_case(Integer data, Bit mask) {
   Integer to_return = data;
 

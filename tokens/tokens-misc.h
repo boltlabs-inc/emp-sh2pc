@@ -203,8 +203,6 @@ Balance_d convert_to_big_endian(Balance_d little_endian_balance, Constants const
 CommitmentRandomness_d distribute_CommitmentRandomness(CommitmentRandomness_l rand, const int party);
 CommitmentRandomness_l localize_CommitmentRandomness(CommitmentRandomness_d rand, const int party);
 
-Balance_d sum_balances(Balance_d lhs, Balance_d rhs, Integer zero);
-
 Integer combine_balance(Balance_d balance);
 Balance_d split_integer_to_balance(Integer integer, Integer mask);
 

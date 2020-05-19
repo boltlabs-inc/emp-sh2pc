@@ -16,7 +16,7 @@ include_directories(${EMP-OT_INCLUDE_DIRS})
 # Installation
 install(FILES cmake/emp-sh2pc-config.cmake DESTINATION cmake/)
    
-add_library(token-utils SHARED tokens/sha256.cpp tokens/hmac.cpp tokens/ecdsa.cpp tokens/tokens.cpp tokens/tokens-misc.cpp tokens/constants.cpp tokens/test-e2e.cpp)
+add_library(token-utils SHARED tokens/sha256.cpp tokens/hmac.cpp tokens/ecdsa.cpp tokens/tokens.cpp tokens/tokens-misc.cpp tokens/constants.cpp tokens/tx-builder.cpp tokens/test-e2e.cpp)
 target_link_libraries(token-utils ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES} ${GMP_LIBRARIES} ${EMP-OT_LIBRARIES})
    
 install(TARGETS token-utils DESTINATION lib)
