@@ -1,41 +1,58 @@
 #include "tx-builder.h"
 
-void append_tx_start(Integer output[4][16], Integer txid1[8], Integer txid2[8], Constants constants) {
-  output[0][0] = constants.xzerotwo; /*0x02000000*/
+using namespace std;
 
-  for (int i=0;i<7; i++) {
-    output[0][i+1] = txid1[i];
-  }
-//  output[0][1] = txid1[0];
-//  output[0][2] = txid1[1];
-//  output[0][3] = txid1[2];
-//  output[0][4] = txid1[3];
-//  output[0][5] = txid1[4];
-//  output[0][6] = txid1[5];
-//  output[0][7] = txid1[6];
-//  output[0][8] = txid1[7];
+struct TxBuilderState {
+    Integer output[5][16];
+    int outer_pos; //The index of the outer array 0-3
+    int inner_pos; //The index of the inner array 0-15
+    int sub_pos; //Because a value doesn't have to be perfectly aligned, 0,8,16,24
+};
 
+void append_tx_start(TxBuilderState* tx_builder, Integer txid1[8], Integer txid2[8], Constants constants) {
+    tx_builder->output[0][0] = constants.xzerotwo; /*0x02000000*/
 
-  output[0][9]  =  constants.xthreedot;          /*0x3bb13029*/
-  output[0][10] =  constants.xcdot;              /*0xce7b1f55*/
-  output[0][11] =  constants.xninedot;           /*0x9ef5e747*/
-  output[0][12] =  constants.xfdot;              /*0xfcac439f*/
-  output[0][13] =  constants.xfourteendot;       /*0x1455a2ec*/
-  output[0][14] =  constants.xsevendot;          /*0x7c5f09b7*/
-  output[0][15] =  constants.xtwentytwoninedot;  /*0x2290795e*/
-  output[1][0]  =  constants.xsevenzerosixdot;   /*0x70665044*/
+    for (int i=0;i<8; i++) {
+        tx_builder->output[0][i+1] = txid1[i];
+    }
 
-  for (int i=0;i<7; i++) {
-    output[1][i+1] = txid2[i];
-  }
-//  output[0][1] = txid2[0];
-//  output[0][2] = txid2[1];
-//  output[0][3] = txid2[2];
-//  output[0][4] = txid2[3];
-//  output[0][5] = txid2[4];
-//  output[0][6] = txid2[5];
-//  output[0][7] = txid2[6];
-//  output[0][8] = txid2[7];
+    tx_builder->output[0][9]  =  constants.xthreedot;          /*0x3bb13029*/
+    tx_builder->output[0][10] =  constants.xcdot;              /*0xce7b1f55*/
+    tx_builder->output[0][11] =  constants.xninedot;           /*0x9ef5e747*/
+    tx_builder->output[0][12] =  constants.xfdot;              /*0xfcac439f*/
+    tx_builder->output[0][13] =  constants.xfourteendot;       /*0x1455a2ec*/
+    tx_builder->output[0][14] =  constants.xsevendot;          /*0x7c5f09b7*/
+    tx_builder->output[0][15] =  constants.xtwentytwoninedot;  /*0x2290795e*/
+    tx_builder->output[1][0]  =  constants.xsevenzerosixdot;   /*0x70665044*/
+
+    for (int i=0;i<8; i++) {
+        tx_builder->output[1][i+1] = txid2[i];
+    }
+
+    tx_builder->output[1][9] = constants.zero;
+    tx_builder->outer_pos = 1;
+    tx_builder->inner_pos = 10;
+    tx_builder->sub_pos = 0;
+}
+
+void append_item(TxBuilderState* tx_builder, Integer front_padding, int sub_pos, Integer* item, int size) {
+    int i = tx_builder->outer_pos;
+    int j = tx_builder->inner_pos;
+    tx_builder->output[i][j] = front_padding | (item[0] >> sub_pos);
+    if (j == 15) {
+        i++;
+    }
+    j = (j + 1) % 16;
+    int inv_sub_pos = 32 - sub_pos;
+    for (int k = 1; k < size; k++) {
+        tx_builder->output[i][j] = (item[k-1] << inv_sub_pos) | (item[k] >> sub_pos);
+        if (j == 15) {
+            i++;
+        }
+        j = (j + 1) % 16;
+    }
+    tx_builder->outer_pos = i;
+    tx_builder->inner_pos = j;
 }
 
 // make sure new close transactions are well-formed
@@ -238,13 +255,13 @@ void validate_transactions(State_d new_state_d,
   hash_outputs_merch_preimage[1][7]  = (new_state_d.rl.revlock[1] << 24) | (new_state_d.rl.revlock[2] >> 8);
   hash_outputs_merch_preimage[1][8]  = (new_state_d.rl.revlock[2] << 24) | (new_state_d.rl.revlock[3] >> 8);
   hash_outputs_merch_preimage[1][9]  = (new_state_d.rl.revlock[3] << 24) | (new_state_d.rl.revlock[4] >> 8);
-  hash_outputs_merch_preimage[1][10]  = (new_state_d.rl.revlock[4] << 24) | (new_state_d.rl.revlock[5] >> 8);
+  hash_outputs_merch_preimage[1][10] = (new_state_d.rl.revlock[4] << 24) | (new_state_d.rl.revlock[5] >> 8);
   hash_outputs_merch_preimage[1][11] = (new_state_d.rl.revlock[5] << 24) | (new_state_d.rl.revlock[6] >> 8);
   hash_outputs_merch_preimage[1][12] = (new_state_d.rl.revlock[6] << 24) | (new_state_d.rl.revlock[7] >> 8);
   hash_outputs_merch_preimage[1][13] = (new_state_d.rl.revlock[7] << 24) | (cust_payout_pub_key_d.key[0] >> 8); //1
   hash_outputs_merch_preimage[1][14] = (cust_payout_pub_key_d.key[0] << 24) | (cust_payout_pub_key_d.key[1] >> 8); //5
   hash_outputs_merch_preimage[1][15] = (cust_payout_pub_key_d.key[1] << 24) | (cust_payout_pub_key_d.key[2] >> 8); //9
-  hash_outputs_merch_preimage[2][0] = (cust_payout_pub_key_d.key[2] << 24) | (cust_payout_pub_key_d.key[3] >> 8); //13
+  hash_outputs_merch_preimage[2][0]  = (cust_payout_pub_key_d.key[2] << 24) | (cust_payout_pub_key_d.key[3] >> 8); //13
   hash_outputs_merch_preimage[2][1]  = (cust_payout_pub_key_d.key[3] << 24) | (cust_payout_pub_key_d.key[4] >> 8); //17
   hash_outputs_merch_preimage[2][2]  = (cust_payout_pub_key_d.key[4] << 24) | (cust_payout_pub_key_d.key[5] >> 8); //21
   hash_outputs_merch_preimage[2][3]  = (cust_payout_pub_key_d.key[5] << 24) | (cust_payout_pub_key_d.key[6] >> 8); //25
@@ -269,203 +286,139 @@ void validate_transactions(State_d new_state_d,
 
 
   // The total preimage is 228 bytes
-  Integer total_preimage_escrow[4][16];
+  TxBuilderState tx_builder_escrow;
 
-//  append_tx_start(total_preimage_escrow, new_state_d.HashPrevOuts_escrow.txid, new_state_d.txid_escrow.txid, constants);
+  append_tx_start(&tx_builder_escrow, new_state_d.HashPrevOuts_escrow.txid, new_state_d.txid_escrow.txid, constants);
 
-    total_preimage_escrow[0][0] = constants.xzerotwo; /*0x02000000*/
+  append_item(&tx_builder_escrow, constants.xfoursevenfivedot, 24, merch_escrow_pub_key_d.key, 9);
 
-    total_preimage_escrow[0][1] = new_state_d.HashPrevOuts_escrow.txid[0];
-    total_preimage_escrow[0][2] = new_state_d.HashPrevOuts_escrow.txid[1];
-    total_preimage_escrow[0][3] = new_state_d.HashPrevOuts_escrow.txid[2];
-    total_preimage_escrow[0][4] = new_state_d.HashPrevOuts_escrow.txid[3];
-    total_preimage_escrow[0][5] = new_state_d.HashPrevOuts_escrow.txid[4];
-    total_preimage_escrow[0][6] = new_state_d.HashPrevOuts_escrow.txid[5];
-    total_preimage_escrow[0][7] = new_state_d.HashPrevOuts_escrow.txid[6];
-    total_preimage_escrow[0][8] = new_state_d.HashPrevOuts_escrow.txid[7];
-
-
-    total_preimage_escrow[0][9]  =  constants.xthreedot;          /*0x3bb13029*/
-    total_preimage_escrow[0][10] =  constants.xcdot;              /*0xce7b1f55*/
-    total_preimage_escrow[0][11] =  constants.xninedot;           /*0x9ef5e747*/
-    total_preimage_escrow[0][12] =  constants.xfdot;              /*0xfcac439f*/
-    total_preimage_escrow[0][13] =  constants.xfourteendot;       /*0x1455a2ec*/
-    total_preimage_escrow[0][14] =  constants.xsevendot;          /*0x7c5f09b7*/
-    total_preimage_escrow[0][15] =  constants.xtwentytwoninedot;  /*0x2290795e*/
-    total_preimage_escrow[1][0]  =  constants.xsevenzerosixdot;   /*0x70665044*/
-
-    total_preimage_escrow[1][1] = new_state_d.txid_escrow.txid[0];
-    total_preimage_escrow[1][2] = new_state_d.txid_escrow.txid[1];
-    total_preimage_escrow[1][3] = new_state_d.txid_escrow.txid[2];
-    total_preimage_escrow[1][4] = new_state_d.txid_escrow.txid[3];
-    total_preimage_escrow[1][5] = new_state_d.txid_escrow.txid[4];
-    total_preimage_escrow[1][6] = new_state_d.txid_escrow.txid[5];
-    total_preimage_escrow[1][7] = new_state_d.txid_escrow.txid[6];
-    total_preimage_escrow[1][8] = new_state_d.txid_escrow.txid[7];
-
-  total_preimage_escrow[1][9] = constants.zero;
-
-  total_preimage_escrow[1][10]  = constants.xfoursevenfivedot /*0x47522100*/ | (merch_escrow_pub_key_d.key[0] >> 24);
-  total_preimage_escrow[1][11] = (merch_escrow_pub_key_d.key[0] << 8) | (merch_escrow_pub_key_d.key[1] >> 24);
-  total_preimage_escrow[1][12] = (merch_escrow_pub_key_d.key[1] << 8) | (merch_escrow_pub_key_d.key[2] >> 24);
-  total_preimage_escrow[1][13] = (merch_escrow_pub_key_d.key[2] << 8) | (merch_escrow_pub_key_d.key[3] >> 24);
-  total_preimage_escrow[1][14] = (merch_escrow_pub_key_d.key[3] << 8) | (merch_escrow_pub_key_d.key[4] >> 24);
-  total_preimage_escrow[1][15] = (merch_escrow_pub_key_d.key[4] << 8) | (merch_escrow_pub_key_d.key[5] >> 24);
-  total_preimage_escrow[2][0] = (merch_escrow_pub_key_d.key[5] << 8) | (merch_escrow_pub_key_d.key[6] >> 24);
-  total_preimage_escrow[2][1]  = (merch_escrow_pub_key_d.key[6] << 8) | (merch_escrow_pub_key_d.key[7] >> 24);
-  total_preimage_escrow[2][2]  = (merch_escrow_pub_key_d.key[7] << 8) | (merch_escrow_pub_key_d.key[8] >> 24);
-  total_preimage_escrow[2][3]  = constants.xtwentyone /*0x21000000*/ | (cust_escrow_pub_key_d.key[0] >> 8);  // first three bytes of the cust public key
+//  tx_builder_escrow.output[1][10]  = constants.xfoursevenfivedot /*0x47522100*/ | (merch_escrow_pub_key_d.key[0] >> 24);
+//  tx_builder_escrow.output[1][11] = (merch_escrow_pub_key_d.key[0] << 8) | (merch_escrow_pub_key_d.key[1] >> 24);
+//  tx_builder_escrow.output[1][12] = (merch_escrow_pub_key_d.key[1] << 8) | (merch_escrow_pub_key_d.key[2] >> 24);
+//  tx_builder_escrow.output[1][13] = (merch_escrow_pub_key_d.key[2] << 8) | (merch_escrow_pub_key_d.key[3] >> 24);
+//  tx_builder_escrow.output[1][14] = (merch_escrow_pub_key_d.key[3] << 8) | (merch_escrow_pub_key_d.key[4] >> 24);
+//  tx_builder_escrow.output[1][15] = (merch_escrow_pub_key_d.key[4] << 8) | (merch_escrow_pub_key_d.key[5] >> 24);
+//  tx_builder_escrow.output[2][0] = (merch_escrow_pub_key_d.key[5] << 8) | (merch_escrow_pub_key_d.key[6] >> 24);
+//  tx_builder_escrow.output[2][1]  = (merch_escrow_pub_key_d.key[6] << 8) | (merch_escrow_pub_key_d.key[7] >> 24);
+//  tx_builder_escrow.output[2][2]  = (merch_escrow_pub_key_d.key[7] << 8) | (merch_escrow_pub_key_d.key[8] >> 24);
+  tx_builder_escrow.output[2][3]  = constants.xtwentyone /*0x21000000*/ | (cust_escrow_pub_key_d.key[0] >> 8);  // first three bytes of the cust public key
   // 30 more bytes of key
-  total_preimage_escrow[2][4]  = (cust_escrow_pub_key_d.key[0] << 24)| (cust_escrow_pub_key_d.key[1] >> 8);
-  total_preimage_escrow[2][5]  = (cust_escrow_pub_key_d.key[1] << 24)| (cust_escrow_pub_key_d.key[2] >> 8);
-  total_preimage_escrow[2][6]  = (cust_escrow_pub_key_d.key[2] << 24)| (cust_escrow_pub_key_d.key[3] >> 8);
-  total_preimage_escrow[2][7]  = (cust_escrow_pub_key_d.key[3] << 24)| (cust_escrow_pub_key_d.key[4] >> 8);
-  total_preimage_escrow[2][8]  = (cust_escrow_pub_key_d.key[4] << 24)| (cust_escrow_pub_key_d.key[5] >> 8);
-  total_preimage_escrow[2][9]  = (cust_escrow_pub_key_d.key[5] << 24)| (cust_escrow_pub_key_d.key[6] >> 8);
-  total_preimage_escrow[2][10]  = (cust_escrow_pub_key_d.key[6] << 24)| (cust_escrow_pub_key_d.key[7] >> 8);
-  total_preimage_escrow[2][11] = (cust_escrow_pub_key_d.key[7] << 24)| (cust_escrow_pub_key_d.key[8] >> 8) | constants.fivetwoae /*0x000052ae*/;
+  tx_builder_escrow.output[2][4]  = (cust_escrow_pub_key_d.key[0] << 24)| (cust_escrow_pub_key_d.key[1] >> 8);
+  tx_builder_escrow.output[2][5]  = (cust_escrow_pub_key_d.key[1] << 24)| (cust_escrow_pub_key_d.key[2] >> 8);
+  tx_builder_escrow.output[2][6]  = (cust_escrow_pub_key_d.key[2] << 24)| (cust_escrow_pub_key_d.key[3] >> 8);
+  tx_builder_escrow.output[2][7]  = (cust_escrow_pub_key_d.key[3] << 24)| (cust_escrow_pub_key_d.key[4] >> 8);
+  tx_builder_escrow.output[2][8]  = (cust_escrow_pub_key_d.key[4] << 24)| (cust_escrow_pub_key_d.key[5] >> 8);
+  tx_builder_escrow.output[2][9]  = (cust_escrow_pub_key_d.key[5] << 24)| (cust_escrow_pub_key_d.key[6] >> 8);
+  tx_builder_escrow.output[2][10]  = (cust_escrow_pub_key_d.key[6] << 24)| (cust_escrow_pub_key_d.key[7] >> 8);
+  tx_builder_escrow.output[2][11] = (cust_escrow_pub_key_d.key[7] << 24)| (cust_escrow_pub_key_d.key[8] >> 8) | constants.fivetwoae /*0x000052ae*/;
 
   Balance_d big_endian_total_amount = split_integer_to_balance(cust_balance_in_state_combined + merch_balance_in_state_combined, constants.fullFsixtyfour);
   Balance_d little_endian_total_amount = convert_to_little_endian(big_endian_total_amount, constants);
-  total_preimage_escrow[2][12] = little_endian_total_amount.balance[0];
-  total_preimage_escrow[2][13] = little_endian_total_amount.balance[1];
+  tx_builder_escrow.output[2][12] = little_endian_total_amount.balance[0];
+  tx_builder_escrow.output[2][13] = little_endian_total_amount.balance[1];
 
-  total_preimage_escrow[2][14] = constants.fullFthirtytwo; /*0xffffffff*/
+  tx_builder_escrow.output[2][14] = constants.fullFthirtytwo; /*0xffffffff*/
 
-  total_preimage_escrow[2][15] = hash_outputs_escrow[0];
-  total_preimage_escrow[3][0]  = hash_outputs_escrow[1];
-  total_preimage_escrow[3][1]  = hash_outputs_escrow[2];
-  total_preimage_escrow[3][2]  = hash_outputs_escrow[3];
-  total_preimage_escrow[3][3]  = hash_outputs_escrow[4];
-  total_preimage_escrow[3][4]  = hash_outputs_escrow[5];
-  total_preimage_escrow[3][5]  = hash_outputs_escrow[6];
-  total_preimage_escrow[3][6]  = hash_outputs_escrow[7];
+  tx_builder_escrow.output[2][15] = hash_outputs_escrow[0];
+  tx_builder_escrow.output[3][0]  = hash_outputs_escrow[1];
+  tx_builder_escrow.output[3][1]  = hash_outputs_escrow[2];
+  tx_builder_escrow.output[3][2]  = hash_outputs_escrow[3];
+  tx_builder_escrow.output[3][3]  = hash_outputs_escrow[4];
+  tx_builder_escrow.output[3][4]  = hash_outputs_escrow[5];
+  tx_builder_escrow.output[3][5]  = hash_outputs_escrow[6];
+  tx_builder_escrow.output[3][6]  = hash_outputs_escrow[7];
 
-  total_preimage_escrow[3][7]  = constants.zero;
-  total_preimage_escrow[3][8]  = constants.xzeroone; /*0x01000000*/
+  tx_builder_escrow.output[3][7]  = constants.zero;
+  tx_builder_escrow.output[3][8]  = constants.xzeroone; /*0x01000000*/
 
-  total_preimage_escrow[3][9]   = constants.xeightfirstbyte; /*0x80000000*/
-  total_preimage_escrow[3][10]  = constants.zero;
-  total_preimage_escrow[3][11]  = constants.zero;
-  total_preimage_escrow[3][12]  = constants.zero;
-  total_preimage_escrow[3][13]  = constants.zero;
-  total_preimage_escrow[3][14]  = constants.zero; //0x00000000;
-  total_preimage_escrow[3][15]  = constants.escrowtransactionpreimagelength; // 228*8 = 1824 bits
+  tx_builder_escrow.output[3][9]   = constants.xeightfirstbyte; /*0x80000000*/
+  tx_builder_escrow.output[3][10]  = constants.zero;
+  tx_builder_escrow.output[3][11]  = constants.zero;
+  tx_builder_escrow.output[3][12]  = constants.zero;
+  tx_builder_escrow.output[3][13]  = constants.zero;
+  tx_builder_escrow.output[3][14]  = constants.zero; //0x00000000;
+  tx_builder_escrow.output[3][15]  = constants.escrowtransactionpreimagelength; // 228*8 = 1824 bits
 
 
   // Integer escrow_digest[8];
-  computeDoubleSHA256_4d_noinit(total_preimage_escrow, escrow_digest, k, H, constants);
+  computeDoubleSHA256_4d_noinit(tx_builder_escrow.output, escrow_digest, k, H, constants);
 
     // The total preimage is 228 bytes
-  Integer total_preimage_merch[5][16];
+  TxBuilderState tx_builder_merch;
 
-  total_preimage_merch[0][0] = constants.xzerotwo; /*0x02000000*/
-  total_preimage_merch[0][1] = new_state_d.HashPrevOuts_merch.txid[0];
-  total_preimage_merch[0][2] = new_state_d.HashPrevOuts_merch.txid[1];
-  total_preimage_merch[0][3] = new_state_d.HashPrevOuts_merch.txid[2];
-  total_preimage_merch[0][4] = new_state_d.HashPrevOuts_merch.txid[3];
-  total_preimage_merch[0][5] = new_state_d.HashPrevOuts_merch.txid[4];
-  total_preimage_merch[0][6] = new_state_d.HashPrevOuts_merch.txid[5];
-  total_preimage_merch[0][7] = new_state_d.HashPrevOuts_merch.txid[6];
-  total_preimage_merch[0][8] = new_state_d.HashPrevOuts_merch.txid[7];
-
-  total_preimage_merch[0][9]  =  constants.xthreedot;          /*0x3bb13029*/
-  total_preimage_merch[0][10] =  constants.xcdot;              /*0xce7b1f55*/
-  total_preimage_merch[0][11] =  constants.xninedot;           /*0x9ef5e747*/
-  total_preimage_merch[0][12] =  constants.xfdot;              /*0xfcac439f*/
-  total_preimage_merch[0][13] =  constants.xfourteendot;       /*0x1455a2ec*/
-  total_preimage_merch[0][14] =  constants.xsevendot;          /*0x7c5f09b7*/
-  total_preimage_merch[0][15] =  constants.xtwentytwoninedot;  /*0x2290795e*/
-  total_preimage_merch[1][0]  =  constants.xsevenzerosixdot;   /*0x70665044*/
-
-  total_preimage_merch[1][1] = new_state_d.txid_merch.txid[0];
-  total_preimage_merch[1][2] = new_state_d.txid_merch.txid[1];
-  total_preimage_merch[1][3] = new_state_d.txid_merch.txid[2];
-  total_preimage_merch[1][4] = new_state_d.txid_merch.txid[3];
-  total_preimage_merch[1][5] = new_state_d.txid_merch.txid[4];
-  total_preimage_merch[1][6] = new_state_d.txid_merch.txid[5];
-  total_preimage_merch[1][7] = new_state_d.txid_merch.txid[6];
-  total_preimage_merch[1][8] = new_state_d.txid_merch.txid[7];
-
-  total_preimage_merch[1][9] = constants.zero;
+  append_tx_start(&tx_builder_merch, new_state_d.HashPrevOuts_merch.txid, new_state_d.txid_merch.txid, constants);
 
   // The script
-  total_preimage_merch[1][10] = constants.xseventwosixdot; /*0x72635221*/
+  tx_builder_merch.output[1][10] = constants.xseventwosixdot; /*0x72635221*/
 
-  total_preimage_merch[1][11] = merch_escrow_pub_key_d.key[0];
-  total_preimage_merch[1][12] = merch_escrow_pub_key_d.key[1];
-  total_preimage_merch[1][13] = merch_escrow_pub_key_d.key[2];
-  total_preimage_merch[1][14] = merch_escrow_pub_key_d.key[3];
-  total_preimage_merch[1][15] = merch_escrow_pub_key_d.key[4];
-  total_preimage_merch[2][0]  = merch_escrow_pub_key_d.key[5];
-  total_preimage_merch[2][1]  = merch_escrow_pub_key_d.key[6];
-  total_preimage_merch[2][2]  = merch_escrow_pub_key_d.key[7];
-  total_preimage_merch[2][3]  = merch_escrow_pub_key_d.key[8] | constants.xzerozerotwentyone /*0x00210000*/ | (cust_escrow_pub_key_d.key[0] >> 16);
+  tx_builder_merch.output[1][11] = merch_escrow_pub_key_d.key[0];
+  tx_builder_merch.output[1][12] = merch_escrow_pub_key_d.key[1];
+  tx_builder_merch.output[1][13] = merch_escrow_pub_key_d.key[2];
+  tx_builder_merch.output[1][14] = merch_escrow_pub_key_d.key[3];
+  tx_builder_merch.output[1][15] = merch_escrow_pub_key_d.key[4];
+  tx_builder_merch.output[2][0]  = merch_escrow_pub_key_d.key[5];
+  tx_builder_merch.output[2][1]  = merch_escrow_pub_key_d.key[6];
+  tx_builder_merch.output[2][2]  = merch_escrow_pub_key_d.key[7];
+  tx_builder_merch.output[2][3]  = merch_escrow_pub_key_d.key[8] | constants.xzerozerotwentyone /*0x00210000*/ | (cust_escrow_pub_key_d.key[0] >> 16);
 
   // 31 more bytes of key
-  total_preimage_merch[2][4]  = (cust_escrow_pub_key_d.key[0] << 16)| (cust_escrow_pub_key_d.key[1] >> 16);
-  total_preimage_merch[2][5]  = (cust_escrow_pub_key_d.key[1] << 16)| (cust_escrow_pub_key_d.key[2] >> 16);
-  total_preimage_merch[2][6]  = (cust_escrow_pub_key_d.key[2] << 16)| (cust_escrow_pub_key_d.key[3] >> 16);
-  total_preimage_merch[2][7]  = (cust_escrow_pub_key_d.key[3] << 16)| (cust_escrow_pub_key_d.key[4] >> 16);
-  total_preimage_merch[2][8]  = (cust_escrow_pub_key_d.key[4] << 16)| (cust_escrow_pub_key_d.key[5] >> 16);
-  total_preimage_merch[2][9]  = (cust_escrow_pub_key_d.key[5] << 16)| (cust_escrow_pub_key_d.key[6] >> 16);
-  total_preimage_merch[2][10] = (cust_escrow_pub_key_d.key[6] << 16)| (cust_escrow_pub_key_d.key[7] >> 16);
-  total_preimage_merch[2][11] = (cust_escrow_pub_key_d.key[7] << 16)| (cust_escrow_pub_key_d.key[8] >> 16) | constants.fiftytwo /*0x00000052*/;
+  tx_builder_merch.output[2][4]  = (cust_escrow_pub_key_d.key[0] << 16)| (cust_escrow_pub_key_d.key[1] >> 16);
+  tx_builder_merch.output[2][5]  = (cust_escrow_pub_key_d.key[1] << 16)| (cust_escrow_pub_key_d.key[2] >> 16);
+  tx_builder_merch.output[2][6]  = (cust_escrow_pub_key_d.key[2] << 16)| (cust_escrow_pub_key_d.key[3] >> 16);
+  tx_builder_merch.output[2][7]  = (cust_escrow_pub_key_d.key[3] << 16)| (cust_escrow_pub_key_d.key[4] >> 16);
+  tx_builder_merch.output[2][8]  = (cust_escrow_pub_key_d.key[4] << 16)| (cust_escrow_pub_key_d.key[5] >> 16);
+  tx_builder_merch.output[2][9]  = (cust_escrow_pub_key_d.key[5] << 16)| (cust_escrow_pub_key_d.key[6] >> 16);
+  tx_builder_merch.output[2][10] = (cust_escrow_pub_key_d.key[6] << 16)| (cust_escrow_pub_key_d.key[7] >> 16);
+  tx_builder_merch.output[2][11] = (cust_escrow_pub_key_d.key[7] << 16)| (cust_escrow_pub_key_d.key[8] >> 16) | constants.fiftytwo /*0x00000052*/;
 
-  total_preimage_merch[2][12] = constants.xaedot; /*0xae6702cf*/
-  total_preimage_merch[2][13] = constants.xzerofivedot; /*0x05b27521*/
+  tx_builder_merch.output[2][12] = constants.xaedot; /*0xae6702cf*/
+  tx_builder_merch.output[2][13] = constants.xzerofivedot; /*0x05b27521*/
 
   Balance_d big_endian_total_amount_merch = split_integer_to_balance(cust_balance_in_state_combined + merch_balance_in_state_combined, constants.fullFsixtyfour);
   Balance_d little_endian_total_amount_merch = convert_to_little_endian(big_endian_total_amount_merch, constants);
 
   /* merch-payout-key*/
-  total_preimage_merch[2][14] = merch_payout_pub_key_d.key[0];
-  total_preimage_merch[2][15] = merch_payout_pub_key_d.key[1];
-  total_preimage_merch[3][0]  = merch_payout_pub_key_d.key[2];
-  total_preimage_merch[3][1]  = merch_payout_pub_key_d.key[3];
-  total_preimage_merch[3][2]  = merch_payout_pub_key_d.key[4];
-  total_preimage_merch[3][3]  = merch_payout_pub_key_d.key[5];
-  total_preimage_merch[3][4]  = merch_payout_pub_key_d.key[6];
-  total_preimage_merch[3][5]  = merch_payout_pub_key_d.key[7]; // FIRST 3 bytes of the amount
-  total_preimage_merch[3][6]  = merch_payout_pub_key_d.key[8] | constants.acsixeightzerozero | (little_endian_total_amount_merch.balance[0]>>24);
-//  total_preimage_merch[3][6]  = merch_payout_pub_key_d.key[8] | Integer(32, 11298816/* 0x00ac6800 */, PUBLIC) | (little_endian_total_amount_merch.balance[0]>>24);
+  tx_builder_merch.output[2][14] = merch_payout_pub_key_d.key[0];
+  tx_builder_merch.output[2][15] = merch_payout_pub_key_d.key[1];
+  tx_builder_merch.output[3][0]  = merch_payout_pub_key_d.key[2];
+  tx_builder_merch.output[3][1]  = merch_payout_pub_key_d.key[3];
+  tx_builder_merch.output[3][2]  = merch_payout_pub_key_d.key[4];
+  tx_builder_merch.output[3][3]  = merch_payout_pub_key_d.key[5];
+  tx_builder_merch.output[3][4]  = merch_payout_pub_key_d.key[6];
+  tx_builder_merch.output[3][5]  = merch_payout_pub_key_d.key[7]; // FIRST 3 bytes of the amount
+  tx_builder_merch.output[3][6]  = merch_payout_pub_key_d.key[8] | constants.acsixeightzerozero | (little_endian_total_amount_merch.balance[0]>>24);
 
-  total_preimage_merch[3][7] = (little_endian_total_amount_merch.balance[0] << 8) | (little_endian_total_amount_merch.balance[1] >> 24);
+  tx_builder_merch.output[3][7] = (little_endian_total_amount_merch.balance[0] << 8) | (little_endian_total_amount_merch.balance[1] >> 24);
 
-  total_preimage_merch[3][8] = (little_endian_total_amount_merch.balance[1] << 8) | constants.ff;
-//  total_preimage_merch[3][8] = (little_endian_total_amount_merch.balance[1] << 8) | Integer (32, 255 /* 0x000000ff */ , PUBLIC);
-  total_preimage_merch[3][9] = constants.ffffffzerozero | (hash_outputs_merch[0] >> 24);
-//  total_preimage_merch[3][9] = Integer(32, 4294967040 /*0xffffff00*/, PUBLIC) | (hash_outputs_merch[0] >> 24);
+  tx_builder_merch.output[3][8] = (little_endian_total_amount_merch.balance[1] << 8) | constants.ff;
+  tx_builder_merch.output[3][9] = constants.ffffffzerozero | (hash_outputs_merch[0] >> 24);
 
-  total_preimage_merch[3][10] =  (hash_outputs_merch[0] << 8) | (hash_outputs_merch[1] >> 24);
-  total_preimage_merch[3][11] =  (hash_outputs_merch[1] << 8) | (hash_outputs_merch[2] >> 24);
-  total_preimage_merch[3][12] =  (hash_outputs_merch[2] << 8) | (hash_outputs_merch[3] >> 24);
-  total_preimage_merch[3][13] =  (hash_outputs_merch[3] << 8) | (hash_outputs_merch[4] >> 24);
-  total_preimage_merch[3][14] =  (hash_outputs_merch[4] << 8) | (hash_outputs_merch[5] >> 24);
-  total_preimage_merch[3][15] =  (hash_outputs_merch[5] << 8) | (hash_outputs_merch[6] >> 24);
-  total_preimage_merch[4][0]  =  (hash_outputs_merch[6] << 8) | (hash_outputs_merch[7] >> 24);
-  total_preimage_merch[4][1]  =  (hash_outputs_merch[7] << 8) | constants.zero;
+  tx_builder_merch.output[3][10] =  (hash_outputs_merch[0] << 8) | (hash_outputs_merch[1] >> 24);
+  tx_builder_merch.output[3][11] =  (hash_outputs_merch[1] << 8) | (hash_outputs_merch[2] >> 24);
+  tx_builder_merch.output[3][12] =  (hash_outputs_merch[2] << 8) | (hash_outputs_merch[3] >> 24);
+  tx_builder_merch.output[3][13] =  (hash_outputs_merch[3] << 8) | (hash_outputs_merch[4] >> 24);
+  tx_builder_merch.output[3][14] =  (hash_outputs_merch[4] << 8) | (hash_outputs_merch[5] >> 24);
+  tx_builder_merch.output[3][15] =  (hash_outputs_merch[5] << 8) | (hash_outputs_merch[6] >> 24);
+  tx_builder_merch.output[4][0]  =  (hash_outputs_merch[6] << 8) | (hash_outputs_merch[7] >> 24);
+  tx_builder_merch.output[4][1]  =  (hash_outputs_merch[7] << 8) | constants.zero;
 
-  total_preimage_merch[4][2]  = constants.one;
-//  total_preimage_merch[4][2]  = Integer(32, 1 /*0x00000001*/, PUBLIC);
-  total_preimage_merch[4][3]  = constants.xeightfourthbyte;
-//  total_preimage_merch[4][3]  = Integer(32, 128 /*0x00000080*/, PUBLIC);
+  tx_builder_merch.output[4][2]  = constants.one;
+  tx_builder_merch.output[4][3]  = constants.xeightfourthbyte;
 
-  total_preimage_merch[4][4]   = constants.zero;
-  total_preimage_merch[4][5]   = constants.zero;
-  total_preimage_merch[4][6]   = constants.zero;
-  total_preimage_merch[4][7]   = constants.zero;
-  total_preimage_merch[4][8]   = constants.zero;
-  total_preimage_merch[4][9]   = constants.zero;
-  total_preimage_merch[4][10]  = constants.zero;
-  total_preimage_merch[4][11]  = constants.zero;
-  total_preimage_merch[4][12]  = constants.zero;
-  total_preimage_merch[4][13]  = constants.zero;
-  total_preimage_merch[4][14]  = constants.zero;//0x00000000;
-  total_preimage_merch[4][15]  = constants.merchtransactionpreimagelength; // 271*8 = 2168 bits
-//  total_preimage_merch[4][15]  = Integer(32, 2168, PUBLIC); // 271*8 = 2168 bits
+  tx_builder_merch.output[4][4]   = constants.zero;
+  tx_builder_merch.output[4][5]   = constants.zero;
+  tx_builder_merch.output[4][6]   = constants.zero;
+  tx_builder_merch.output[4][7]   = constants.zero;
+  tx_builder_merch.output[4][8]   = constants.zero;
+  tx_builder_merch.output[4][9]   = constants.zero;
+  tx_builder_merch.output[4][10]  = constants.zero;
+  tx_builder_merch.output[4][11]  = constants.zero;
+  tx_builder_merch.output[4][12]  = constants.zero;
+  tx_builder_merch.output[4][13]  = constants.zero;
+  tx_builder_merch.output[4][14]  = constants.zero;//0x00000000;
+  tx_builder_merch.output[4][15]  = constants.merchtransactionpreimagelength; // 271*8 = 2168 bits
 
-  computeDoubleSHA256_5d_noinit(total_preimage_merch, merch_digest, k, H, constants);
+  computeDoubleSHA256_5d_noinit(tx_builder_merch.output, merch_digest, k, H, constants);
 
 //   dump_buffer("hash_outputs_merch_preimage0=", hash_outputs_merch_preimage[0]);
 //   dump_buffer("hash_outputs_merch_preimage1=", hash_outputs_merch_preimage[1]);
