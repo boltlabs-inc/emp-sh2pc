@@ -35,7 +35,7 @@ void append_tx_start(TxBuilderState* tx_builder, Integer txid1[8], Integer txid2
     tx_builder->sub_pos = 0;
 }
 
-void append_item(TxBuilderState* tx_builder, Integer front_padding, int sub_pos, Integer* item, int size) {
+void append_item(TxBuilderState* tx_builder, Integer front_padding, Integer back_padding, int sub_pos, Integer* item, int size) {
     int i = tx_builder->outer_pos;
     int j = tx_builder->inner_pos;
     tx_builder->output[i][j] = front_padding | (item[0] >> sub_pos);
@@ -44,13 +44,20 @@ void append_item(TxBuilderState* tx_builder, Integer front_padding, int sub_pos,
     }
     j = (j + 1) % 16;
     int inv_sub_pos = 32 - sub_pos;
-    for (int k = 1; k < size; k++) {
+    for (int k = 1; k < size-1; k++) {
         tx_builder->output[i][j] = (item[k-1] << inv_sub_pos) | (item[k] >> sub_pos);
         if (j == 15) {
             i++;
         }
         j = (j + 1) % 16;
     }
+    tx_builder->output[i][j] = (item[size-2] << inv_sub_pos)| (item[size-1] >> sub_pos) | back_padding;
+
+    if (j == 15) {
+        i++;
+    }
+    j = (j + 1) % 16;
+
     tx_builder->outer_pos = i;
     tx_builder->inner_pos = j;
 }
@@ -290,27 +297,19 @@ void validate_transactions(State_d new_state_d,
 
   append_tx_start(&tx_builder_escrow, new_state_d.HashPrevOuts_escrow.txid, new_state_d.txid_escrow.txid, constants);
 
-  append_item(&tx_builder_escrow, constants.xfoursevenfivedot, 24, merch_escrow_pub_key_d.key, 9);
+  append_item(&tx_builder_escrow, constants.xfoursevenfivedot, constants.zero, 24, merch_escrow_pub_key_d.key, 9);
 
-//  tx_builder_escrow.output[1][10]  = constants.xfoursevenfivedot /*0x47522100*/ | (merch_escrow_pub_key_d.key[0] >> 24);
-//  tx_builder_escrow.output[1][11] = (merch_escrow_pub_key_d.key[0] << 8) | (merch_escrow_pub_key_d.key[1] >> 24);
-//  tx_builder_escrow.output[1][12] = (merch_escrow_pub_key_d.key[1] << 8) | (merch_escrow_pub_key_d.key[2] >> 24);
-//  tx_builder_escrow.output[1][13] = (merch_escrow_pub_key_d.key[2] << 8) | (merch_escrow_pub_key_d.key[3] >> 24);
-//  tx_builder_escrow.output[1][14] = (merch_escrow_pub_key_d.key[3] << 8) | (merch_escrow_pub_key_d.key[4] >> 24);
-//  tx_builder_escrow.output[1][15] = (merch_escrow_pub_key_d.key[4] << 8) | (merch_escrow_pub_key_d.key[5] >> 24);
-//  tx_builder_escrow.output[2][0] = (merch_escrow_pub_key_d.key[5] << 8) | (merch_escrow_pub_key_d.key[6] >> 24);
-//  tx_builder_escrow.output[2][1]  = (merch_escrow_pub_key_d.key[6] << 8) | (merch_escrow_pub_key_d.key[7] >> 24);
-//  tx_builder_escrow.output[2][2]  = (merch_escrow_pub_key_d.key[7] << 8) | (merch_escrow_pub_key_d.key[8] >> 24);
-  tx_builder_escrow.output[2][3]  = constants.xtwentyone /*0x21000000*/ | (cust_escrow_pub_key_d.key[0] >> 8);  // first three bytes of the cust public key
+  append_item(&tx_builder_escrow, constants.xtwentyone, constants.fivetwoae, 8, cust_escrow_pub_key_d.key, 9);
+//  tx_builder_escrow.output[2][3]  = constants.xtwentyone /*0x21000000*/ | (cust_escrow_pub_key_d.key[0] >> 8);  // first three bytes of the cust public key
   // 30 more bytes of key
-  tx_builder_escrow.output[2][4]  = (cust_escrow_pub_key_d.key[0] << 24)| (cust_escrow_pub_key_d.key[1] >> 8);
-  tx_builder_escrow.output[2][5]  = (cust_escrow_pub_key_d.key[1] << 24)| (cust_escrow_pub_key_d.key[2] >> 8);
-  tx_builder_escrow.output[2][6]  = (cust_escrow_pub_key_d.key[2] << 24)| (cust_escrow_pub_key_d.key[3] >> 8);
-  tx_builder_escrow.output[2][7]  = (cust_escrow_pub_key_d.key[3] << 24)| (cust_escrow_pub_key_d.key[4] >> 8);
-  tx_builder_escrow.output[2][8]  = (cust_escrow_pub_key_d.key[4] << 24)| (cust_escrow_pub_key_d.key[5] >> 8);
-  tx_builder_escrow.output[2][9]  = (cust_escrow_pub_key_d.key[5] << 24)| (cust_escrow_pub_key_d.key[6] >> 8);
-  tx_builder_escrow.output[2][10]  = (cust_escrow_pub_key_d.key[6] << 24)| (cust_escrow_pub_key_d.key[7] >> 8);
-  tx_builder_escrow.output[2][11] = (cust_escrow_pub_key_d.key[7] << 24)| (cust_escrow_pub_key_d.key[8] >> 8) | constants.fivetwoae /*0x000052ae*/;
+//  tx_builder_escrow.output[2][4]  = (cust_escrow_pub_key_d.key[0] << 24)| (cust_escrow_pub_key_d.key[1] >> 8);
+//  tx_builder_escrow.output[2][5]  = (cust_escrow_pub_key_d.key[1] << 24)| (cust_escrow_pub_key_d.key[2] >> 8);
+//  tx_builder_escrow.output[2][6]  = (cust_escrow_pub_key_d.key[2] << 24)| (cust_escrow_pub_key_d.key[3] >> 8);
+//  tx_builder_escrow.output[2][7]  = (cust_escrow_pub_key_d.key[3] << 24)| (cust_escrow_pub_key_d.key[4] >> 8);
+//  tx_builder_escrow.output[2][8]  = (cust_escrow_pub_key_d.key[4] << 24)| (cust_escrow_pub_key_d.key[5] >> 8);
+//  tx_builder_escrow.output[2][9]  = (cust_escrow_pub_key_d.key[5] << 24)| (cust_escrow_pub_key_d.key[6] >> 8);
+//  tx_builder_escrow.output[2][10]  = (cust_escrow_pub_key_d.key[6] << 24)| (cust_escrow_pub_key_d.key[7] >> 8);
+//  tx_builder_escrow.output[2][11] = (cust_escrow_pub_key_d.key[7] << 24)| (cust_escrow_pub_key_d.key[8] >> 8) | constants.fivetwoae /*0x000052ae*/;
 
   Balance_d big_endian_total_amount = split_integer_to_balance(cust_balance_in_state_combined + merch_balance_in_state_combined, constants.fullFsixtyfour);
   Balance_d little_endian_total_amount = convert_to_little_endian(big_endian_total_amount, constants);
