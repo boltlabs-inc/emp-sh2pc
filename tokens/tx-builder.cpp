@@ -1,4 +1,5 @@
 #include "tx-builder.h"
+#include <vector>
 
 using namespace std;
 
@@ -35,29 +36,62 @@ void append_tx_start(TxBuilderState* tx_builder, Integer txid1[8], Integer txid2
     tx_builder->sub_pos = 0;
 }
 
-void append_item(TxBuilderState* tx_builder, Integer front_padding, Integer back_padding, int sub_pos, Integer* item, int size) {
+void append_item(TxBuilderState* tx_builder, Integer front_padding, Integer back_padding, int sub_pos, Integer* item, int size, int end_shift, bool overflow=false) {
     int i = tx_builder->outer_pos;
     int j = tx_builder->inner_pos;
-    tx_builder->output[i][j] = front_padding | (item[0] >> sub_pos);
+    int sub = sub_pos + tx_builder->sub_pos;
+    int inv_sub_pos = 32 - sub;
+    if (tx_builder->sub_pos == 0) {
+        tx_builder->output[i][j] = front_padding | (item[0] >> sub);
+    } else {
+        tx_builder->output[i][j] = tx_builder->output[i][j] | (item[0] >> sub);
+    }
     if (j == 15) {
         i++;
     }
     j = (j + 1) % 16;
-    int inv_sub_pos = 32 - sub_pos;
-    for (int k = 1; k < size-1; k++) {
-        tx_builder->output[i][j] = (item[k-1] << inv_sub_pos) | (item[k] >> sub_pos);
+    int nr_of_it = size - 1;
+    if (overflow) {
+        nr_of_it = size;
+    }
+    for (int k = 1; k < nr_of_it; k++) {
+        tx_builder->output[i][j] = (item[k-1] << inv_sub_pos) | (item[k] >> sub);
         if (j == 15) {
             i++;
         }
         j = (j + 1) % 16;
     }
-    tx_builder->output[i][j] = (item[size-2] << inv_sub_pos)| (item[size-1] >> sub_pos) | back_padding;
-
-    if (j == 15) {
-        i++;
+    if (overflow) {
+        tx_builder->output[i][j] = (item[size-1] << inv_sub_pos) | back_padding;
+    } else {
+        tx_builder->output[i][j] = (item[size-2] << inv_sub_pos) | (item[size-1] >> sub) | back_padding;
     }
-    j = (j + 1) % 16;
 
+    if (end_shift == 0) {
+        if (j == 15) {
+            i++;
+        }
+        j = (j + 1) % 16;
+        tx_builder->sub_pos = 0;
+    } else {
+        tx_builder->sub_pos = end_shift;
+    }
+
+
+    tx_builder->outer_pos = i;
+    tx_builder->inner_pos = j;
+}
+
+void append_constants(TxBuilderState* tx_builder, vector<Integer> constants_in) {
+    int i = tx_builder->outer_pos;
+    int j = tx_builder->inner_pos;
+    for (Integer con : constants_in) {
+        tx_builder->output[i][j] = con;
+        if (j == 15) {
+            i++;
+        }
+        j = (j + 1) % 16;
+    }
     tx_builder->outer_pos = i;
     tx_builder->inner_pos = j;
 }
@@ -292,132 +326,66 @@ void validate_transactions(State_d new_state_d,
   computeDoubleSHA256_3d_noinit(hash_outputs_merch_preimage, hash_outputs_merch, k, H, constants);
 
 
-  // The total preimage is 228 bytes
+  //START -----cust-close-from-escrow transaction-----
   TxBuilderState tx_builder_escrow;
-
+  //Start cust-close-from-escrow transaction with input tx id and own tx id
   append_tx_start(&tx_builder_escrow, new_state_d.HashPrevOuts_escrow.txid, new_state_d.txid_escrow.txid, constants);
-
-  append_item(&tx_builder_escrow, constants.xfoursevenfivedot, constants.zero, 24, merch_escrow_pub_key_d.key, 9);
-
-  append_item(&tx_builder_escrow, constants.xtwentyone, constants.fivetwoae, 8, cust_escrow_pub_key_d.key, 9);
-//  tx_builder_escrow.output[2][3]  = constants.xtwentyone /*0x21000000*/ | (cust_escrow_pub_key_d.key[0] >> 8);  // first three bytes of the cust public key
-  // 30 more bytes of key
-//  tx_builder_escrow.output[2][4]  = (cust_escrow_pub_key_d.key[0] << 24)| (cust_escrow_pub_key_d.key[1] >> 8);
-//  tx_builder_escrow.output[2][5]  = (cust_escrow_pub_key_d.key[1] << 24)| (cust_escrow_pub_key_d.key[2] >> 8);
-//  tx_builder_escrow.output[2][6]  = (cust_escrow_pub_key_d.key[2] << 24)| (cust_escrow_pub_key_d.key[3] >> 8);
-//  tx_builder_escrow.output[2][7]  = (cust_escrow_pub_key_d.key[3] << 24)| (cust_escrow_pub_key_d.key[4] >> 8);
-//  tx_builder_escrow.output[2][8]  = (cust_escrow_pub_key_d.key[4] << 24)| (cust_escrow_pub_key_d.key[5] >> 8);
-//  tx_builder_escrow.output[2][9]  = (cust_escrow_pub_key_d.key[5] << 24)| (cust_escrow_pub_key_d.key[6] >> 8);
-//  tx_builder_escrow.output[2][10]  = (cust_escrow_pub_key_d.key[6] << 24)| (cust_escrow_pub_key_d.key[7] >> 8);
-//  tx_builder_escrow.output[2][11] = (cust_escrow_pub_key_d.key[7] << 24)| (cust_escrow_pub_key_d.key[8] >> 8) | constants.fivetwoae /*0x000052ae*/;
+  //Add merchant public key to cust-close-from-escrow transaction
+  append_item(&tx_builder_escrow, constants.xfoursevenfivedot, constants.zero, 24, merch_escrow_pub_key_d.key, 9, 0);
+  //Add customer public key to cust-close-from-escrow transaction
+  append_item(&tx_builder_escrow, constants.xtwentyone, constants.fivetwoae, 8, cust_escrow_pub_key_d.key, 9, 0);
 
   Balance_d big_endian_total_amount = split_integer_to_balance(cust_balance_in_state_combined + merch_balance_in_state_combined, constants.fullFsixtyfour);
   Balance_d little_endian_total_amount = convert_to_little_endian(big_endian_total_amount, constants);
-  tx_builder_escrow.output[2][12] = little_endian_total_amount.balance[0];
-  tx_builder_escrow.output[2][13] = little_endian_total_amount.balance[1];
+  //Add total output balance to cust-close-from-escrow transaction
+  append_item(&tx_builder_escrow, constants.zero, constants.zero, 0, little_endian_total_amount.balance, 2, 0);
 
-  tx_builder_escrow.output[2][14] = constants.fullFthirtytwo; /*0xffffffff*/
+  append_constants(&tx_builder_escrow, vector<Integer>{constants.fullFthirtytwo});
 
-  tx_builder_escrow.output[2][15] = hash_outputs_escrow[0];
-  tx_builder_escrow.output[3][0]  = hash_outputs_escrow[1];
-  tx_builder_escrow.output[3][1]  = hash_outputs_escrow[2];
-  tx_builder_escrow.output[3][2]  = hash_outputs_escrow[3];
-  tx_builder_escrow.output[3][3]  = hash_outputs_escrow[4];
-  tx_builder_escrow.output[3][4]  = hash_outputs_escrow[5];
-  tx_builder_escrow.output[3][5]  = hash_outputs_escrow[6];
-  tx_builder_escrow.output[3][6]  = hash_outputs_escrow[7];
-
-  tx_builder_escrow.output[3][7]  = constants.zero;
-  tx_builder_escrow.output[3][8]  = constants.xzeroone; /*0x01000000*/
-
-  tx_builder_escrow.output[3][9]   = constants.xeightfirstbyte; /*0x80000000*/
-  tx_builder_escrow.output[3][10]  = constants.zero;
-  tx_builder_escrow.output[3][11]  = constants.zero;
-  tx_builder_escrow.output[3][12]  = constants.zero;
-  tx_builder_escrow.output[3][13]  = constants.zero;
-  tx_builder_escrow.output[3][14]  = constants.zero; //0x00000000;
-  tx_builder_escrow.output[3][15]  = constants.escrowtransactionpreimagelength; // 228*8 = 1824 bits
+  //Add hash of outputs to cust-close-from-escrow transaction
+  append_item(&tx_builder_escrow, constants.zero, constants.zero, 0, hash_outputs_escrow, 8, 0);
+  //Add padding to cust-close-from-escrow transaction
+  append_constants(&tx_builder_escrow, vector<Integer>{constants.zero, constants.xzeroone, constants.xeightfirstbyte,
+                    constants.zero, constants.zero, constants.zero, constants.zero,
+                    constants.zero, constants.escrowtransactionpreimagelength});
 
 
-  // Integer escrow_digest[8];
+  //Compute Hash of transaction
   computeDoubleSHA256_4d_noinit(tx_builder_escrow.output, escrow_digest, k, H, constants);
+  //END -----cust-close-from-escrow transaction-----
 
-    // The total preimage is 228 bytes
+  //START ----cust-close-from-merch transaction-----
   TxBuilderState tx_builder_merch;
-
+  //Start cust-close-from-merch transaction with input tx id and own tx id
   append_tx_start(&tx_builder_merch, new_state_d.HashPrevOuts_merch.txid, new_state_d.txid_merch.txid, constants);
 
   // The script
-  tx_builder_merch.output[1][10] = constants.xseventwosixdot; /*0x72635221*/
+  append_constants(&tx_builder_merch, vector<Integer>{constants.xseventwosixdot});
+  //Add merchant public key to cust-close-from-merch transaction
+  append_item(&tx_builder_merch, constants.zero, constants.xzerozerotwentyone, 0, merch_escrow_pub_key_d.key, 9, 16);
 
-  tx_builder_merch.output[1][11] = merch_escrow_pub_key_d.key[0];
-  tx_builder_merch.output[1][12] = merch_escrow_pub_key_d.key[1];
-  tx_builder_merch.output[1][13] = merch_escrow_pub_key_d.key[2];
-  tx_builder_merch.output[1][14] = merch_escrow_pub_key_d.key[3];
-  tx_builder_merch.output[1][15] = merch_escrow_pub_key_d.key[4];
-  tx_builder_merch.output[2][0]  = merch_escrow_pub_key_d.key[5];
-  tx_builder_merch.output[2][1]  = merch_escrow_pub_key_d.key[6];
-  tx_builder_merch.output[2][2]  = merch_escrow_pub_key_d.key[7];
-  tx_builder_merch.output[2][3]  = merch_escrow_pub_key_d.key[8] | constants.xzerozerotwentyone /*0x00210000*/ | (cust_escrow_pub_key_d.key[0] >> 16);
+  //Add customer public key to cust-close-from-merch transaction
+  append_item(&tx_builder_merch, constants.zero, constants.fiftytwo, 0, cust_escrow_pub_key_d.key, 9, 0);
 
-  // 31 more bytes of key
-  tx_builder_merch.output[2][4]  = (cust_escrow_pub_key_d.key[0] << 16)| (cust_escrow_pub_key_d.key[1] >> 16);
-  tx_builder_merch.output[2][5]  = (cust_escrow_pub_key_d.key[1] << 16)| (cust_escrow_pub_key_d.key[2] >> 16);
-  tx_builder_merch.output[2][6]  = (cust_escrow_pub_key_d.key[2] << 16)| (cust_escrow_pub_key_d.key[3] >> 16);
-  tx_builder_merch.output[2][7]  = (cust_escrow_pub_key_d.key[3] << 16)| (cust_escrow_pub_key_d.key[4] >> 16);
-  tx_builder_merch.output[2][8]  = (cust_escrow_pub_key_d.key[4] << 16)| (cust_escrow_pub_key_d.key[5] >> 16);
-  tx_builder_merch.output[2][9]  = (cust_escrow_pub_key_d.key[5] << 16)| (cust_escrow_pub_key_d.key[6] >> 16);
-  tx_builder_merch.output[2][10] = (cust_escrow_pub_key_d.key[6] << 16)| (cust_escrow_pub_key_d.key[7] >> 16);
-  tx_builder_merch.output[2][11] = (cust_escrow_pub_key_d.key[7] << 16)| (cust_escrow_pub_key_d.key[8] >> 16) | constants.fiftytwo /*0x00000052*/;
+  append_constants(&tx_builder_merch, vector<Integer>{constants.xaedot, constants.xzerofivedot});
 
-  tx_builder_merch.output[2][12] = constants.xaedot; /*0xae6702cf*/
-  tx_builder_merch.output[2][13] = constants.xzerofivedot; /*0x05b27521*/
-
+  // Add merch-payout-key to cust-close-from-merch transaction
+  append_item(&tx_builder_merch, constants.zero, constants.acsixeightzerozero, 0, merch_payout_pub_key_d.key, 9, 24);
+  // Add total amount to cust-close-from-merch transaction
   Balance_d big_endian_total_amount_merch = split_integer_to_balance(cust_balance_in_state_combined + merch_balance_in_state_combined, constants.fullFsixtyfour);
   Balance_d little_endian_total_amount_merch = convert_to_little_endian(big_endian_total_amount_merch, constants);
+  append_item(&tx_builder_merch, constants.zero, constants.ff, 0, little_endian_total_amount_merch.balance, 2, 0, true);
 
-  /* merch-payout-key*/
-  tx_builder_merch.output[2][14] = merch_payout_pub_key_d.key[0];
-  tx_builder_merch.output[2][15] = merch_payout_pub_key_d.key[1];
-  tx_builder_merch.output[3][0]  = merch_payout_pub_key_d.key[2];
-  tx_builder_merch.output[3][1]  = merch_payout_pub_key_d.key[3];
-  tx_builder_merch.output[3][2]  = merch_payout_pub_key_d.key[4];
-  tx_builder_merch.output[3][3]  = merch_payout_pub_key_d.key[5];
-  tx_builder_merch.output[3][4]  = merch_payout_pub_key_d.key[6];
-  tx_builder_merch.output[3][5]  = merch_payout_pub_key_d.key[7]; // FIRST 3 bytes of the amount
-  tx_builder_merch.output[3][6]  = merch_payout_pub_key_d.key[8] | constants.acsixeightzerozero | (little_endian_total_amount_merch.balance[0]>>24);
-
-  tx_builder_merch.output[3][7] = (little_endian_total_amount_merch.balance[0] << 8) | (little_endian_total_amount_merch.balance[1] >> 24);
-
-  tx_builder_merch.output[3][8] = (little_endian_total_amount_merch.balance[1] << 8) | constants.ff;
-  tx_builder_merch.output[3][9] = constants.ffffffzerozero | (hash_outputs_merch[0] >> 24);
-
-  tx_builder_merch.output[3][10] =  (hash_outputs_merch[0] << 8) | (hash_outputs_merch[1] >> 24);
-  tx_builder_merch.output[3][11] =  (hash_outputs_merch[1] << 8) | (hash_outputs_merch[2] >> 24);
-  tx_builder_merch.output[3][12] =  (hash_outputs_merch[2] << 8) | (hash_outputs_merch[3] >> 24);
-  tx_builder_merch.output[3][13] =  (hash_outputs_merch[3] << 8) | (hash_outputs_merch[4] >> 24);
-  tx_builder_merch.output[3][14] =  (hash_outputs_merch[4] << 8) | (hash_outputs_merch[5] >> 24);
-  tx_builder_merch.output[3][15] =  (hash_outputs_merch[5] << 8) | (hash_outputs_merch[6] >> 24);
-  tx_builder_merch.output[4][0]  =  (hash_outputs_merch[6] << 8) | (hash_outputs_merch[7] >> 24);
-  tx_builder_merch.output[4][1]  =  (hash_outputs_merch[7] << 8) | constants.zero;
-
-  tx_builder_merch.output[4][2]  = constants.one;
-  tx_builder_merch.output[4][3]  = constants.xeightfourthbyte;
-
-  tx_builder_merch.output[4][4]   = constants.zero;
-  tx_builder_merch.output[4][5]   = constants.zero;
-  tx_builder_merch.output[4][6]   = constants.zero;
-  tx_builder_merch.output[4][7]   = constants.zero;
-  tx_builder_merch.output[4][8]   = constants.zero;
-  tx_builder_merch.output[4][9]   = constants.zero;
-  tx_builder_merch.output[4][10]  = constants.zero;
-  tx_builder_merch.output[4][11]  = constants.zero;
-  tx_builder_merch.output[4][12]  = constants.zero;
-  tx_builder_merch.output[4][13]  = constants.zero;
-  tx_builder_merch.output[4][14]  = constants.zero;//0x00000000;
-  tx_builder_merch.output[4][15]  = constants.merchtransactionpreimagelength; // 271*8 = 2168 bits
+  //Add hash of output script to cust-close-from-merch transaction
+  append_item(&tx_builder_merch, constants.ffffffzerozero, constants.zero, 24, hash_outputs_merch, 8, 0, true);
+  //Add padding to cust-close-from-merch transaction
+  append_constants(&tx_builder_merch, vector<Integer>{constants.one,constants.xeightfourthbyte,
+                    constants.zero, constants.zero, constants.zero, constants.zero, constants.zero,
+                    constants.zero, constants.zero, constants.zero, constants.zero, constants.zero,
+                    constants.zero, constants.merchtransactionpreimagelength});
 
   computeDoubleSHA256_5d_noinit(tx_builder_merch.output, merch_digest, k, H, constants);
+  //END -----cust-close-from-merch transaction-----
 
 //   dump_buffer("hash_outputs_merch_preimage0=", hash_outputs_merch_preimage[0]);
 //   dump_buffer("hash_outputs_merch_preimage1=", hash_outputs_merch_preimage[1]);
