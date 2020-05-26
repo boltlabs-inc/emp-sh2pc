@@ -42,15 +42,6 @@ void* load_circuit_file(const char *path);
  * plus mangling of pretty Rust/C++ types to match the format used by
  * the MPC frameworks
  *
- * TYPISSUE - There are some weird types here, as well. Everything has a type,
- * but some of them are clearly incorrect 
- * (e.g.a public key will not fit into a normal 32-bit integer). 
- * but I don't know what representation they -will- take.
- * I've marked such parameters with TYPISSUE
- *
- * Uses char * instead of int for compatibility with Rust.
- *
- * Comments are sort of in doxygen style.
  */
 
 /**** LOCAL TYPES ****/
@@ -79,7 +70,6 @@ struct HMACKey_l {
 /* A Commitment to an HMAC Key
  * We are using hash based commitments, so this is really just the output of a SHA256 invocation
  */
-
 struct HMACKeyCommitment_l {
   uint32_t commitment[8];
 };
@@ -128,14 +118,16 @@ struct EcdsaPartialSig_l {
 struct Nonce_l {
   uint32_t nonce[4];
 };
-/* Revocation lock - TYPISSUE: not sure what type this is yet.
- * Tentatively sized to use a hash (SHA256-based) commitment scheme.
+/* Revocation lock
  * \param rl 	: a revocation lock.
  */
 struct RevLock_l {
   uint32_t revlock[8];
 };
 
+/* Commitment of Revocation lock
+ * \param commitment 	: a commitment.
+ */
 struct RevLockCommitment_l {
   uint32_t commitment[8];
 };
@@ -146,30 +138,43 @@ struct Txid_l {
   uint32_t txid[8];
 };
 
+/* bitcoin-flavored public key
+ */
 struct BitcoinPublicKey_l {
   uint32_t key[9]; // last byte padded with zeros.
 };
 
+/* hash of a bitcoin-flavored public key
+ */
 struct PublicKeyHash_l {
   uint32_t hash[5];
 };
 
+/* balance in satoshis
+ */
 struct Balance_l {
   uint32_t balance[2];
 };
 
+/* randomness used to compute commitment
+ */
 struct CommitmentRandomness_l {
   uint32_t randomness[4];
 };
 
 /* state type
  *
- * \param nonce         : unique identifier for the transaction?
- * \param rl 			: revocation lock for current state
- * \param balance_cust  : customer balance 
- * \param balance_merch : merchant balance
- * \param txid_merch    : transaction ID for merchant close transaction (bits, formatted as they appear in the 'source' field of a transaction that spends it) 
- * \param txid_escrow   : transaction ID for escrow transaction (ditto on format)
+ * \param nonce                 : unique identifier for the transaction?
+ * \param rl 			        : revocation lock for current state
+ * \param balance_cust          : customer balance
+ * \param balance_merch         : merchant balance
+ * \param txid_merch            : transaction ID for merchant close transaction (bits, formatted as they appear in the 'source' field of a transaction that spends it)
+ * \param txid_escrow           : transaction ID for escrow transaction (ditto on format)
+ * \param HashPrevOuts_merch    : transaction ID for previous merch transaction (ditto on format)
+ * \param HashPrevOuts_escrow   : transaction ID for previous escrow transaction (ditto on format)
+ * \param min_fee               : minimum customer close fee
+ * \param max_fee               : maximum customer close fee
+ * \param fee_mc                : merchant close fee
  */
 struct State_l {
   struct Nonce_l nonce;
@@ -312,6 +317,10 @@ void build_masked_tokens_merch(
   struct EcdsaPartialSig_l sig2
 );
 
+
+/*
+    This runs the actual MPC protocol, both CUST and MERCH call this function with their inputs
+*/
 void issue_tokens(
 /* CUSTOMER INPUTS */
   State_l old_state_l,
@@ -332,7 +341,6 @@ void issue_tokens(
   CommitmentRandomness_l hmac_commitment_randomness_l,
   CommitmentRandomness_l paytoken_mask_commitment_randomness_l,
 
-/* TODO: ECDSA Key info */
 /* PUBLIC INPUTS */
   Balance_l epsilon_l,
   HMACKeyCommitment_l hmac_key_commitment_l,
