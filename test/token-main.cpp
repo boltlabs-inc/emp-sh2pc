@@ -158,6 +158,7 @@ int main(int argc, char** argv) {
         BitcoinPublicKey_l merch_payout_pub_key_l;
         Nonce_l nonce_l;
         Balance_l val_cpfp;
+        uint16_t self_delay = 0;
 
         issue_tokens(/* CUSTOMER INPUTS */
                        old_state_l,
@@ -185,6 +186,7 @@ int main(int argc, char** argv) {
                        rlc_l,
                        nonce_l,
                        val_cpfp,
+                       self_delay,
                        merch_escrow_pub_key_l,
                        merch_dispute_key_l,
                        merch_payout_pub_key_l,
@@ -225,6 +227,7 @@ int main(int argc, char** argv) {
   BitcoinPublicKey_l merch_payout_pub_key_l;
   Nonce_l nonce_l;
   Balance_l val_cpfp;
+  uint16_t self_delay = 0;
 
   // Initialize shared vars
   amt.balance[0] = 1000;
@@ -262,7 +265,7 @@ int main(int argc, char** argv) {
 	build_masked_tokens_merch(io_callback, nc, cf_ptr,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
       merch_dispute_key_l, merch_publickey_hash,
-      merch_payout_pub_key_l, nonce_l, val_cpfp,
+      merch_payout_pub_key_l, nonce_l, val_cpfp, self_delay,
       hmac_key, mask, mask, mask, hmac_rand, pay_token_rand, sig, sig);
   } else {
     State_l w;
@@ -279,7 +282,7 @@ int main(int argc, char** argv) {
     build_masked_tokens_cust(io_callback, nc, cf_ptr,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
           merch_dispute_key_l, merch_publickey_hash,
-          merch_payout_pub_key_l, nonce_l, val_cpfp,
+          merch_payout_pub_key_l, nonce_l, val_cpfp, self_delay,
 	  rl_rand, w, w, fee_cc, pt_old, cust_escrow_pub_key_l, cust_payout_pub_key_l, cust_publickey_hash_l,
 	  &pt_return, &ct_escrow, &ct_merch);
   }

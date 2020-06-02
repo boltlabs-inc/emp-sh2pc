@@ -10,35 +10,67 @@ struct TxBuilderState {
     int sub_pos = 0; //Because a value doesn't have to be perfectly aligned, 0,8,16,24
 };
 
+/**
+    This appends items to the tx_builder, the weird inputs are to do shifts. Basically, everything should be aligned by bytes,
+    which would be 8 bits, a refactor might make this easier, but this is how it was implemented.
+    tx_builder: the struct containing the tx that's being build + the position it's at
+    front_padding: An integer constant that would be used to fill out the first position if there is a shift using sub_pos
+    back_padding: An integer constant that would be used to fill out the last position given a shift using sub_pos
+    sub_pos: Used to shift the appended item this many bits to the right, filling up with front_padding and back_padding
+    item: The actual item being appended (array of integers)
+    size: number of integers inside the item array
+    end_shift: When the next item is gonna be positioned at a certain shift,
+                this means the last value is not filling up the 32 bit integer
+                (gets stored as sub_pos inside tx_builder)
+    overflow: if the last integer is splitted over two integers, false by default
+*/
 void append_item(TxBuilderState* tx_builder, Integer front_padding, Integer back_padding, int sub_pos, Integer* item, int size, int end_shift, bool overflow=false) {
     int i = tx_builder->outer_pos;
     int j = tx_builder->inner_pos;
-    int sub = sub_pos + tx_builder->sub_pos;
+    int sub = sub_pos + tx_builder->sub_pos; // If sub_pos existed in tx_builder, we need to shift by that much to the right.
     int inv_sub_pos = 32 - sub;
-    if (tx_builder->sub_pos == 0) {
+    if (size == 1) {
         tx_builder->output[i][j] = front_padding | (item[0] >> sub);
+        if (sub > 0) {
+            if (j == 15) {
+                i++;
+            }
+            j = (j + 1) % 16;
+            tx_builder->output[i][j] = (item[0] << inv_sub_pos) | back_padding;
+        } else {
+            tx_builder->output[i][j] = tx_builder->output[i][j] | back_padding;
+        }
     } else {
-        tx_builder->output[i][j] = tx_builder->output[i][j] | (item[0] >> sub);
-    }
-    if (j == 15) {
-        i++;
-    }
-    j = (j + 1) % 16;
-    int nr_of_it = size - 1;
-    if (overflow) {
-        nr_of_it = size;
-    }
-    for (int k = 1; k < nr_of_it; k++) {
-        tx_builder->output[i][j] = (item[k-1] << inv_sub_pos) | (item[k] >> sub);
+        if (tx_builder->sub_pos == 0) {
+            // Add front_padding xor'ed with the first element in the item-array (shifted to the right by sub_pos)
+            tx_builder->output[i][j] = front_padding | (item[0] >> sub);
+        } else {
+            // if sub_pos existed in tx_builder, we need to add first part to the already partly filled piece of the output at i and j
+            tx_builder->output[i][j] = tx_builder->output[i][j] | (item[0] >> sub);
+        }
         if (j == 15) {
             i++;
         }
         j = (j + 1) % 16;
-    }
-    if (overflow) {
-        tx_builder->output[i][j] = (item[size-1] << inv_sub_pos) | back_padding;
-    } else {
-        tx_builder->output[i][j] = (item[size-2] << inv_sub_pos) | (item[size-1] >> sub) | back_padding;
+        int nr_of_it = size - 1;
+        if (overflow) {
+            nr_of_it = size;
+        }
+        for (int k = 1; k < nr_of_it; k++) {
+            // Add all parts of the item considering the shift
+            tx_builder->output[i][j] = (item[k-1] << inv_sub_pos) | (item[k] >> sub);
+            if (j == 15) {
+                i++;
+            }
+            j = (j + 1) % 16;
+        }
+        if (overflow) {
+            //Overflow means that the last part of the item has a part that is the only one at the last position
+            //(without item at size-2) fill out the element with back_padding
+            tx_builder->output[i][j] = (item[size-1] << inv_sub_pos) | back_padding;
+        } else {
+            tx_builder->output[i][j] = (item[size-2] << inv_sub_pos) | (item[size-1] >> sub) | back_padding;
+        }
     }
 
     if (end_shift == 0) {
@@ -83,7 +115,7 @@ void append_tx_start(TxBuilderState* tx_builder, Integer txid1[8], Integer txid2
 void validate_transactions(State_d new_state_d,
   BitcoinPublicKey_d cust_escrow_pub_key_d, BitcoinPublicKey_d cust_payout_pub_key_d, PublicKeyHash_d cust_child_publickey_hash_d,
   BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d,
-  PublicKeyHash_d merch_publickey_hash_d, Integer escrow_digest[8], Integer merch_digest[8], Balance_d fee_cc_d, Integer k[64], Integer H[8], Balance_d val_cpfp_d, Constants constants)
+  PublicKeyHash_d merch_publickey_hash_d, Integer escrow_digest[8], Integer merch_digest[8], Balance_d fee_cc_d, Integer k[64], Integer H[8], Balance_d val_cpfp_d, Integer self_delay_d, Constants constants)
 {
   //Build output for customer with delay
   TxBuilderState customer_delayed_script_builder;
@@ -91,10 +123,10 @@ void validate_transactions(State_d new_state_d,
   //Add revocation lock
   append_item(&customer_delayed_script_builder, constants.xsixthreedot, constants.eighteight, 24, new_state_d.rl.revlock, 8, 0, true);
   //Add merchant dispute key
-  append_item(&customer_delayed_script_builder, constants.xtwentyone, constants.sixsevenzero | constants.twohundred, 8, merch_dispute_key_d.key, 9, 0);
+  append_item(&customer_delayed_script_builder, constants.xtwentyone, constants.sixsevenzero | constants.lenSelfDelay, 8, merch_dispute_key_d.key, 9, 0);
 
-  // TODO EMP-6: This previous last byte and the following to bytes is the delay.  We should talk about how long we want them to be
-  append_constants(&customer_delayed_script_builder, vector<Integer>{constants.xcfzerofive | constants.btwosevenfive});
+  //Add toSelfDelay
+  append_item(&customer_delayed_script_builder, constants.zero, constants.btwosevenfive, 0, &self_delay_d, 1, 0);
   //Add customer payout public key
   append_item(&customer_delayed_script_builder, constants.xtwentyone, constants.sixeightac, 8, cust_payout_pub_key_d.key, 9, 0);
 
@@ -235,7 +267,8 @@ void validate_transactions(State_d new_state_d,
   //Add customer public key to cust-close-from-merch transaction
   append_item(&tx_builder_merch, constants.zero, constants.fiftytwo, 0, cust_escrow_pub_key_d.key, 9, 0);
 
-  append_constants(&tx_builder_merch, vector<Integer>{constants.xaedot, constants.xzerofivedot});
+  //Add toSelfDelay
+  append_item(&tx_builder_merch, constants.xaedot, constants.xzerofivedot, 24, &self_delay_d, 1, 0, true);
 
   // Add merch-payout-key to cust-close-from-merch transaction
   append_item(&tx_builder_merch, constants.zero, constants.acsixeightzerozero, 0, merch_payout_pub_key_d.key, 9, 24);

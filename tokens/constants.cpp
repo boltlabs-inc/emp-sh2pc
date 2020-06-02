@@ -32,7 +32,6 @@ Constants distribute_Constants(const int party) {
       .eighteight =Integer(32, 136 , party),                /*0x00000088*/
       .xtwentyone =Integer(32, 553648128, party),
       .sixsevenzero =Integer(32, 26368, party),             /*0x00006700*/
-      .xcfzerofive =Integer(32, 3473211392 , party),        /*0xcf050000*/
       .btwosevenfive =Integer(32, 45685, party),            /*0x0000b275*/
       .sixeightac =Integer(32, 26796, party),               /*0x000068ac*/
       .xtwentytwodot =Integer(32, 570433536 , party),       /*0x22002000*/
@@ -55,8 +54,8 @@ Constants distribute_Constants(const int party) {
       .xseventwosixdot =Integer(32, 1919111713 , party),    /*0x72635221*/
       .xzerozerotwentyone =Integer(32, 2162688 , party),    /*0x00210000*/
       .fiftytwo =Integer(32, 82, party),                    /*0x00000052*/
-      .xaedot =Integer(32, 2925986511, party),              /*0xae6702cf*/
-      .xzerofivedot =Integer(32,   95581473, party),        /*0x05b27521*/
+      .xaedot =Integer(32, 2925986304, party),              /*0xae670200*/
+      .xzerofivedot =Integer(32, 11695393, party),          /*0x00b27521*/
       .acsixeightzerozero =Integer(32, 11298816, party),    /*0x00ac6800*/
       .xsixteenzerozero =Integer(32, 5632, party),          /*0x00001600*/
       .xfourteenzerozero =Integer(32, 335544320, party),    /*0x14000000*/
@@ -73,7 +72,7 @@ Constants distribute_Constants(const int party) {
       .thirtytwo =Integer(256, 32, party),
       .zero =Integer(32, 0, party),
       .one =Integer(32, 1 /*0x00000001*/, party),
-      .twohundred =Integer(32,2 /*0x000002*/, party),
+      .lenSelfDelay =Integer(32,2 /*0x000002*/, party),
       .dustlimit = Integer(64, 546, party)
   };
 }
@@ -101,7 +100,6 @@ Bit constants_not_equal(const Constants& lhs, const Constants& rhs) {
   error_signal = error_signal | !lhs.eighteight.equal(rhs.eighteight);
   error_signal = error_signal | !lhs.xtwentyone.equal(rhs.xtwentyone);
   error_signal = error_signal | !lhs.sixsevenzero.equal(rhs.sixsevenzero);
-  error_signal = error_signal | !lhs.xcfzerofive.equal(rhs.xcfzerofive);
   error_signal = error_signal | !lhs.btwosevenfive.equal(rhs.btwosevenfive);
   error_signal = error_signal | !lhs.sixeightac.equal(rhs.sixeightac);
   error_signal = error_signal | !lhs.xtwentytwodot.equal(rhs.xtwentytwodot);
@@ -139,7 +137,7 @@ Bit constants_not_equal(const Constants& lhs, const Constants& rhs) {
   error_signal = error_signal | !lhs.thirtytwo.equal(rhs.thirtytwo);
   error_signal = error_signal | !lhs.zero.equal(rhs.zero);
   error_signal = error_signal | !lhs.one.equal(rhs.one);
-  error_signal = error_signal | !lhs.twohundred.equal(rhs.twohundred);
+  error_signal = error_signal | !lhs.lenSelfDelay.equal(rhs.lenSelfDelay);
   error_signal = error_signal | !lhs.dustlimit.equal(rhs.dustlimit);
 	return error_signal;
 }

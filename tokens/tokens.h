@@ -239,6 +239,7 @@ void build_masked_tokens_cust(
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
   struct Balance_l val_cpfp,
+  uint32_t self_delay,
 
   struct CommitmentRandomness_l revlock_commitment_randomness_l,
   struct State_l w_new,
@@ -306,6 +307,7 @@ void build_masked_tokens_merch(
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
   struct Balance_l val_cpfp,
+  uint32_t self_delay,
 
   struct HMACKey_l hmac_key,
   struct Mask_l merch_mask_l,
@@ -348,6 +350,7 @@ void issue_tokens(
   RevLockCommitment_l rlc_l,
   Nonce_l nonce_l,
   Balance_l val_cpfp,
+  uint32_t self_delay,
   BitcoinPublicKey_l merch_escrow_pub_key_l,
   BitcoinPublicKey_l merch_dispute_key_l,
   BitcoinPublicKey_l merch_payout_pub_key_l,

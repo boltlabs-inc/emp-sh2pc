@@ -28,7 +28,6 @@ struct Constants {
     Integer eighteight;
     Integer xtwentyone;
     Integer sixsevenzero;
-    Integer xcfzerofive;
     Integer btwosevenfive;
     Integer sixeightac;
     Integer xtwentytwodot;
@@ -68,7 +67,7 @@ struct Constants {
     Integer thirtytwo;
     Integer zero;
     Integer one;
-    Integer twohundred;
+    Integer lenSelfDelay;
     Integer dustlimit;
 };
 

@@ -68,6 +68,7 @@ void issue_tokens(
   RevLockCommitment_l rlc_l,
   Nonce_l nonce_l,
   Balance_l val_cpfp,
+  uint32_t self_delay,
   BitcoinPublicKey_l merch_escrow_pub_key_l,
   BitcoinPublicKey_l merch_dispute_key_l, 
   BitcoinPublicKey_l merch_payout_pub_key_l,
@@ -97,6 +98,7 @@ void issue_tokens(
   RevLockCommitment_d rlc_d = distribute_RevLockCommitment(rlc_l, CUST);
   Nonce_d nonce_d = distribute_Nonce(nonce_l, CUST);
   Balance_d val_cpfp_d = distribute_Balance(val_cpfp, CUST);
+  Integer self_delay_d = Integer(32, self_delay, CUST);
   BitcoinPublicKey_d merch_escrow_pub_key_d = distribute_BitcoinPublicKey(merch_escrow_pub_key_l, CUST);
   BitcoinPublicKey_d merch_dispute_key_d = distribute_BitcoinPublicKey(merch_dispute_key_l, CUST);
   BitcoinPublicKey_d merch_payout_pub_key_d = distribute_BitcoinPublicKey(merch_payout_pub_key_l, CUST);
@@ -128,6 +130,7 @@ void issue_tokens(
   RevLockCommitment_d rlc_d_merch = distribute_RevLockCommitment(rlc_l, MERCH);
   Nonce_d nonce_d_merch = distribute_Nonce(nonce_l, MERCH);
   Balance_d val_cpfp_d_merch = distribute_Balance(val_cpfp, MERCH);
+  Integer self_delay_d_merch = Integer(32, self_delay, MERCH);
   BitcoinPublicKey_d merch_escrow_pub_key_d_merch = distribute_BitcoinPublicKey(merch_escrow_pub_key_l, MERCH);
   BitcoinPublicKey_d merch_dispute_key_d_merch = distribute_BitcoinPublicKey(merch_dispute_key_l, MERCH);
   BitcoinPublicKey_d merch_payout_pub_key_d_merch = distribute_BitcoinPublicKey(merch_payout_pub_key_l, MERCH);
@@ -145,8 +148,8 @@ void issue_tokens(
 
   //Compare public inputs + constants to be the same between CUST and MERCH
   Bit error_signal(false);
-  error_signal = error_signal | compare_public_input(epsilon_d, hmac_key_commitment_d, paytoken_mask_commitment_d, rlc_d, nonce_d, val_cpfp_d, merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, merch_publickey_hash_d,
-                                    epsilon_d_merch, hmac_key_commitment_d_merch, paytoken_mask_commitment_d_merch, rlc_d_merch, nonce_d_merch, val_cpfp_d_merch, merch_escrow_pub_key_d_merch, merch_dispute_key_d_merch, merch_payout_pub_key_d_merch, merch_publickey_hash_d_merch);
+  error_signal = error_signal | compare_public_input(epsilon_d, hmac_key_commitment_d, paytoken_mask_commitment_d, rlc_d, nonce_d, val_cpfp_d, self_delay_d, merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, merch_publickey_hash_d,
+                                    epsilon_d_merch, hmac_key_commitment_d_merch, paytoken_mask_commitment_d_merch, rlc_d_merch, nonce_d_merch, val_cpfp_d_merch, self_delay_d_merch, merch_escrow_pub_key_d_merch, merch_dispute_key_d_merch, merch_payout_pub_key_d_merch, merch_publickey_hash_d_merch);
   error_signal = error_signal | constants_not_equal(constants, constants_merch);
   error_signal = error_signal | q_not_equal(qs, qs_merch);
   error_signal = error_signal | compare_k_H(k, H, k_merch, H_merch);
@@ -173,7 +176,7 @@ void issue_tokens(
   validate_transactions(new_state_d,
     cust_escrow_pub_key_d, cust_payout_pub_key_d, cust_publickey_hash_d,
     merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d,
-    merch_publickey_hash_d, escrow_digest, merch_digest, fee_cc_d, k, H, val_cpfp_d, constants);
+    merch_publickey_hash_d, escrow_digest, merch_digest, fee_cc_d, k, H, val_cpfp_d, self_delay_d, constants);
 
   // we should return into these txserialized_d or hash 
 
@@ -257,6 +260,7 @@ void build_masked_tokens_cust(IOCallback io_callback,
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
   struct Balance_l val_cpfp,
+  uint32_t self_delay,
 
   struct CommitmentRandomness_l revlock_commitment_randomness_l,
   struct State_l w_new,
@@ -335,6 +339,7 @@ issue_tokens(
   rlc_l,
   nonce_l,
   val_cpfp,
+  self_delay,
   merch_escrow_pub_key_l,
   merch_dispute_key_l, 
   merch_payout_pub_key_l,
@@ -366,6 +371,7 @@ void build_masked_tokens_merch(IOCallback io_callback,
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
   struct Balance_l val_cpfp,
+  uint32_t self_delay,
 
   struct HMACKey_l hmac_key,
   struct Mask_l merch_mask_l,
@@ -443,6 +449,7 @@ issue_tokens(
   rlc_l,
   nonce_l,
   val_cpfp,
+  self_delay,
   merch_escrow_pub_key_l,
   merch_dispute_key_l,
   merch_payout_pub_key_l, 
