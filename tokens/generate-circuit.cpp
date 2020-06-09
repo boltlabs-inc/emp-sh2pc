@@ -38,6 +38,8 @@ int main(int argc, char** argv) {
     BitcoinPublicKey_l merch_payout_pub_key_l;
     Nonce_l nonce_l;
     Balance_l val_cpfp;
+    Balance_l bal_min_cust;
+    Balance_l bal_min_merch;
     uint16_t self_delay = 0;
 
     issue_tokens(/* CUSTOMER INPUTS */
@@ -66,6 +68,8 @@ int main(int argc, char** argv) {
                    rlc_l,
                    nonce_l,
                    val_cpfp,
+                   bal_min_cust,
+                   bal_min_merch,
                    self_delay,
                    merch_escrow_pub_key_l,
                    merch_dispute_key_l,

@@ -73,7 +73,6 @@ Constants distribute_Constants(const int party) {
       .zero =Integer(32, 0, party),
       .one =Integer(32, 1 /*0x00000001*/, party),
       .lenSelfDelay =Integer(32,2 /*0x000002*/, party),
-      .dustlimit = Integer(64, 546, party)
   };
 }
 
@@ -138,7 +137,6 @@ Bit constants_not_equal(const Constants& lhs, const Constants& rhs) {
   error_signal = error_signal | !lhs.zero.equal(rhs.zero);
   error_signal = error_signal | !lhs.one.equal(rhs.one);
   error_signal = error_signal | !lhs.lenSelfDelay.equal(rhs.lenSelfDelay);
-  error_signal = error_signal | !lhs.dustlimit.equal(rhs.dustlimit);
 	return error_signal;
 }
 

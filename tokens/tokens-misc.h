@@ -296,7 +296,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
  *
  * \return b 	: success bit
  */
-Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d, Nonce_d nonce_d, Balance_d epsilon_d, Balance_d fee_cc_d, Balance_d val_cpfp_d, Integer k[64], Integer H[8],  Constants constants);
+Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d, Nonce_d nonce_d, Balance_d epsilon_d, Balance_d fee_cc_d, Balance_d val_cpfp_d, Balance_d bal_min_cust_d, Balance_d bal_min_merch_d, Integer k[64], Integer H[8],  Constants constants);
 
 /* opens and verifies commitment to a wallet
  * e.g. checks that com == commit(w;t)
@@ -362,5 +362,5 @@ void mask_closetoken(Integer token[8], Mask_d mask);
 void bigint_into_smallint_array(Integer target[8], Integer source, Integer fullF);
 
 Bit compare_k_H(Integer k[64], Integer H[8], Integer k_merch[64], Integer H_merch[8]);
-Bit compare_public_input(Balance_d epsilon_d, HMACKeyCommitment_d hmac_key_commitment_d, MaskCommitment_d paytoken_mask_commitment_d, RevLockCommitment_d rlc_d, Nonce_d nonce_d, Balance_d val_cpfp_d, Integer to_self_delay_d, BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, PublicKeyHash_d merch_publickey_hash_d,
-                                        Balance_d epsilon_d_merch, HMACKeyCommitment_d hmac_key_commitment_d_merch, MaskCommitment_d paytoken_mask_commitment_d_merch, RevLockCommitment_d rlc_d_merch, Nonce_d nonce_d_merch, Balance_d val_cpfp_d_merch, Integer to_self_delay_d_merch, BitcoinPublicKey_d merch_escrow_pub_key_d_merch, BitcoinPublicKey_d merch_dispute_key_d_merch, BitcoinPublicKey_d merch_payout_pub_key_d_merch, PublicKeyHash_d merch_publickey_hash_d_merch);
+Bit compare_public_input(Balance_d epsilon_d, HMACKeyCommitment_d hmac_key_commitment_d, MaskCommitment_d paytoken_mask_commitment_d, RevLockCommitment_d rlc_d, Nonce_d nonce_d, Balance_d val_cpfp_d, Balance_d bal_min_cust_d, Balance_d bal_min_merch_d, Integer to_self_delay_d, BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, PublicKeyHash_d merch_publickey_hash_d,
+                                        Balance_d epsilon_d_merch, HMACKeyCommitment_d hmac_key_commitment_d_merch, MaskCommitment_d paytoken_mask_commitment_d_merch, RevLockCommitment_d rlc_d_merch, Nonce_d nonce_d_merch, Balance_d val_cpfp_d_merch, Balance_d bal_min_cust_d_merch, Balance_d bal_min_merch_d_merch, Integer to_self_delay_d_merch, BitcoinPublicKey_d merch_escrow_pub_key_d_merch, BitcoinPublicKey_d merch_dispute_key_d_merch, BitcoinPublicKey_d merch_payout_pub_key_d_merch, PublicKeyHash_d merch_publickey_hash_d_merch);

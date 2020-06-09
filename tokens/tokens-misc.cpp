@@ -510,8 +510,8 @@ Bit compare_k_H(Integer k[64], Integer H[8], Integer k_merch[64], Integer H_merc
   return error_signal;
 }
 
-Bit compare_public_input(Balance_d epsilon_d, HMACKeyCommitment_d hmac_key_commitment_d, MaskCommitment_d paytoken_mask_commitment_d, RevLockCommitment_d rlc_d, Nonce_d nonce_d, Balance_d val_cpfp_d, Integer self_delay_d, BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, PublicKeyHash_d merch_publickey_hash_d,
-                                        Balance_d epsilon_d_merch, HMACKeyCommitment_d hmac_key_commitment_d_merch, MaskCommitment_d paytoken_mask_commitment_d_merch, RevLockCommitment_d rlc_d_merch, Nonce_d nonce_d_merch, Balance_d val_cpfp_d_merch, Integer self_delay_d_merch, BitcoinPublicKey_d merch_escrow_pub_key_d_merch, BitcoinPublicKey_d merch_dispute_key_d_merch, BitcoinPublicKey_d merch_payout_pub_key_d_merch, PublicKeyHash_d merch_publickey_hash_d_merch) {
+Bit compare_public_input(Balance_d epsilon_d, HMACKeyCommitment_d hmac_key_commitment_d, MaskCommitment_d paytoken_mask_commitment_d, RevLockCommitment_d rlc_d, Nonce_d nonce_d, Balance_d val_cpfp_d, Balance_d bal_min_cust_d, Balance_d bal_min_merch_d, Integer self_delay_d, BitcoinPublicKey_d merch_escrow_pub_key_d, BitcoinPublicKey_d merch_dispute_key_d, BitcoinPublicKey_d merch_payout_pub_key_d, PublicKeyHash_d merch_publickey_hash_d,
+                                        Balance_d epsilon_d_merch, HMACKeyCommitment_d hmac_key_commitment_d_merch, MaskCommitment_d paytoken_mask_commitment_d_merch, RevLockCommitment_d rlc_d_merch, Nonce_d nonce_d_merch, Balance_d val_cpfp_d_merch, Balance_d bal_min_cust_d_merch, Balance_d bal_min_merch_d_merch, Integer self_delay_d_merch, BitcoinPublicKey_d merch_escrow_pub_key_d_merch, BitcoinPublicKey_d merch_dispute_key_d_merch, BitcoinPublicKey_d merch_payout_pub_key_d_merch, PublicKeyHash_d merch_publickey_hash_d_merch) {
   Bit error_signal(false);
   for (int i=0; i<2; ++i) {
     error_signal = error_signal | !epsilon_d.balance[i].equal(epsilon_d_merch.balance[i]);
@@ -530,6 +530,12 @@ Bit compare_public_input(Balance_d epsilon_d, HMACKeyCommitment_d hmac_key_commi
   }
   for (int i=0; i<2; ++i) {
     error_signal = error_signal | !val_cpfp_d.balance[i].equal(val_cpfp_d_merch.balance[i]);
+  }
+  for (int i=0; i<2; ++i) {
+    error_signal = error_signal | !bal_min_cust_d.balance[i].equal(bal_min_cust_d_merch.balance[i]);
+  }
+  for (int i=0; i<2; ++i) {
+    error_signal = error_signal | !bal_min_merch_d.balance[i].equal(bal_min_merch_d_merch.balance[i]);
   }
   error_signal = error_signal | !self_delay_d.equal(self_delay_d);
   for (int i=0; i<9; ++i) {

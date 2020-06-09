@@ -68,9 +68,11 @@ void issue_tokens(
   RevLockCommitment_l rlc_l,
   Nonce_l nonce_l,
   Balance_l val_cpfp,
+  Balance_l bal_min_cust,
+  Balance_l bal_min_merch,
   uint32_t self_delay,
   BitcoinPublicKey_l merch_escrow_pub_key_l,
-  BitcoinPublicKey_l merch_dispute_key_l, 
+  BitcoinPublicKey_l merch_dispute_key_l,
   BitcoinPublicKey_l merch_payout_pub_key_l,
   PublicKeyHash_l merch_publickey_hash_l,
 /* OUTPUTS */
@@ -98,6 +100,8 @@ void issue_tokens(
   RevLockCommitment_d rlc_d = distribute_RevLockCommitment(rlc_l, CUST);
   Nonce_d nonce_d = distribute_Nonce(nonce_l, CUST);
   Balance_d val_cpfp_d = distribute_Balance(val_cpfp, CUST);
+  Balance_d bal_min_cust_d = distribute_Balance(bal_min_cust, CUST);
+  Balance_d bal_min_merch_d = distribute_Balance(bal_min_merch, CUST);
   Integer self_delay_d = Integer(32, self_delay, CUST);
   BitcoinPublicKey_d merch_escrow_pub_key_d = distribute_BitcoinPublicKey(merch_escrow_pub_key_l, CUST);
   BitcoinPublicKey_d merch_dispute_key_d = distribute_BitcoinPublicKey(merch_dispute_key_l, CUST);
@@ -130,6 +134,8 @@ void issue_tokens(
   RevLockCommitment_d rlc_d_merch = distribute_RevLockCommitment(rlc_l, MERCH);
   Nonce_d nonce_d_merch = distribute_Nonce(nonce_l, MERCH);
   Balance_d val_cpfp_d_merch = distribute_Balance(val_cpfp, MERCH);
+  Balance_d bal_min_cust_d_merch = distribute_Balance(bal_min_cust, MERCH);
+  Balance_d bal_min_merch_d_merch = distribute_Balance(bal_min_merch, MERCH);
   Integer self_delay_d_merch = Integer(32, self_delay, MERCH);
   BitcoinPublicKey_d merch_escrow_pub_key_d_merch = distribute_BitcoinPublicKey(merch_escrow_pub_key_l, MERCH);
   BitcoinPublicKey_d merch_dispute_key_d_merch = distribute_BitcoinPublicKey(merch_dispute_key_l, MERCH);
@@ -141,15 +147,15 @@ void issue_tokens(
   Integer k_merch[64];
   Integer H_merch[8];
   initSHA256(k_merch, H_merch, MERCH);
-  
+
   Q qs_merch = distribute_Q(MERCH);
 
   Integer(1556, 0, MERCH); //Fix for different number of input wires between parties
 
   //Compare public inputs + constants to be the same between CUST and MERCH
   Bit error_signal(false);
-  error_signal = error_signal | compare_public_input(epsilon_d, hmac_key_commitment_d, paytoken_mask_commitment_d, rlc_d, nonce_d, val_cpfp_d, self_delay_d, merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, merch_publickey_hash_d,
-                                    epsilon_d_merch, hmac_key_commitment_d_merch, paytoken_mask_commitment_d_merch, rlc_d_merch, nonce_d_merch, val_cpfp_d_merch, self_delay_d_merch, merch_escrow_pub_key_d_merch, merch_dispute_key_d_merch, merch_payout_pub_key_d_merch, merch_publickey_hash_d_merch);
+  error_signal = error_signal | compare_public_input(epsilon_d, hmac_key_commitment_d, paytoken_mask_commitment_d, rlc_d, nonce_d, val_cpfp_d, bal_min_cust_d, bal_min_merch_d, self_delay_d, merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d, merch_publickey_hash_d,
+                                    epsilon_d_merch, hmac_key_commitment_d_merch, paytoken_mask_commitment_d_merch, rlc_d_merch, nonce_d_merch, val_cpfp_d_merch, bal_min_cust_d_merch, bal_min_merch_d_merch, self_delay_d_merch, merch_escrow_pub_key_d_merch, merch_dispute_key_d_merch, merch_payout_pub_key_d_merch, merch_publickey_hash_d_merch);
   error_signal = error_signal | constants_not_equal(constants, constants_merch);
   error_signal = error_signal | q_not_equal(qs, qs_merch);
   error_signal = error_signal | compare_k_H(k, H, k_merch, H_merch);
@@ -164,7 +170,7 @@ void issue_tokens(
 #if defined(DEBUG)
   cout << "comparing old to new state" << endl;
 #endif
-  error_signal = (error_signal | compare_states(old_state_d, new_state_d, rlc_d, revlock_commitment_randomness_d, nonce_d, epsilon_d, fee_cc_d, val_cpfp_d, k, H, constants));
+  error_signal = (error_signal | compare_states(old_state_d, new_state_d, rlc_d, revlock_commitment_randomness_d, nonce_d, epsilon_d, fee_cc_d, val_cpfp_d, bal_min_cust_d, bal_min_merch_d, k, H, constants));
 
   // constructs new close transactions and computes hash
 #if defined(DEBUG)
@@ -178,7 +184,7 @@ void issue_tokens(
     merch_escrow_pub_key_d, merch_dispute_key_d, merch_payout_pub_key_d,
     merch_publickey_hash_d, escrow_digest, merch_digest, fee_cc_d, k, H, val_cpfp_d, self_delay_d, constants);
 
-  // we should return into these txserialized_d or hash 
+  // we should return into these txserialized_d or hash
 
   // sign new close transactions
 #if defined(DEBUG)
@@ -248,7 +254,7 @@ void issue_tokens(
 void build_masked_tokens_cust(IOCallback io_callback,
   struct Conn_l conn,
   void *circuit_file,
-  
+
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
 
@@ -260,6 +266,8 @@ void build_masked_tokens_cust(IOCallback io_callback,
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
   struct Balance_l val_cpfp,
+  struct Balance_l bal_min_cust,
+  struct Balance_l bal_min_merch,
   uint32_t self_delay,
 
   struct CommitmentRandomness_l revlock_commitment_randomness_l,
@@ -339,9 +347,11 @@ issue_tokens(
   rlc_l,
   nonce_l,
   val_cpfp,
+  bal_min_cust,
+  bal_min_merch,
   self_delay,
   merch_escrow_pub_key_l,
-  merch_dispute_key_l, 
+  merch_dispute_key_l,
   merch_payout_pub_key_l,
   merch_publickey_hash,
 /* OUTPUTS */
@@ -371,6 +381,8 @@ void build_masked_tokens_merch(IOCallback io_callback,
   struct BitcoinPublicKey_l merch_payout_pub_key_l,
   struct Nonce_l nonce_l,
   struct Balance_l val_cpfp,
+  struct Balance_l bal_min_cust,
+  struct Balance_l bal_min_merch,
   uint32_t self_delay,
 
   struct HMACKey_l hmac_key,
@@ -449,10 +461,12 @@ issue_tokens(
   rlc_l,
   nonce_l,
   val_cpfp,
+  bal_min_cust,
+  bal_min_merch,
   self_delay,
   merch_escrow_pub_key_l,
   merch_dispute_key_l,
-  merch_payout_pub_key_l, 
+  merch_payout_pub_key_l,
   merch_publickey_hash,
 /* OUTPUTS */
   &pt_return,
@@ -476,7 +490,7 @@ PayToken_d sign_token(State_d state, HMACKey_d key, Constants constants, Integer
 
 Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac_commitment_randomness_d, HMACKey_d opening, State_d old_state, PayToken_d old_paytoken, Constants constants, Integer k[64], Integer H[8]) {
 
-  // check that the opening is valid 
+  // check that the opening is valid
   Integer message[2][16];
 
   for(int i=0; i<16; i++) {
@@ -500,7 +514,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
   message[1][12] = constants.zero; //0x00000000;
   message[1][13] = constants.zero; //0x00000000;
 
-  // Message length 
+  // Message length
   message[1][14] = constants.zero; //0x00000000;
 //  message[1][15] = Integer(32, 640, PUBLIC);
   message[1][15] = constants.hmackeycommitmentpreimagelength;
@@ -528,7 +542,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
 }
 
 // make sure wallets are well-formed
-Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d revlock_commitment_randomness_d, Nonce_d nonce_d, Balance_d epsilon_d, Balance_d fee_cc_d, Balance_d val_cpfp_d, Integer k[64], Integer H[8], Constants constants) {
+Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d revlock_commitment_randomness_d, Nonce_d nonce_d, Balance_d epsilon_d, Balance_d fee_cc_d, Balance_d val_cpfp_d, Balance_d bal_min_cust_d, Balance_d bal_min_merch_d, Integer k[64], Integer H[8], Constants constants) {
 
   //Make sure the fields are all correct
   Bit b; // TODO initialize to 0
@@ -595,8 +609,10 @@ Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d
   // Dustlimit checks
   // make sure theres enough funds for the amount we have payed
   // We want to make sure we never go below the dust limit on either payout
-  b = (b | (!(old_balance_merch_combined + epsilon_combined).geq(constants.dustlimit + fee_mc_combined + val_cpfp_combined)));
-  b = (b | (!(old_balance_cust_combined - epsilon_combined).geq(constants.dustlimit + fee_cc_combined + val_cpfp_combined)));
+  Integer bal_min_cust_combined = combine_balance(bal_min_cust_d);
+  Integer bal_min_merch_combined = combine_balance(bal_min_merch_d);
+  b = (b | (!(old_balance_merch_combined + epsilon_combined).geq(bal_min_merch_combined + fee_mc_combined + val_cpfp_combined)));
+  b = (b | (!(old_balance_cust_combined - epsilon_combined).geq(bal_min_cust_combined + fee_cc_combined + val_cpfp_combined)));
 
   return b;
 }
@@ -624,7 +640,7 @@ Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, Commitm
   message[0][12] = constants.xeightfirstbyte; //0x80000000;
   message[0][13] = constants.zero; //0x00000000;
 
-  // Message length 
+  // Message length
   message[0][14] = constants.zero; //0x00000000;
   message[0][15] = constants.revlockcommitmentpreimagelength; // 256 bit RL
 //  message[0][15] = Integer(32, 384, PUBLIC); // 256 bit RL
@@ -657,7 +673,7 @@ Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, Commitm
   message[0][12] = constants.xeightfirstbyte; //0x80000000;
   message[0][13] = constants.zero; //0x00000000;
 
-  // Message length 
+  // Message length
   message[0][14] = constants.zero; //0x00000000;
   message[0][15] = constants.maskcommitmentpreimagelength;
 

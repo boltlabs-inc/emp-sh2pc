@@ -68,7 +68,6 @@ struct Constants {
     Integer zero;
     Integer one;
     Integer lenSelfDelay;
-    Integer dustlimit;
 };
 
 typedef struct Q Q;
