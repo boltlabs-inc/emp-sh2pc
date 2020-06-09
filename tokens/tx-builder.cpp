@@ -237,7 +237,7 @@ void validate_transactions(State_d new_state_d,
 
   Balance_d big_endian_total_amount = split_integer_to_balance(cust_balance_in_state_combined + merch_balance_in_state_combined, constants.fullFsixtyfour);
   Balance_d little_endian_total_amount = convert_to_little_endian(big_endian_total_amount, constants);
-  //Add total output balance to cust-close-from-escrow transaction
+  //Add total input balance to cust-close-from-escrow transaction
   append_item(&tx_builder_escrow, constants.zero, constants.zero, 0, little_endian_total_amount.balance, 2, 0);
 
   append_constants(&tx_builder_escrow, vector<Integer>{constants.fullFthirtytwo});
@@ -272,8 +272,8 @@ void validate_transactions(State_d new_state_d,
 
   // Add merch-payout-key to cust-close-from-merch transaction
   append_item(&tx_builder_merch, constants.zero, constants.acsixeightzerozero, 0, merch_payout_pub_key_d.key, 9, 24);
-  // Add total amount to cust-close-from-merch transaction
-  Balance_d big_endian_total_amount_merch = split_integer_to_balance(cust_balance_in_state_combined + merch_balance_in_state_combined, constants.fullFsixtyfour);
+  // Add total input amount to cust-close-from-merch transaction
+  Balance_d big_endian_total_amount_merch = split_integer_to_balance(cust_balance_in_state_combined + merch_balance_in_state_combined - val_cpfp_combined - fee_mc_combined, constants.fullFsixtyfour);
   Balance_d little_endian_total_amount_merch = convert_to_little_endian(big_endian_total_amount_merch, constants);
   append_item(&tx_builder_merch, constants.zero, constants.ff, 0, little_endian_total_amount_merch.balance, 2, 0, true);
 
