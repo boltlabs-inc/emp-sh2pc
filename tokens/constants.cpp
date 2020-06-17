@@ -69,6 +69,8 @@ Constants distribute_Constants(const int party) {
       .zero =Integer(32, 0, party),
       .one =Integer(32, 1 /*0x00000001*/, party),
       .two =Integer(32,2 /*0x00000002*/, party),
+      .sixteen =Integer(32,16 /*0x00000002*/, party),
+      .twentyfour =Integer(32,24 /*0x00000002*/, party),
   };
 }
 
@@ -78,8 +80,6 @@ Bit constants_not_equal(const Constants& lhs, const Constants& rhs) {
   error_signal = error_signal | !lhs.ipad.equal(rhs.ipad);
   error_signal = error_signal | !lhs.opad.equal(rhs.opad);
   error_signal = error_signal | !lhs.xeightfirstbyte.equal(rhs.xeightfirstbyte);
-  error_signal = error_signal | !lhs.xeightsecondbyte.equal(rhs.xeightsecondbyte);
-  error_signal = error_signal | !lhs.xeightthirdbyte.equal(rhs.xeightthirdbyte);
   error_signal = error_signal | !lhs.xeightfourthbyte.equal(rhs.xeightfourthbyte);
   error_signal = error_signal | !lhs.hmacinnerhashlength.equal(rhs.hmacinnerhashlength);
   error_signal = error_signal | !lhs.hmacouterhashlength.equal(rhs.hmacouterhashlength);
@@ -131,6 +131,8 @@ Bit constants_not_equal(const Constants& lhs, const Constants& rhs) {
   error_signal = error_signal | !lhs.zero.equal(rhs.zero);
   error_signal = error_signal | !lhs.one.equal(rhs.one);
   error_signal = error_signal | !lhs.two.equal(rhs.two);
+  error_signal = error_signal | !lhs.sixteen.equal(rhs.sixteen);
+  error_signal = error_signal | !lhs.twentyfour.equal(rhs.twentyfour);
 	return error_signal;
 }
 

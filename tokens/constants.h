@@ -9,11 +9,7 @@ struct Constants {
     Integer opad;
 
     Integer xeightfirstbyte;
-    Integer xeightsecondbyte;
-    Integer xeightthirdbyte;
     Integer xeightfourthbyte;
-
-    Integer xsevenf;
 
     Integer hmacinnerhashlength;
     Integer hmacouterhashlength;
@@ -25,6 +21,7 @@ struct Constants {
     Integer merchtransactionpreimagelength;
     Integer hashoutputspreimagelength;
 
+    Integer xsevenf;
     Integer xsixthreedot;
     Integer xeighteight;
     Integer xtwentyone;
@@ -44,7 +41,7 @@ struct Constants {
     Integer xfourteendot;
     Integer xsevendot;
     Integer xtwentytwoninedot;
-    Integer xsevenzerosixdot ;
+    Integer xsevenzerosixdot;
     Integer xfoursevenfivedot;
     Integer xfivetwoae;
     Integer xzeroone;
@@ -67,6 +64,8 @@ struct Constants {
     Integer zero;
     Integer one;
     Integer two;
+    Integer sixteen;
+    Integer twentyfour;
 };
 
 typedef struct Q Q;

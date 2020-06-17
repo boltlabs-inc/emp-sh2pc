@@ -111,16 +111,14 @@ void validate_transactions(State_d new_state_d,
 
     //Compute self_delay_length
     //Can reveal, because is public input
-    bool isLenSelfDelayOne = (self_delay_d >= constants.zero & self_delay_d <= constants.xsevenf).reveal<bool>();
+    Bit isLenSelfDelayOne = self_delay_d >= constants.zero & self_delay_d <= constants.xsevenf;
     Integer self_delay_with_length_one = constants.one << 24 | self_delay_d >> 8;
     Integer self_delay_with_length_two = constants.two << 24 | self_delay_d >> 8;
-    if (isLenSelfDelayOne) {
-        //Add toSelfDelay
-        append_item(&customer_delayed_script_builder, self_delay_with_length_one, 16);
-    } else {
-        //Add toSelfDelay
-        append_item(&customer_delayed_script_builder, self_delay_with_length_two, 24);
-    }
+    Integer self_delay_with_length = self_delay_with_length_two.select(isLenSelfDelayOne, self_delay_with_length_one);
+    Integer nr_of_bits = constants.twentyfour.select(isLenSelfDelayOne, constants.sixteen);
+    int nr_of_bits_int = nr_of_bits.reveal<int>(); //TODO: fix for AG2PC
+    //Add toSelfDelay
+    append_item(&customer_delayed_script_builder, self_delay_with_length, nr_of_bits_int);
     append_item(&customer_delayed_script_builder, constants.xbtwosevenfive, 16);
     //Add customer payout public key
     append_item(&customer_delayed_script_builder, constants.xtwentyone, 8);
@@ -298,11 +296,9 @@ void validate_transactions(State_d new_state_d,
 
     //Add toSelfDelay
     append_item(&tx_builder_merch, constants.xaedot, 16);
-    if (isLenSelfDelayOne) {
-        append_item(&tx_builder_merch, self_delay_with_length_one, 16);
-    } else {
-        append_item(&tx_builder_merch, self_delay_with_length_two, 24);
-    }
+//    append_item(&tx_builder_merch, constants.two << 24, 8);
+//    append_item(&tx_builder_merch, self_delay_d, 16);
+    append_item(&tx_builder_merch, self_delay_with_length, nr_of_bits_int);
     append_item(&tx_builder_merch, constants.xbtwosevendot, 24);
 
     // Add merch-payout-key to cust-close-from-merch transaction

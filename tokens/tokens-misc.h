@@ -298,18 +298,6 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
  */
 Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d, Nonce_d nonce_d, Balance_d epsilon_d, Balance_d fee_cc_d, Balance_d val_cpfp_d, Balance_d bal_min_cust_d, Balance_d bal_min_merch_d, Integer k[64], Integer H[8],  Constants constants);
 
-/* opens and verifies commitment to a wallet
- * e.g. checks that com == commit(w;t)
- * where commit is a SHA256 commitment scheme
- * 
- * \param[in] com   : commitment to new wallet object using a SHA256 commitment
- * \param[in] w     : wallet object
- * \param[in] t     : commitment randomness (TYPISSUE)
- *
- * \return b 	: success bit
- */
-Bit open_commitment();
-
 Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d, Integer k[64], Integer H[8], Constants constants);
 
 Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d mask_commitment_randomness_d, Integer k[64], Integer H[8], Constants constants);

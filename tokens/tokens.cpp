@@ -502,7 +502,6 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
   message[1][1] = hmac_commitment_randomness_d.randomness[1];
   message[1][2] = hmac_commitment_randomness_d.randomness[2];
   message[1][3] = hmac_commitment_randomness_d.randomness[3];
-//  message[1][4] = Integer(32, -2147483648, PUBLIC); //0x80000000;
   message[1][4] = constants.xeightfirstbyte; //0x80000000;
   message[1][5] = constants.zero; //0x00000000;
   message[1][6] = constants.zero; //0x00000000;
@@ -516,14 +515,13 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
 
   // Message length
   message[1][14] = constants.zero; //0x00000000;
-//  message[1][15] = Integer(32, 640, PUBLIC);
   message[1][15] = constants.hmackeycommitmentpreimagelength;
 
   Integer hashresult[8];
 
   computeSHA256_2d_noinit(message, hashresult, k, H);
 
-  Bit b; // TODO initialize to 0
+  Bit b(false);
 
   for(int i=0; i<8; i++) {
      Bit not_equal = !(commitment.commitment[i].equal(hashresult[i]));
@@ -545,7 +543,7 @@ Bit verify_token_sig(HMACKeyCommitment_d commitment, CommitmentRandomness_d hmac
 Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d revlock_commitment_randomness_d, Nonce_d nonce_d, Balance_d epsilon_d, Balance_d fee_cc_d, Balance_d val_cpfp_d, Balance_d bal_min_cust_d, Balance_d bal_min_merch_d, Integer k[64], Integer H[8], Constants constants) {
 
   //Make sure the fields are all correct
-  Bit b; // TODO initialize to 0
+  Bit b(false);
 
   for(int i=0; i<8; i++) {
      Bit not_equal = !(old_state_d.txid_merch.txid[i].equal(new_state_d.txid_merch.txid[i]));
@@ -617,14 +615,8 @@ Bit compare_states(State_d old_state_d, State_d new_state_d, RevLockCommitment_d
   return b;
 }
 
-// make sure customer committed to this new wallet
-Bit open_commitment() {
-  Bit b;
-  return b;
-}
-
 Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, CommitmentRandomness_d rl_rand_d, Integer k[64], Integer H[8], Constants constants) {
-  Bit b;  // TODO initialize to 0
+  Bit b(false);  // TODO initialize to 0
 
   Integer message[1][16];
 
@@ -636,14 +628,12 @@ Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, Commitm
   message[0][9] = rl_rand_d.randomness[1];
   message[0][10] = rl_rand_d.randomness[2];
   message[0][11] = rl_rand_d.randomness[3];
-//  message[0][12] = Integer(32, -2147483648, PUBLIC); //0x80000000;
   message[0][12] = constants.xeightfirstbyte; //0x80000000;
   message[0][13] = constants.zero; //0x00000000;
 
   // Message length
   message[0][14] = constants.zero; //0x00000000;
   message[0][15] = constants.commitmentpreimagelength; // 256 bit RL
-//  message[0][15] = Integer(32, 384, PUBLIC); // 256 bit RL
 
   Integer hashresult[8];
 
@@ -657,7 +647,7 @@ Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, Commitm
 }
 
 Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, CommitmentRandomness_d mask_commitment_randomness_d, Integer k[64], Integer H[8], Constants constants) {
-  Bit b;  // TODO initialize to 0
+  Bit b(false);
 
   Integer message[1][16];
 
