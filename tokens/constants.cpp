@@ -30,7 +30,7 @@ Constants distribute_Constants(const int party) {
       // Constants for transactions
       .xsixthreedot =Integer(32, 1671962624 , party),       /*0x63a92000*/
       .eighteight =Integer(32, 136 , party),                /*0x00000088*/
-      .xtwentyone =Integer(32, 553648128, party),
+      .xtwentyone =Integer(32, 553648128, party),           /*0x21000000*/
       .sixsevenzero =Integer(32, 26368, party),             /*0x00006700*/
       .btwosevenfive =Integer(32, 45685, party),            /*0x0000b275*/
       .sixeightac =Integer(32, 26796, party),               /*0x000068ac*/
@@ -54,6 +54,7 @@ Constants distribute_Constants(const int party) {
       .xseventwosixdot =Integer(32, 1919111713 , party),    /*0x72635221*/
       .xzerozerotwentyone =Integer(32, 2162688 , party),    /*0x00210000*/
       .fiftytwo =Integer(32, 82, party),                    /*0x00000052*/
+//      .xaedot =Integer(32, 2925985792, party),              /*0xae670000*/
       .xaedot =Integer(32, 2925986304, party),              /*0xae670200*/
       .xzerofivedot =Integer(32, 11695393, party),          /*0x00b27521*/
       .acsixeightzerozero =Integer(32, 11298816, party),    /*0x00ac6800*/
@@ -72,7 +73,7 @@ Constants distribute_Constants(const int party) {
       .thirtytwo =Integer(256, 32, party),
       .zero =Integer(32, 0, party),
       .one =Integer(32, 1 /*0x00000001*/, party),
-      .lenSelfDelay =Integer(32,2 /*0x000002*/, party),
+      .lenSelfDelay =Integer(32,2 /*0x00000002*/, party),
   };
 }
 
