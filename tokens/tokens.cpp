@@ -642,7 +642,7 @@ Bit verify_revlock_commitment(RevLock_d rl_d, RevLockCommitment_d rlc_d, Commitm
 
   // Message length
   message[0][14] = constants.zero; //0x00000000;
-  message[0][15] = constants.revlockcommitmentpreimagelength; // 256 bit RL
+  message[0][15] = constants.commitmentpreimagelength; // 256 bit RL
 //  message[0][15] = Integer(32, 384, PUBLIC); // 256 bit RL
 
   Integer hashresult[8];
@@ -675,7 +675,7 @@ Bit verify_mask_commitment(Mask_d mask, MaskCommitment_d maskcommitment, Commitm
 
   // Message length
   message[0][14] = constants.zero; //0x00000000;
-  message[0][15] = constants.maskcommitmentpreimagelength;
+  message[0][15] = constants.commitmentpreimagelength;
 
   Integer hashresult[8];
 

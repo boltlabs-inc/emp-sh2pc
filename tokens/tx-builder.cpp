@@ -103,29 +103,29 @@ void validate_transactions(State_d new_state_d,
     //Add revocation lock
     append_item(&customer_delayed_script_builder, constants.xsixthreedot, 24);
     append_items(&customer_delayed_script_builder, new_state_d.rl.revlock, 8 * 32);
-    append_item(&customer_delayed_script_builder, constants.eighteight << 24, 8);
-//  //Compute self_delay_length
-//  Integer self_delay_with_length;
-//  //Can reveal, because is public input TODO: does this keep working
-//  if ((self_delay_d < constants.ff).reveal<bool>()) {
-//      self_delay_with_length = constants.one << 8 | self_delay_d;
-//  } else {
-//      self_delay_with_length = constants.lenSelfDelay << 16 | self_delay_d;
-//  }
+    append_item(&customer_delayed_script_builder, constants.xeighteight, 8);
     //Add merchant dispute key
     append_item(&customer_delayed_script_builder, constants.xtwentyone, 8);
     append_items(&customer_delayed_script_builder, merch_dispute_key_d.key, 8 * 32 + 8);
-    Integer con = constants.sixsevenzero | constants.lenSelfDelay;
-    append_item(&customer_delayed_script_builder, con << 16, 16);
+    append_item(&customer_delayed_script_builder, constants.xsixsevenzero, 8);
 
-    //Add toSelfDelay
-    append_item(&customer_delayed_script_builder, self_delay_d, 16);
-    append_item(&customer_delayed_script_builder, constants.btwosevenfive << 16, 16);
-//  append_item(&customer_delayed_script_builder, constants.zero, constants.btwosevenfive, 0, &self_delay_with_length, 1, 0);
+    //Compute self_delay_length
+    //Can reveal, because is public input
+    bool isLenSelfDelayOne = (self_delay_d >= constants.zero & self_delay_d <= constants.xsevenf).reveal<bool>();
+    Integer self_delay_with_length_one = constants.one << 24 | self_delay_d >> 8;
+    Integer self_delay_with_length_two = constants.two << 24 | self_delay_d >> 8;
+    if (isLenSelfDelayOne) {
+        //Add toSelfDelay
+        append_item(&customer_delayed_script_builder, self_delay_with_length_one, 16);
+    } else {
+        //Add toSelfDelay
+        append_item(&customer_delayed_script_builder, self_delay_with_length_two, 24);
+    }
+    append_item(&customer_delayed_script_builder, constants.xbtwosevenfive, 16);
     //Add customer payout public key
     append_item(&customer_delayed_script_builder, constants.xtwentyone, 8);
     append_items(&customer_delayed_script_builder, cust_payout_pub_key_d.key, 8 * 32 + 8);
-    append_item(&customer_delayed_script_builder, constants.sixeightac << 16, 16);
+    append_item(&customer_delayed_script_builder, constants.xsixeightac, 16);
 
     //Add padding
     append_constants(&customer_delayed_script_builder, vector < Integer > {constants.xeightfirstbyte, constants.zero,
@@ -185,7 +185,7 @@ void validate_transactions(State_d new_state_d,
     append_items(&outputs_escrow_builder, customer_delayed_script_hash, 8 * 32);
     //Add merchant balance output
     append_items(&outputs_escrow_builder, hash_outputs_escrow_little_endian_balance_merch.balance, 2 * 32);
-    append_item(&outputs_escrow_builder, constants.sixteen << 24, 8);
+    append_item(&outputs_escrow_builder, constants.xsixteen, 8);
     //Add merchant public key
     append_item(&outputs_escrow_builder, constants.xzerozerofourteen, 16);
     append_items(&outputs_escrow_builder, merch_publickey_hash_d.hash, 5 * 32);
@@ -199,11 +199,11 @@ void validate_transactions(State_d new_state_d,
     append_items(&outputs_escrow_builder, cust_payout_pub_key_d.key, 8 * 32 + 8);
     //Add child-pays-for-parent balance
     append_items(&outputs_escrow_builder, val_cpfp_little_endian.balance, 2 * 32);
-    append_item(&outputs_escrow_builder, constants.xsixteenzerozero << 16, 16);
+    append_item(&outputs_escrow_builder, constants.xsixteen, 16);
     //Add public key child-pays-for-parent
     append_item(&outputs_escrow_builder, constants.xfourteenzerozero, 8);
     append_items(&outputs_escrow_builder, cust_child_publickey_hash_d.hash, 5 * 32);
-    append_item(&outputs_escrow_builder, constants.xeightsecondbyte << 8, 24);
+    append_item(&outputs_escrow_builder, constants.xeightfirstbyte, 24);
 
     append_constants(&outputs_escrow_builder, vector < Integer > {constants.zero, constants.hashoutputspreimagelength});
 
@@ -221,7 +221,7 @@ void validate_transactions(State_d new_state_d,
     append_items(&outputs_merch_builder, customer_delayed_script_hash, 8 * 32);
     //Add merchant balance output
     append_items(&outputs_merch_builder, hash_outputs_merch_little_endian_balance_merch.balance, 2 * 32);
-    append_item(&outputs_merch_builder, constants.sixteen << 24, 8);
+    append_item(&outputs_merch_builder, constants.xsixteen, 8);
     //Add merchant public key
     append_item(&outputs_merch_builder, constants.xzerozerofourteen, 16);
     append_items(&outputs_merch_builder, merch_publickey_hash_d.hash, 5 * 32);
@@ -235,11 +235,11 @@ void validate_transactions(State_d new_state_d,
     append_items(&outputs_merch_builder, cust_payout_pub_key_d.key, 8 * 32 + 8);
     //Add child-pays-for-parent balance
     append_items(&outputs_merch_builder, val_cpfp_little_endian.balance, 2 * 32);
-    append_item(&outputs_merch_builder, constants.xsixteenzerozero << 16, 16);
+    append_item(&outputs_merch_builder, constants.xsixteen, 16);
     //Add public key child-pays-for-parent
     append_item(&outputs_merch_builder, constants.xfourteenzerozero, 8);
     append_items(&outputs_merch_builder, cust_child_publickey_hash_d.hash, 5 * 32);
-    append_item(&outputs_merch_builder, constants.xeightsecondbyte << 8, 24);
+    append_item(&outputs_merch_builder, constants.xeightfirstbyte, 24);
 
     append_constants(&outputs_merch_builder, vector < Integer > {constants.zero, constants.hashoutputspreimagelength});
 
@@ -258,7 +258,7 @@ void validate_transactions(State_d new_state_d,
     //Add customer public key to cust-close-from-escrow transaction
     append_item(&tx_builder_escrow, constants.xtwentyone, 8);
     append_items(&tx_builder_escrow, cust_escrow_pub_key_d.key, 8 * 32 + 8);
-    append_item(&tx_builder_escrow, constants.fivetwoae << 16, 16);
+    append_item(&tx_builder_escrow, constants.xfivetwoae, 16);
 
     Balance_d big_endian_total_amount = split_integer_to_balance(
             cust_balance_in_state_combined + merch_balance_in_state_combined, constants.fullFsixtyfour);
@@ -290,28 +290,31 @@ void validate_transactions(State_d new_state_d,
     append_constants(&tx_builder_merch, vector < Integer > {constants.xseventwosixdot});
     //Add merchant public key to cust-close-from-merch transaction
     append_items(&tx_builder_merch, merch_escrow_pub_key_d.key, 8 * 32 + 8);
-    append_item(&tx_builder_merch, constants.xzerozerotwentyone << 8, 8);
+    append_item(&tx_builder_merch, constants.xtwentyone, 8);
 
     //Add customer public key to cust-close-from-merch transaction
     append_items(&tx_builder_merch, cust_escrow_pub_key_d.key, 8 * 32 + 8);
-    append_item(&tx_builder_merch, constants.fiftytwo << 24, 8);
+    append_item(&tx_builder_merch, constants.xfiftytwo, 8);
 
     //Add toSelfDelay
-//  append_item(&tx_builder_merch, constants.xaedot, constants.xzerofivedot, 16, &self_delay_with_length, 1, 0, true);
-    append_item(&tx_builder_merch, constants.xaedot, 24);
-    append_item(&tx_builder_merch, self_delay_d, 16);
-    append_item(&tx_builder_merch, constants.xzerofivedot << 8, 24);
+    append_item(&tx_builder_merch, constants.xaedot, 16);
+    if (isLenSelfDelayOne) {
+        append_item(&tx_builder_merch, self_delay_with_length_one, 16);
+    } else {
+        append_item(&tx_builder_merch, self_delay_with_length_two, 24);
+    }
+    append_item(&tx_builder_merch, constants.xbtwosevendot, 24);
 
     // Add merch-payout-key to cust-close-from-merch transaction
     append_items(&tx_builder_merch, merch_payout_pub_key_d.key, 8 * 32 + 8);
-    append_item(&tx_builder_merch, constants.acsixeightzerozero << 8, 16);
+    append_item(&tx_builder_merch, constants.xacsixeight, 16);
     // Add total input amount to cust-close-from-merch transaction
     Balance_d big_endian_total_amount_merch = split_integer_to_balance(
             cust_balance_in_state_combined + merch_balance_in_state_combined - val_cpfp_combined - fee_mc_combined,
             constants.fullFsixtyfour);
     Balance_d little_endian_total_amount_merch = convert_to_little_endian(big_endian_total_amount_merch, constants);
     append_items(&tx_builder_merch, little_endian_total_amount_merch.balance, 2 * 32);
-    append_item(&tx_builder_merch, constants.ff << 24, 8);
+    append_item(&tx_builder_merch, constants.xff, 8);
 
     //Add hash of output script to cust-close-from-merch transaction
     append_item(&tx_builder_merch, constants.ffffffzerozero, 24);
