@@ -13,25 +13,26 @@ struct Constants {
     Integer xeightthirdbyte;
     Integer xeightfourthbyte;
 
+    Integer xsevenf;
+
     Integer hmacinnerhashlength;
     Integer hmacouterhashlength;
     Integer hmackeycommitmentpreimagelength;
     Integer doubleshapreimagelength;
-    Integer revlockcommitmentpreimagelength;
-    Integer maskcommitmentpreimagelength;
+    Integer commitmentpreimagelength;
     Integer customerdelayerscriptpreimagelength;
     Integer escrowtransactionpreimagelength;
     Integer merchtransactionpreimagelength;
     Integer hashoutputspreimagelength;
 
     Integer xsixthreedot;
-    Integer eighteight;
+    Integer xeighteight;
     Integer xtwentyone;
-    Integer sixsevenzero;
-    Integer btwosevenfive;
-    Integer sixeightac;
+    Integer xsixsevenzero;
+    Integer xbtwosevenfive;
+    Integer xsixeightac;
     Integer xtwentytwodot;
-    Integer sixteen;
+    Integer xsixteen;
     Integer xzerozerofourteen;
     Integer threesevensixa;
     Integer xfourtyone;
@@ -45,29 +46,27 @@ struct Constants {
     Integer xtwentytwoninedot;
     Integer xsevenzerosixdot ;
     Integer xfoursevenfivedot;
-    Integer fivetwoae;
+    Integer xfivetwoae;
     Integer xzeroone;
     Integer xseventwosixdot;
-    Integer xzerozerotwentyone;
-    Integer fiftytwo;
+    Integer xfiftytwo;
     Integer xaedot;
-    Integer xzerofivedot;
-    Integer acsixeightzerozero;
-    Integer xsixteenzerozero;
+    Integer xbtwosevendot;
+    Integer xacsixeight;
     Integer xfourteenzerozero;
 
     Integer fullF;
     Integer fullFsixtyfour;
     Integer fullFthirtytwo;
     Integer xzerozeroff;
-    Integer ff;
+    Integer xff;
     Integer ffffffzerozero;
     Integer ffzerozero;
 
     Integer thirtytwo;
     Integer zero;
     Integer one;
-    Integer lenSelfDelay;
+    Integer two;
 };
 
 typedef struct Q Q;
