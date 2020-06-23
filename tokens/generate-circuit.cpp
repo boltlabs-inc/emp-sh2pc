@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
     Balance_l val_cpfp;
     Balance_l bal_min_cust;
     Balance_l bal_min_merch;
-    uint16_t self_delay = 127;
+    uint16_t self_delay = 128;
 
     issue_tokens(/* CUSTOMER INPUTS */
                    old_state_l,
