@@ -70,7 +70,7 @@ void issue_tokens(
   Balance_l val_cpfp,
   Balance_l bal_min_cust,
   Balance_l bal_min_merch,
-  uint32_t self_delay,
+  uint16_t self_delay,
   BitcoinPublicKey_l merch_escrow_pub_key_l,
   BitcoinPublicKey_l merch_dispute_key_l,
   BitcoinPublicKey_l merch_payout_pub_key_l,
@@ -102,7 +102,7 @@ void issue_tokens(
   Balance_d val_cpfp_d = distribute_Balance(val_cpfp, CUST);
   Balance_d bal_min_cust_d = distribute_Balance(bal_min_cust, CUST);
   Balance_d bal_min_merch_d = distribute_Balance(bal_min_merch, CUST);
-  Integer self_delay_d = Integer(32, self_delay, CUST);
+  Integer self_delay_d = Integer(16, self_delay, CUST);
   BitcoinPublicKey_d merch_escrow_pub_key_d = distribute_BitcoinPublicKey(merch_escrow_pub_key_l, CUST);
   BitcoinPublicKey_d merch_dispute_key_d = distribute_BitcoinPublicKey(merch_dispute_key_l, CUST);
   BitcoinPublicKey_d merch_payout_pub_key_d = distribute_BitcoinPublicKey(merch_payout_pub_key_l, CUST);
@@ -136,7 +136,7 @@ void issue_tokens(
   Balance_d val_cpfp_d_merch = distribute_Balance(val_cpfp, MERCH);
   Balance_d bal_min_cust_d_merch = distribute_Balance(bal_min_cust, MERCH);
   Balance_d bal_min_merch_d_merch = distribute_Balance(bal_min_merch, MERCH);
-  Integer self_delay_d_merch = Integer(32, self_delay, MERCH);
+  Integer self_delay_d_merch = Integer(16, self_delay, MERCH);
   BitcoinPublicKey_d merch_escrow_pub_key_d_merch = distribute_BitcoinPublicKey(merch_escrow_pub_key_l, MERCH);
   BitcoinPublicKey_d merch_dispute_key_d_merch = distribute_BitcoinPublicKey(merch_dispute_key_l, MERCH);
   BitcoinPublicKey_d merch_payout_pub_key_d_merch = distribute_BitcoinPublicKey(merch_payout_pub_key_l, MERCH);
@@ -159,6 +159,23 @@ void issue_tokens(
   error_signal = error_signal | constants_not_equal(constants, constants_merch);
   error_signal = error_signal | q_not_equal(qs, qs_merch);
   error_signal = error_signal | compare_k_H(k, H, k_merch, H_merch);
+
+  if (self_delay < 128) {
+    Integer one = constants.one;
+//    one = one << 24;
+    one.resize(16, false);
+    self_delay_d = one << 8 | self_delay_d;
+    self_delay_d_merch = one << 8 | self_delay_d_merch;
+  } else {
+    Integer two = constants.two;
+    self_delay_d = self_delay_d << 8 | self_delay_d >> 8;
+    self_delay_d_merch = self_delay_d_merch << 8 | self_delay_d_merch >> 8;
+    self_delay_d.resize(24, false);
+    self_delay_d_merch.resize(24, false);
+    two.resize(24, false);
+    self_delay_d = two << 16 | self_delay_d;
+    self_delay_d_merch = two << 16 | self_delay_d_merch;
+  }
 
 #if defined(DEBUG)
   cout << "distributed everything. verifying token sig" << endl;
@@ -268,7 +285,7 @@ void build_masked_tokens_cust(IOCallback io_callback,
   struct Balance_l val_cpfp,
   struct Balance_l bal_min_cust,
   struct Balance_l bal_min_merch,
-  uint32_t self_delay,
+  uint16_t self_delay,
 
   struct CommitmentRandomness_l revlock_commitment_randomness_l,
   struct State_l w_new,
@@ -383,7 +400,7 @@ void build_masked_tokens_merch(IOCallback io_callback,
   struct Balance_l val_cpfp,
   struct Balance_l bal_min_cust,
   struct Balance_l bal_min_merch,
-  uint32_t self_delay,
+  uint16_t self_delay,
 
   struct HMACKey_l hmac_key,
   struct Mask_l merch_mask_l,

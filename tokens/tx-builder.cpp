@@ -21,6 +21,11 @@ void append_item(TxBuilderState *tx_builder, Integer in, int nr_of_bits = 32) {
     int i = tx_builder->outer_pos;
     int j = tx_builder->inner_pos;
     int sub = tx_builder->sub_pos;
+    if (in.size() != 32) {
+        int shift = 32 - in.size();
+        in.resize(32, false);
+        in = in << shift;
+    }
     if (sub > 0) {
         tx_builder->output[i][j] = tx_builder->output[i][j] | in >> sub;
     } else {
@@ -109,16 +114,8 @@ void validate_transactions(State_d new_state_d,
     append_items(&customer_delayed_script_builder, merch_dispute_key_d.key, 8 * 32 + 8);
     append_item(&customer_delayed_script_builder, constants.xsixsevenzero, 8);
 
-    //Compute self_delay_length
-    //Can reveal, because is public input
-    Bit isLenSelfDelayOne = self_delay_d >= constants.zero & self_delay_d <= constants.xsevenf;
-    Integer self_delay_with_length_one = constants.one << 24 | self_delay_d >> 8;
-    Integer self_delay_with_length_two = constants.two << 24 | self_delay_d >> 8;
-    Integer self_delay_with_length = self_delay_with_length_two.select(isLenSelfDelayOne, self_delay_with_length_one);
-    Integer nr_of_bits = constants.twentyfour.select(isLenSelfDelayOne, constants.sixteen);
-    int nr_of_bits_int = nr_of_bits.reveal<int>(); //TODO: fix for AG2PC
     //Add toSelfDelay
-    append_item(&customer_delayed_script_builder, self_delay_with_length, nr_of_bits_int);
+    append_item(&customer_delayed_script_builder, self_delay_d, self_delay_d.size());
     append_item(&customer_delayed_script_builder, constants.xbtwosevenfive, 16);
     //Add customer payout public key
     append_item(&customer_delayed_script_builder, constants.xtwentyone, 8);
@@ -126,15 +123,17 @@ void validate_transactions(State_d new_state_d,
     append_item(&customer_delayed_script_builder, constants.xsixeightac, 16);
 
     //Add padding
-    append_constants(&customer_delayed_script_builder, vector < Integer > {constants.xeightfirstbyte, constants.zero,
-                                                                           constants.zero,
-                                                                           constants.customerdelayerscriptpreimagelength});
+    append_constants(&customer_delayed_script_builder, vector < Integer > {constants.xeightfirstbyte, constants.zero, constants.zero});
+    if (self_delay_d.size() == 24) {
+        append_constants(&customer_delayed_script_builder, vector < Integer > {constants.customerdelayerscriptpreimagelength});
+    } else {
+        append_item(&customer_delayed_script_builder, constants.zero, 8);
+        append_item(&customer_delayed_script_builder, constants.customerdelayerscriptpreimagelengthshort, 32);
+    }
 
     Integer customer_delayed_script_hash[8];
 
     computeSHA256_2d_noinit(customer_delayed_script_builder.output, customer_delayed_script_hash, k, H);
-//  dump_buffer("cust_deplay_script_preimage0=", customer_delayed_script_builder.output[0]);
-//  dump_buffer("cust_deplay_script_preimage1=", customer_delayed_script_builder.output[1]);
 
 
     // Doing math for the balance
@@ -285,7 +284,11 @@ void validate_transactions(State_d new_state_d,
     append_tx_start(&tx_builder_merch, new_state_d.HashPrevOuts_merch.txid, new_state_d.txid_merch.txid, constants);
 
     // The script
-    append_constants(&tx_builder_merch, vector < Integer > {constants.xseventwosixdot});
+    if (self_delay_d.size() == 24) {
+        append_constants(&tx_builder_merch, vector < Integer > {constants.xseventwosixdot});
+    } else {
+        append_constants(&tx_builder_merch, vector < Integer > {constants.xseventwosixdotshort});
+    }
     //Add merchant public key to cust-close-from-merch transaction
     append_items(&tx_builder_merch, merch_escrow_pub_key_d.key, 8 * 32 + 8);
     append_item(&tx_builder_merch, constants.xtwentyone, 8);
@@ -296,9 +299,7 @@ void validate_transactions(State_d new_state_d,
 
     //Add toSelfDelay
     append_item(&tx_builder_merch, constants.xaedot, 16);
-//    append_item(&tx_builder_merch, constants.two << 24, 8);
-//    append_item(&tx_builder_merch, self_delay_d, 16);
-    append_item(&tx_builder_merch, self_delay_with_length, nr_of_bits_int);
+    append_item(&tx_builder_merch, self_delay_d, self_delay_d.size());
     append_item(&tx_builder_merch, constants.xbtwosevendot, 24);
 
     // Add merch-payout-key to cust-close-from-merch transaction
@@ -322,7 +323,13 @@ void validate_transactions(State_d new_state_d,
                                                             constants.zero, constants.zero,
                                                             constants.zero, constants.zero, constants.zero,
                                                             constants.zero, constants.zero,
-                                                            constants.zero, constants.merchtransactionpreimagelength});
+                                                            constants.zero});
+    if (self_delay_d.size() == 24) {
+        append_constants(&tx_builder_merch, vector < Integer > {constants.merchtransactionpreimagelength});
+    } else {
+        append_item(&tx_builder_merch, constants.zero, 8);
+        append_item(&tx_builder_merch, constants.merchtransactionpreimagelengthshort, 32);
+    }
 
     computeDoubleSHA256_5d_noinit(tx_builder_merch.output, merch_digest, k, H, constants);
     //END -----cust-close-from-merch transaction-----

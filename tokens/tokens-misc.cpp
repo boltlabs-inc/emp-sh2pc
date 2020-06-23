@@ -29,7 +29,7 @@ HMACKey_d distribute_HMACKey(HMACKey_l key, const int party) {
 HMACKey_l localize_HMACKey(HMACKey_d key, const int party) {
   HMACKey_l to_return;
   // GABE TODO
-  
+
   return to_return;
 }
 
@@ -92,7 +92,7 @@ PayToken_d distribute_PayToken(PayToken_l paytoken, const int party) {
   return to_return;
 }
 
-void localize_PayToken(PayToken_l* target, PayToken_d paytoken, const int party) {  
+void localize_PayToken(PayToken_l* target, PayToken_d paytoken, const int party) {
   for(int i=0; i<8; i++) {
     target->paytoken[i] = paytoken.paytoken[i].reveal<uint32_t>(party);
   }
@@ -130,7 +130,7 @@ Txid_d distribute_Txid(Txid_l txid, const int party) {
   to_return.txid[6] = Integer(32, txid.txid[6], party);
   to_return.txid[7] = Integer(32, txid.txid[7], party);
 
-  return to_return;  
+  return to_return;
 }
 
 Txid_l localize_Txid(Txid_d txid, const int party) {
@@ -182,7 +182,7 @@ HMACKeyCommitment_d distribute_HMACKeyCommitment(HMACKeyCommitment_l commitment,
   to_return.commitment[6] = Integer(32, commitment.commitment[6], party, true);
   to_return.commitment[7] = Integer(32, commitment.commitment[7], party, true);
 
-  return to_return;  
+  return to_return;
 
 }
 
@@ -206,7 +206,7 @@ MaskCommitment_d distribute_MaskCommitment(MaskCommitment_l commitment, const in
   to_return.commitment[6] = Integer(32, commitment.commitment[6], party, true);
   to_return.commitment[7] = Integer(32, commitment.commitment[7], party, true);
 
-  return to_return;  
+  return to_return;
 
 }
 
@@ -281,7 +281,7 @@ Mask_d distribute_Mask(Mask_l mask, const int party) {
   to_return.mask[6] = Integer(32, mask.mask[6], party);
   to_return.mask[7] = Integer(32, mask.mask[7], party);
 
-  return to_return;  
+  return to_return;
 }
 
 Mask_l localize_Mask(Mask_d mask, const int party) {
@@ -389,19 +389,13 @@ Balance_d convert_to_little_endian(Balance_d big_endian_balance, Constants const
   Integer mask_second_rightmost_byte = constants.ffzerozero;
 //  Integer mask_second_rightmost_byte(32, 65280 /* 0000ff00 */, PUBLIC);
 
-  little_endian_balance.balance[0] = ((big_endian_balance.balance[1]) << 24)
-        | ((big_endian_balance.balance[1] & mask_second_rightmost_byte) << 8)
-        | ((big_endian_balance.balance[1] & mask_second_leftmost_byte) >> 8)
-        | ((big_endian_balance.balance[1]) >> 24);
+  little_endian_balance.balance[0] = switch_endianness(big_endian_balance.balance[1], constants);
 
-  little_endian_balance.balance[1] = ((big_endian_balance.balance[0]) << 24)
-        | ((big_endian_balance.balance[0] & mask_second_rightmost_byte) << 8)
-        | ((big_endian_balance.balance[0] & mask_second_leftmost_byte) >> 8)
-        | ((big_endian_balance.balance[0]) >> 24);
+  little_endian_balance.balance[1] = switch_endianness(big_endian_balance.balance[0], constants);
 
   return little_endian_balance;
-
 }
+
 Balance_d convert_to_big_endian(Balance_d little_endian_balance, Constants constants) {
   Balance_d big_endian_balance;
 
@@ -410,17 +404,20 @@ Balance_d convert_to_big_endian(Balance_d little_endian_balance, Constants const
   Integer mask_second_rightmost_byte = constants.ffzerozero;
 //  Integer mask_second_rightmost_byte(32, 65280 /* 0000ff00 */, PUBLIC);
 
-  big_endian_balance.balance[0] = ((little_endian_balance.balance[1]) << 24)
-        | ((little_endian_balance.balance[1] & mask_second_rightmost_byte) << 8)
-        | ((little_endian_balance.balance[1] & mask_second_leftmost_byte) >> 8)
-        | ((little_endian_balance.balance[1]) >> 24);
+  big_endian_balance.balance[0] = switch_endianness(little_endian_balance.balance[1], constants);
 
-  big_endian_balance.balance[1] = ((little_endian_balance.balance[0]) << 24)
-        | ((little_endian_balance.balance[0] & mask_second_rightmost_byte) << 8)
-        | ((little_endian_balance.balance[0] & mask_second_leftmost_byte) >> 8)
-        | ((little_endian_balance.balance[0]) >> 24);
+  big_endian_balance.balance[1] = switch_endianness(little_endian_balance.balance[0], constants);
 
   return big_endian_balance;
+}
+
+Integer switch_endianness(Integer big_endian_int, Constants constants) {
+    Integer mask_second_leftmost_byte = constants.xzerozeroff;
+    Integer mask_second_rightmost_byte = constants.ffzerozero;
+
+    return ((big_endian_int) << 24) | ((big_endian_int & mask_second_rightmost_byte) << 8)
+           | ((big_endian_int & mask_second_leftmost_byte) >> 8)
+           | ((big_endian_int) >> 24);
 }
 
 Integer handle_error_case(Integer data, Bit mask) {

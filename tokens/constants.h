@@ -17,8 +17,10 @@ struct Constants {
     Integer doubleshapreimagelength;
     Integer commitmentpreimagelength;
     Integer customerdelayerscriptpreimagelength;
+    Integer customerdelayerscriptpreimagelengthshort;
     Integer escrowtransactionpreimagelength;
     Integer merchtransactionpreimagelength;
+    Integer merchtransactionpreimagelengthshort;
     Integer hashoutputspreimagelength;
 
     Integer xsevenf;
@@ -46,6 +48,7 @@ struct Constants {
     Integer xfivetwoae;
     Integer xzeroone;
     Integer xseventwosixdot;
+    Integer xseventwosixdotshort;
     Integer xfiftytwo;
     Integer xaedot;
     Integer xbtwosevendot;
@@ -64,8 +67,6 @@ struct Constants {
     Integer zero;
     Integer one;
     Integer two;
-    Integer sixteen;
-    Integer twentyfour;
 };
 
 typedef struct Q Q;

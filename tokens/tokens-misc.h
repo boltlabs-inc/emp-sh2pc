@@ -199,6 +199,7 @@ Balance_l localize_Balance(Balance_d balance, const int party);
 
 Balance_d convert_to_little_endian(Balance_d big_endian_balance, Constants constants);
 Balance_d convert_to_big_endian(Balance_d little_endian_balance, Constants constants);
+Integer switch_endianness(Integer big_endian_int, Constants constants);
 
 CommitmentRandomness_d distribute_CommitmentRandomness(CommitmentRandomness_l rand, const int party);
 CommitmentRandomness_l localize_CommitmentRandomness(CommitmentRandomness_d rand, const int party);
