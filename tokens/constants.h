@@ -71,6 +71,7 @@ struct Constants {
     Integer one;
     Integer two;
     Integer eighty;
+    Integer maxint16;
 };
 
 typedef struct Q Q;

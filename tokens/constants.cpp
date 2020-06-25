@@ -76,6 +76,7 @@ Constants distribute_Constants(const int party) {
       .one =Integer(32, 1 /*0x00000001*/, party),
       .two =Integer(32,2 /*0x00000002*/, party),
       .eighty = Integer(8, 80, party),
+      .maxint16 = Integer(16, 32767, party), /*0x7fff*/
   };
 }
 
@@ -143,6 +144,7 @@ Bit constants_not_equal(const Constants& lhs, const Constants& rhs) {
   error_signal = error_signal | !lhs.one.equal(rhs.one);
   error_signal = error_signal | !lhs.two.equal(rhs.two);
   error_signal = error_signal | !lhs.eighty.equal(rhs.eighty);
+  error_signal = error_signal | !lhs.maxint16.equal(rhs.maxint16);
 	return error_signal;
 }
 
