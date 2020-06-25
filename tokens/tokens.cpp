@@ -160,7 +160,10 @@ void issue_tokens(
   error_signal = error_signal | q_not_equal(qs, qs_merch);
   error_signal = error_signal | compare_k_H(k, H, k_merch, H_merch);
 
-  if (self_delay < 128) {
+  if (self_delay <= 16) {
+    self_delay_d.resize(8, false);
+    self_delay_d = self_delay_d + constants.eighty;
+  } else if (self_delay < 128) {
     Integer one = constants.one;
 //    one = one << 24;
     one.resize(16, false);

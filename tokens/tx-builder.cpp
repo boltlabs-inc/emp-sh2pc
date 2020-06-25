@@ -123,12 +123,17 @@ void validate_transactions(State_d new_state_d,
     append_item(&customer_delayed_script_builder, constants.xsixeightac, 16);
 
     //Add padding
-    append_constants(&customer_delayed_script_builder, vector < Integer > {constants.xeightfirstbyte, constants.zero, constants.zero});
+    append_constants(&customer_delayed_script_builder,
+                     vector < Integer > {constants.xeightfirstbyte, constants.zero, constants.zero});
     if (self_delay_d.size() == 24) {
-        append_constants(&customer_delayed_script_builder, vector < Integer > {constants.customerdelayerscriptpreimagelength});
-    } else {
+        append_constants(&customer_delayed_script_builder,
+                         vector < Integer > {constants.customerdelayerscriptpreimagelength});
+    } else if (self_delay_d.size() == 16) {
         append_item(&customer_delayed_script_builder, constants.zero, 8);
         append_item(&customer_delayed_script_builder, constants.customerdelayerscriptpreimagelengthshort, 32);
+    } else {
+        append_item(&customer_delayed_script_builder, constants.zero, 16);
+        append_item(&customer_delayed_script_builder, constants.customerdelayerscriptpreimagelengthveryshort, 32);
     }
 
     Integer customer_delayed_script_hash[8];
@@ -286,8 +291,10 @@ void validate_transactions(State_d new_state_d,
     // The script
     if (self_delay_d.size() == 24) {
         append_constants(&tx_builder_merch, vector < Integer > {constants.xseventwosixdot});
+    } else if (self_delay_d.size() == 16) {
+        append_constants(&tx_builder_merch, vector < Integer > {constants.xsevenonesixdot});
     } else {
-        append_constants(&tx_builder_merch, vector < Integer > {constants.xseventwosixdotshort});
+        append_constants(&tx_builder_merch, vector < Integer > {constants.xsevenzerosixthreedot});
     }
     //Add merchant public key to cust-close-from-merch transaction
     append_items(&tx_builder_merch, merch_escrow_pub_key_d.key, 8 * 32 + 8);
@@ -326,9 +333,12 @@ void validate_transactions(State_d new_state_d,
                                                             constants.zero});
     if (self_delay_d.size() == 24) {
         append_constants(&tx_builder_merch, vector < Integer > {constants.merchtransactionpreimagelength});
-    } else {
+    } else if (self_delay_d.size() == 16) {
         append_item(&tx_builder_merch, constants.zero, 8);
         append_item(&tx_builder_merch, constants.merchtransactionpreimagelengthshort, 32);
+    } else {
+        append_item(&tx_builder_merch, constants.zero, 16);
+        append_item(&tx_builder_merch, constants.merchtransactionpreimagelengthveryshort, 32);
     }
 
     computeDoubleSHA256_5d_noinit(tx_builder_merch.output, merch_digest, k, H, constants);

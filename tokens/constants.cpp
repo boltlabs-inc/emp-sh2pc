@@ -20,9 +20,11 @@ Constants distribute_Constants(const int party) {
 
       .customerdelayerscriptpreimagelength =Integer(32, 896, party),
       .customerdelayerscriptpreimagelengthshort =Integer(32, 888, party),
+      .customerdelayerscriptpreimagelengthveryshort =Integer(32, 880, party),
       .escrowtransactionpreimagelength =Integer(32, 1824, party),
       .merchtransactionpreimagelength =Integer(32, 2168, party),
       .merchtransactionpreimagelengthshort =Integer(32, 2160, party),
+      .merchtransactionpreimagelengthveryshort =Integer(32, 2152, party),
       .hashoutputspreimagelength =Integer(32, 1448, party),
 
 
@@ -52,7 +54,8 @@ Constants distribute_Constants(const int party) {
       .xfivetwoae =Integer(32, 1387134976, party),          /*0x52ae0000*/
       .xzeroone =Integer(32, 16777216 , party),             /*0x01000000*/
       .xseventwosixdot =Integer(32, 1919111713 , party),    /*0x72635221*/
-      .xseventwosixdotshort=Integer(32, 1902334497 , party),/*0x71635221*/
+      .xsevenonesixdot =Integer(32, 1902334497 , party),    /*0x71635221*/
+      .xsevenzerosixthreedot =Integer(32, 1885557281 , party),   /*0x70635221*/
       .xfiftytwo =Integer(32, 1375731712, party),           /*0x52000000*/
       .xaedot =Integer(32, 2925985792, party),              /*0xae670000*/
       .xbtwosevendot =Integer(32, -1300946688, party),      /*0xb2752100*/
@@ -72,6 +75,7 @@ Constants distribute_Constants(const int party) {
       .zero =Integer(32, 0, party),
       .one =Integer(32, 1 /*0x00000001*/, party),
       .two =Integer(32,2 /*0x00000002*/, party),
+      .eighty = Integer(8, 80, party),
   };
 }
 
@@ -89,9 +93,11 @@ Bit constants_not_equal(const Constants& lhs, const Constants& rhs) {
   error_signal = error_signal | !lhs.commitmentpreimagelength.equal(rhs.commitmentpreimagelength);
   error_signal = error_signal | !lhs.customerdelayerscriptpreimagelength.equal(rhs.customerdelayerscriptpreimagelength);
   error_signal = error_signal | !lhs.customerdelayerscriptpreimagelengthshort.equal(rhs.customerdelayerscriptpreimagelengthshort);
+  error_signal = error_signal | !lhs.customerdelayerscriptpreimagelengthveryshort.equal(rhs.customerdelayerscriptpreimagelengthveryshort);
   error_signal = error_signal | !lhs.escrowtransactionpreimagelength.equal(rhs.escrowtransactionpreimagelength);
   error_signal = error_signal | !lhs.merchtransactionpreimagelength.equal(rhs.merchtransactionpreimagelength);
   error_signal = error_signal | !lhs.merchtransactionpreimagelengthshort.equal(rhs.merchtransactionpreimagelengthshort);
+  error_signal = error_signal | !lhs.merchtransactionpreimagelengthveryshort.equal(rhs.merchtransactionpreimagelengthveryshort);
   error_signal = error_signal | !lhs.hashoutputspreimagelength.equal(rhs.hashoutputspreimagelength);
   error_signal = error_signal | !lhs.xsevenf.equal(rhs.xsevenf);
   error_signal = error_signal | !lhs.xsixthreedot.equal(rhs.xsixthreedot);
@@ -118,7 +124,8 @@ Bit constants_not_equal(const Constants& lhs, const Constants& rhs) {
   error_signal = error_signal | !lhs.xfivetwoae.equal(rhs.xfivetwoae);
   error_signal = error_signal | !lhs.xzeroone.equal(rhs.xzeroone);
   error_signal = error_signal | !lhs.xseventwosixdot.equal(rhs.xseventwosixdot);
-  error_signal = error_signal | !lhs.xseventwosixdotshort.equal(rhs.xseventwosixdotshort);
+  error_signal = error_signal | !lhs.xsevenonesixdot.equal(rhs.xsevenonesixdot);
+  error_signal = error_signal | !lhs.xsevenzerosixthreedot.equal(rhs.xsevenzerosixthreedot);
   error_signal = error_signal | !lhs.xfiftytwo.equal(rhs.xfiftytwo);
   error_signal = error_signal | !lhs.xaedot.equal(rhs.xaedot);
   error_signal = error_signal | !lhs.xbtwosevendot.equal(rhs.xbtwosevendot);
@@ -135,6 +142,7 @@ Bit constants_not_equal(const Constants& lhs, const Constants& rhs) {
   error_signal = error_signal | !lhs.zero.equal(rhs.zero);
   error_signal = error_signal | !lhs.one.equal(rhs.one);
   error_signal = error_signal | !lhs.two.equal(rhs.two);
+  error_signal = error_signal | !lhs.eighty.equal(rhs.eighty);
 	return error_signal;
 }
 
