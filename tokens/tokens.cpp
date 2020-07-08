@@ -32,6 +32,13 @@ void* get_gonetio_ptr(void *raw_stream_fd, int party) {
     return static_cast<void *>(io_ptr);
 }
 
+/* Returns a pointer to a LndNetIO ptr */
+void* get_lndnetio_ptr(void* peer, cb_send send_cb, cb_receive receive_cb, int party) {
+    bool is_server = (party == MERCH) ? true : false;
+    LndNetIO *io_ptr = new LndNetIO(peer, send_cb, receive_cb, is_server);
+    return static_cast<void *>(io_ptr);
+}
+
 void* load_circuit_file(const char *filename) {
   cout << "Loading circuit file for SH2PC: " << string(filename) << endl;
   setup_plain_prot(true, filename);
@@ -277,6 +284,9 @@ void issue_tokens(
  */
 void build_masked_tokens_cust(IOCallback io_callback,
   struct Conn_l conn,
+  void *peer,
+  cb_send send_cb,
+  cb_receive receive_cb,
   void *circuit_file,
 
   struct Balance_l epsilon_l,
@@ -311,23 +321,29 @@ void build_masked_tokens_cust(IOCallback io_callback,
   UnixNetIO *io1 = nullptr;
   NetIO *io2 = nullptr;
   GoNetIO *io3 = nullptr;
+  LndNetIO *io4 = nullptr;
   ConnType conn_type = conn.conn_type;
   if (io_callback != NULL) {
-    auto *io_ptr = io_callback((void *) &conn, CUST);
-    if (conn_type == UNIXNETIO) {
-        io1 = static_cast<UnixNetIO *>(io_ptr);
-        setup_semi_honest(io1, CUST);
-    } else if (conn_type == NETIO) {
-        io2 = static_cast<NetIO *>(io_ptr);
-        setup_semi_honest(io2, CUST);
-    } else if (conn_type == CUSTOM) {
-        io3 = static_cast<GoNetIO *>(io_ptr);
-        setup_semi_honest(io3, CUST);
-    } else {
-        /* custom IO connection */
-        cout << "specify a supported connection type" << endl;
-        return;
-    }
+      if (conn_type == LNDNETIO) {
+          io4 = static_cast<LndNetIO *>(get_lndnetio_ptr(peer, send_cb, receive_cb, CUST));
+          setup_semi_honest(io4, CUST);
+      } else {
+          auto *io_ptr = io_callback((void *) &conn, CUST);
+          if (conn_type == UNIXNETIO) {
+              io1 = static_cast<UnixNetIO *>(io_ptr);
+              setup_semi_honest(io1, CUST);
+          } else if (conn_type == NETIO) {
+              io2 = static_cast<NetIO *>(io_ptr);
+              setup_semi_honest(io2, CUST);
+          } else if (conn_type == CUSTOM) {
+              io3 = static_cast<GoNetIO *>(io_ptr);
+              setup_semi_honest(io3, CUST);
+          } else {
+              /* custom IO connection */
+              cout << "specify a supported connection type" << endl;
+              return;
+          }
+      }
   } else {
     cout << "did not specify a IO connection callback for customer" << endl;
     return;
@@ -393,6 +409,9 @@ issue_tokens(
 
 void build_masked_tokens_merch(IOCallback io_callback,
   struct Conn_l conn,
+  void *peer,
+  cb_send send_cb,
+  cb_receive receive_cb,
   void *circuit_file,
   struct Balance_l epsilon_l,
   struct RevLockCommitment_l rlc_l, // TYPISSUE: this doesn't match the docs. should be a commitment
@@ -423,23 +442,29 @@ void build_masked_tokens_merch(IOCallback io_callback,
   UnixNetIO *io1 = nullptr;
   NetIO *io2 = nullptr;
   GoNetIO *io3 = nullptr;
+  LndNetIO *io4 = nullptr;
   ConnType conn_type = conn.conn_type;
   if (io_callback != NULL) {
-    auto *io_ptr = io_callback((void *) &conn, MERCH);
-    if (conn_type == UNIXNETIO) {
-        io1 = static_cast<UnixNetIO *>(io_ptr);
-        setup_semi_honest(io1, MERCH);
-    } else if (conn_type == NETIO) {
-        io2 = static_cast<NetIO *>(io_ptr);
-        setup_semi_honest(io2, MERCH);
-    } else if (conn_type == CUSTOM) {
-        io3 = static_cast<GoNetIO *>(io_ptr);
-        setup_semi_honest(io3, MERCH);
-    } else {
-        /* custom IO connection */
-        cout << "specify a supported connection type" << endl;
-        return;
-    }
+      if (conn_type == LNDNETIO) {
+          io4 = static_cast<LndNetIO *>(get_lndnetio_ptr(peer, send_cb, receive_cb, MERCH));
+          setup_semi_honest(io4, MERCH);
+      } else {
+          auto *io_ptr = io_callback((void *) &conn, MERCH);
+          if (conn_type == UNIXNETIO) {
+              io1 = static_cast<UnixNetIO *>(io_ptr);
+              setup_semi_honest(io1, MERCH);
+          } else if (conn_type == NETIO) {
+              io2 = static_cast<NetIO *>(io_ptr);
+              setup_semi_honest(io2, MERCH);
+          } else if (conn_type == CUSTOM) {
+              io3 = static_cast<GoNetIO *>(io_ptr);
+              setup_semi_honest(io3, MERCH);
+          } else {
+              /* custom IO connection */
+              cout << "specify a supported connection type" << endl;
+              return;
+          }
+      }
   } else {
     cout << "did not specify a IO connection callback for merchant" << endl;
     return;

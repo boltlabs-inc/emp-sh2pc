@@ -13,7 +13,7 @@ extern "C" {
  * - UNIXNETIO = unix domain socket with a specified file
  * - TORNETIO = onion-routing based connection
  */
-enum ConnType { CUSTOM = 0, NETIO, UNIXNETIO, TORNETIO };
+enum ConnType { CUSTOM = 0, NETIO, UNIXNETIO, LNDNETIO, TORNETIO };
 
 /* IO Channel Callback interface - allows caller to handle
  * how connection is made between customer and merchant
@@ -190,6 +190,11 @@ struct State_l {
   struct Balance_l fee_mc;
 };
 
+typedef struct Receive_return;
+
+typedef Receive_return (*cb_receive)(void*);
+typedef char* (*cb_send)(void*, int, void*);
+
 /* customer's token generation function
  *
  * runs MPC to compute masked tokens (close- and pay-).
@@ -227,6 +232,9 @@ struct State_l {
 void build_masked_tokens_cust(
   IOCallback io_callback,
   struct Conn_l conn,
+  void *peer,
+  cb_send send_cb,
+  cb_receive receive_cb,
   void *circuit_file,
 
   struct Balance_l epsilon_l,
@@ -297,6 +305,9 @@ void build_masked_tokens_cust(
 void build_masked_tokens_merch(
   IOCallback io_callback,
   struct Conn_l conn,
+  void *peer,
+  cb_send send_cb,
+  cb_receive receive_cb,
   void *circuit_file,
 
   struct Balance_l epsilon_l,

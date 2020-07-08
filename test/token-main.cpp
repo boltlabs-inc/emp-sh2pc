@@ -268,7 +268,7 @@ int main(int argc, char** argv) {
     CommitmentRandomness_l hmac_rand;
     CommitmentRandomness_l pay_token_rand;
 
-	build_masked_tokens_merch(io_callback, nc, cf_ptr,
+	build_masked_tokens_merch(io_callback, nc, NULL, NULL, NULL, cf_ptr,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
       merch_dispute_key_l, merch_publickey_hash,
       merch_payout_pub_key_l, nonce_l, val_cpfp, bal_min_cust, bal_min_merch, self_delay,
@@ -285,7 +285,7 @@ int main(int argc, char** argv) {
     EcdsaSig_l ct_merch;
     PublicKeyHash_l cust_publickey_hash_l;
 
-    build_masked_tokens_cust(io_callback, nc, cf_ptr,
+    build_masked_tokens_cust(io_callback, nc, NULL, NULL, NULL, cf_ptr,
 	  amt, rl, paymask_com, key_com, merch_escrow_pub_key_l,
           merch_dispute_key_l, merch_publickey_hash,
           merch_payout_pub_key_l, nonce_l, val_cpfp, bal_min_cust, bal_min_merch, self_delay,
