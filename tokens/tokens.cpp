@@ -402,9 +402,22 @@ issue_tokens(
 #if defined(DEBUG)
   cout << "customer finished!" << endl;
 #endif
-  if (io1 != nullptr) delete io1;
-  if (io2 != nullptr) delete io2;
-  if (io3 != nullptr) delete io3;
+  if (io1 != nullptr) {
+      io1->flush();
+      delete io1;
+  }
+  if (io2 != nullptr) {
+      io2->flush();
+      delete io2;
+  }
+  if (io3 != nullptr) {
+      io3->flush();
+      delete io3;
+  }
+  if (io4 != nullptr) {
+      io4->flush();
+      delete io4;
+  }
 }
 
 void build_masked_tokens_merch(IOCallback io_callback,
@@ -526,9 +539,22 @@ issue_tokens(
 #if defined(DEBUG)
   cout << "merchant finished!" << endl;
 #endif
-  if (io1 != nullptr) delete io1;
-  if (io2 != nullptr) delete io2;
-  if (io3 != nullptr) delete io3;
+    if (io1 != nullptr) {
+        io1->flush();
+        delete io1;
+    }
+    if (io2 != nullptr) {
+        io2->flush();
+        delete io2;
+    }
+    if (io3 != nullptr) {
+        io3->flush();
+        delete io3;
+    }
+    if (io4 != nullptr) {
+        io4->flush();
+        delete io4;
+    }
 }
 
 PayToken_d sign_token(State_d state, HMACKey_d key, Constants constants, Integer k[64], Integer H[8]) {
